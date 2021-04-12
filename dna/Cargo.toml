@@ -1,0 +1,16 @@
+[workspace]
+members = [
+"zomes/profiles",
+"zomes/chess",
+]
+
+[profile.dev]
+opt-level = "z"
+
+[profile.release]
+opt-level = "z"
+
+[patch.crates-io]
+
+
+

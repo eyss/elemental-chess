@@ -1,0 +1,12 @@
+[package]
+name = "profiles"
+version = "0.0.1"
+authors = [ "guillem_cordoba" ]
+edition = "2018"
+
+[lib]
+name = "profiles"
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+profiles = {git = "https://github.com/holochain-open-dev/profiles", package = "profiles", branch =  "main"}

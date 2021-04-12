@@ -1,0 +1,16 @@
+[package]
+name = "chess"
+version = "0.0.1"
+authors = [ "manuel_puentes" ]
+edition = "2018"
+
+[lib]
+name = "chess"
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+serde = "1"
+hdk = "0.0.100"
+chess = "3.2.0"
+derive_more = "0"
+holochain_turn_based_game = "0.2.0"
