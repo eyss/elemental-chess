@@ -3,6 +3,7 @@ use std::str::FromStr;
 use holochain_turn_based_game::prelude::TurnBasedGame;
 use chess::{ChessMove, Color, Game, GameResult, Square};
 
+pub mod chess_handlers;
 
 #[derive(Clone, Debug)]
 pub struct ChessGame {
@@ -94,8 +95,4 @@ impl TurnBasedGame<ChessGameMove> for ChessGame {
             None => None,
         }
     }
-}
-
-pub fn create_game(players: Vec<AgentPubKey>) -> ExternResult<EntryHash> {
-    holochain_turn_based_game::prelude::create_game(players)
 }
