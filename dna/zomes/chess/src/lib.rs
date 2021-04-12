@@ -3,8 +3,9 @@ use holochain_turn_based_game::prelude::*;
 
 pub mod entries;
 use entries::chess::chess_handlers;
-use entries::chess::ChessGameMove;
 use entries::invitation::Invitation;
+
+use entries::chess::{MakeMoveInput, SurrenderInput};
 
 entry_defs![GameMoveEntry::entry_def(), GameEntry::entry_def()];
 
@@ -19,13 +20,13 @@ pub fn create_game(players: Vec<AgentPubKey>) -> ExternResult<EntryHash> {
 }
 
 #[hdk_extern]
-pub fn make_move( game_address: EntryHash, prev_movement: Option<EntryHash>, game_mov: ChessGameMove) -> ExternResult<EntryHash> {
-    return chess_handlers::make_move(game_address, prev_movement, game_mov);
+pub fn make_move(input: MakeMoveInput) -> ExternResult<EntryHash> {
+    return chess_handlers::make_move(input.game_address, input.prev_movement, input.game_move);
 }
 
 #[hdk_extern]
-pub fn surrender(game_address: EntryHash, prev_mov: Option<EntryHash>) -> ExternResult<EntryHash> {
-    return chess_handlers::surrender(game_address, prev_mov);
+pub fn surrender(input: SurrenderInput) -> ExternResult<EntryHash> {
+    return chess_handlers::surrender(input.game_address, input.prev_movement);
 }
 
 #[hdk_extern]
@@ -39,7 +40,7 @@ pub fn get_game_moves(game_address: EntryHash) -> ExternResult<Vec<String>> {
 }
 
 #[hdk_extern]
-pub fn get_received_invitations(_:()) -> ExternResult<Vec<Invitation>> {
+pub fn get_received_invitations(_: ()) -> ExternResult<Vec<Invitation>> {
     return chess_handlers::get_received_invitations();
 }
 

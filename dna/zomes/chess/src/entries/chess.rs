@@ -19,7 +19,6 @@ impl Into<String> for ChessGame {
 }
 
 #[derive(Clone, SerializedBytes, Deserialize, Serialize, Debug)]
-
 pub enum ChessGameMove {
     PlacePiece { from: String, to: String },
     Resign,
@@ -96,3 +95,18 @@ impl TurnBasedGame<ChessGameMove> for ChessGame {
         }
     }
 }
+
+
+#[derive(Clone, SerializedBytes, Deserialize, Serialize, Debug)]
+pub struct MakeMoveInput{
+    pub game_address:EntryHash,
+    pub prev_movement:Option<EntryHash>,
+    pub game_move: ChessGameMove
+}
+
+#[derive(Clone, SerializedBytes, Deserialize, Serialize, Debug)]
+pub struct SurrenderInput{
+    pub game_address:EntryHash,
+    pub prev_movement:Option<EntryHash>,
+}
+

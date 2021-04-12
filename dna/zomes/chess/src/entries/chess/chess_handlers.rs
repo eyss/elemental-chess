@@ -9,9 +9,9 @@ pub fn create_game(players: Vec<AgentPubKey>) -> ExternResult<EntryHash> {
 pub fn make_move(
     game_address: EntryHash,
     prev_movement: Option<EntryHash>,
-    game_mov: ChessGameMove,
+    game_move: ChessGameMove,
 ) -> ExternResult<EntryHash> {
-    holochain_turn_based_game::prelude::create_move(game_address, prev_movement, game_mov)
+    holochain_turn_based_game::prelude::create_move(game_address, prev_movement, game_move)
 }
 
 pub fn surrender(game_address: EntryHash, prev_mov: Option<EntryHash>) -> ExternResult<EntryHash> {

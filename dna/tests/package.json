@@ -1,0 +1,22 @@
+{
+  "name": "demo-1",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "TRYORAMA_LOG_LEVEL=info RUST_LOG=debug RUST_BACKTRACE=1 TRYORAMA_HOLOCHAIN_PATH=\"holochain\" ts-node src/index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@holochain/conductor-api": "0.0.1",
+    "@holochain/tryorama": "^0.4.1",
+    "@types/lodash": "^4.14.168",
+    "@types/node": "^14.14.31",
+    "concurrently": "^6.0.0",
+    "lodash": "^4.17.21",
+    "tape": "^5.2.0",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.2"
+  }
+}
