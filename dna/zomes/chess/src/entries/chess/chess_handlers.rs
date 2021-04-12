@@ -14,14 +14,14 @@ pub fn make_move(
     holochain_turn_based_game::prelude::create_move(game_address, prev_movement, game_mov)
 }
 
-pub fn surrender(prev_mov: Option<EntryHash>, game_address: EntryHash) -> ExternResult<EntryHash> {
-    let game_move = ChessGameMove::Resign;
-    holochain_turn_based_game::prelude::create_move(game_address, prev_mov, game_move)
+pub fn surrender(game_address: EntryHash, prev_mov: Option<EntryHash>) -> ExternResult<EntryHash> {
+    let game_mov = ChessGameMove::Resign;
+    holochain_turn_based_game::prelude::create_move(game_address, prev_mov, game_mov)
 }
 
 pub fn get_game_state(game_address: EntryHash) -> ExternResult<String> {
     let chess_game_state: ChessGame =
-        holochain_turn_based_game::prelude::get_game_state(game_address)?;
+    holochain_turn_based_game::prelude::get_game_state(game_address)?;
     Ok(chess_game_state.into())
 }
 
