@@ -3,16 +3,11 @@ use holochain_turn_based_game::prelude::*;
 
 pub mod entries;
 use entries::chess::chess_handlers;
-use entries::invitation::Invitation;
 
-use entries::chess::{MakeMoveInput, SurrenderInput};
+use entries::chess::{ChessGameMove, MakeMoveInput, SurrenderInput};
 
 entry_defs![GameMoveEntry::entry_def(), GameEntry::entry_def()];
 
-#[hdk_extern]
-pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    Ok(InitCallbackResult::Pass)
-}
 
 #[hdk_extern]
 pub fn create_game(players: Vec<AgentPubKey>) -> ExternResult<EntryHash> {
@@ -39,17 +34,12 @@ pub fn get_game_moves(game_address: EntryHash) -> ExternResult<Vec<String>> {
     return chess_handlers::get_game_moves(game_address);
 }
 
+// TESTING METHODS 
 #[hdk_extern]
-pub fn get_received_invitations(_: ()) -> ExternResult<Vec<Invitation>> {
-    return chess_handlers::get_received_invitations();
-}
-
-#[hdk_extern]
-pub fn reject_invitation(invitation: Invitation) -> ExternResult<bool> {
-    return chess_handlers::reject_invitation(invitation);
-}
-
-#[hdk_extern]
-pub fn accept_invitation(invitation: Invitation) -> ExternResult<bool> {
-    return chess_handlers::accept_invitation(invitation);
+pub fn get_movement(_: ()) -> ExternResult<ChessGameMove> {
+    let movement = ChessGameMove::PlacePiece {
+        from: String::from("Movimiento"),
+        to: String::from("Movimiento_2"),
+    };
+    Ok(movement)
 }

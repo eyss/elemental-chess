@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@holochain-open-dev/core-types": "git+https://github.com/holochain-open-dev/core-types.git#build",
     "@holochain/conductor-api": "0.0.1",
     "@holochain/tryorama": "^0.4.1",
     "@types/lodash": "^4.14.168",
