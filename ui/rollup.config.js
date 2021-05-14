@@ -4,7 +4,8 @@ import { createSpaConfig } from '@open-wc/building-rollup';
 import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import replace from '@rollup/plugin-replace';
-import copy from 'rollup-plugin-copy-assets';
+import builtins from 'rollup-plugin-node-builtins';
+import globals from 'rollup-plugin-node-globals';
 
 // use createBasicConfig to do regular JS to JS bundling
 // import { createBasicConfig } from '@open-wc/building-rollup';
@@ -21,6 +22,7 @@ const baseConfig = createSpaConfig({
   developmentMode: process.env.ROLLUP_WATCH === 'true',
   nodeResolve: {
     browser: true,
+    preferBuiltins: false,
   },
 
   // set to true to inject the service worker registration into your index.html
@@ -36,13 +38,10 @@ export default merge(baseConfig, {
   // optionally set a HTML template manually
   // input: './app.js',
   plugins: [
-    copy({
-      assets: ['./assets'],
-    }),
     replace({
       'process.env.NODE_ENV': '"production"',
-      'process.env.HC_PORT': `${process.env.HC_PORT}`,
     }),
+    builtins(),
     typescript({ experimentalDecorators: true }),
     commonjs({
       include: [
@@ -52,7 +51,9 @@ export default merge(baseConfig, {
         'node_modules/navigo/**/*',
         'node_modules/@msgpack/**/*',
         'node_modules/@holochain/conductor-api/**/*',
+        'node_modules/chess.js/**/*',
       ],
     }),
+    globals(),
   ],
 });

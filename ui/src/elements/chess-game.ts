@@ -1,6 +1,7 @@
 import { LitElement, html, css, property } from 'lit-element';
-import 'chessboard-element';
-import * as Chess from 'chess.js';
+import { ChessBoardElement } from 'chessboard-element';
+// @ts-ignore
+import { Chess } from 'chess.js';
 import { BaseElement, DepsElement } from '@holochain-open-dev/common';
 import ConductorApi from '@holochain/conductor-api';
 import * as msgpack from '@msgpack/msgpack';
@@ -12,6 +13,7 @@ import { ChessService } from '../chess.service';
 import { ChessMove, GameEntry, GameMoveEntry, MoveInfo } from '../types';
 import { serializeHash } from '@holochain-open-dev/core-types';
 import { ProfilesStore } from '@holochain-open-dev/profiles';
+import { ListItem } from 'scoped-material-components/mwc-list-item';
 
 const whiteSquareGrey = '#a9a9a9';
 const blackSquareGrey = '#696969';
@@ -26,7 +28,7 @@ export abstract class ChessGame
   _gameInfo!: GameEntry;
   _moves: Array<MoveInfo<ChessMove>> = [];
 
-  _chessGame!: Chess.ChessInstance;
+  _chessGame!: any;
   _chessStyles!: string;
 
   abstract get _deps(): { chess: ChessService; profiles: ProfilesStore };
@@ -52,6 +54,7 @@ export abstract class ChessGame
 
   listenForOpponentMove() {
     const hcConnection = this._deps.chess.appWebsocket;
+    console.log(hcConnection.client.socket.url);
     ConductorApi.AppWebsocket.connect(
       hcConnection.client.socket.url,
       15000,
@@ -61,15 +64,15 @@ export abstract class ChessGame
           const game_hash = payload.Move.move_entry.game_hash;
           if (game_hash !== this.gameHash) return;
 
-          const move_entry = payload.Move.move_entry;
-          move_entry.game_move = msgpack.decode(move_entry.game_move);
+          const move = payload.Move;
+          move.move_entry.game_move = msgpack.decode(move.move_entry.game_move);
 
-          this._moves.push(move_entry);
+          this._moves.push(move);
 
-          const { from, to } = move_entry.game_move;
+          const { from, to } = move.move_entry.game_move;
           const moveString = `${from}-${to}`;
 
-          this._chessGame.move(moveString, { sloppy: true });
+          this._chessGame.move({ from, to });
           (this.shadowRoot?.getElementById('board') as any).move(moveString);
 
           this.requestUpdate();
@@ -79,15 +82,28 @@ export abstract class ChessGame
   }
 
   async firstUpdated() {
-    this._gameInfo = await this._deps.chess.getGame(this.gameHash);
+    const gameInfo = await this._deps.chess.getGame(this.gameHash);
     this._moves = await this._deps.chess.getGameMoves(this.gameHash);
-    await this._deps.profiles.fetchAgentProfile(this.getOpponent());
 
-    this._chessGame = new Chess.Chess();
+    const opponent = gameInfo.players.find(
+      player => player !== this.myAddress
+    ) as string;
+
+    await this._deps.profiles.fetchAgentProfile(opponent);
+
+    this._chessGame = new Chess();
+    for (const move of this._moves) {
+      if (move.move_entry.game_move.type === 'PlacePiece') {
+        const { from, to } = move.move_entry.game_move;
+        this._chessGame.move({ from, to });
+      }
+    }
 
     this._chessStyles = '';
 
     this.listenForOpponentMove();
+
+    this._gameInfo = gameInfo;
   }
 
   get myAddress() {
@@ -196,7 +212,7 @@ export abstract class ChessGame
     }
   }
 
-  async makeMove(from: Chess.Square, to: Chess.Square) {
+  async makeMove(from: string, to: string) {
     const move: ChessMove = {
       type: 'PlacePiece',
       from,
@@ -204,7 +220,7 @@ export abstract class ChessGame
     };
     const previousMove = this._moves[this._moves.length - 1];
     const previousMoveHash = previousMove ? previousMove.move_hash : undefined;
-
+    console.log(previousMoveHash);
     const move_entry: GameMoveEntry<ChessMove> = {
       author_pub_key: this.myAddress,
       game_hash: this.gameHash,
@@ -278,9 +294,7 @@ export abstract class ChessGame
         <span>Opponent: ${this.getOpponentNickname()}</span>
         <span
           >Created at:
-          ${new Date(
-            this._gameInfo.created_at
-          ).toLocaleString()}</span
+          ${new Date(this._gameInfo.created_at).toLocaleString()}</span
         >
         ${this.renderMoveList()}
       </div>
@@ -301,6 +315,7 @@ export abstract class ChessGame
           style="width: 700px; margin-right: 40px"
           .orientation=${this.amIWhite() ? 'white' : 'black'}
           draggable-pieces
+          position="${this._chessGame.fen()}"
           @drag-start=${this.onDragStart}
           @drop=${this.onDrop}
           @mouseover-square=${this.onMouseOverSquare}
@@ -315,6 +330,8 @@ export abstract class ChessGame
     return {
       'mwc-circular-progress': CircularProgress,
       'mwc-list': List,
+      'mwc-list-item': ListItem,
+      'chess-board': ChessBoardElement,
     };
   }
 }

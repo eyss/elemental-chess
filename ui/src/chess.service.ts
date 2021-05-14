@@ -6,7 +6,7 @@ export class ChessService {
   constructor(
     public appWebsocket: AppWebsocket,
     public cellId: CellId,
-    public zomeName = 'invitations'
+    public zomeName = 'chess'
   ) {}
 
   createGame(opponentPubKey: string): Promise<string> {
@@ -39,7 +39,7 @@ export class ChessService {
   ): Promise<string> {
     return this.callZome('make_move', {
       game_hash: gameHash,
-      prev_movement: previousMoveHash,
+      previous_move_hash: previousMoveHash,
       game_move: move,
     });
   }

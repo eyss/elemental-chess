@@ -5,4 +5,5 @@ export default {
   rootDir: 'dist',
   appIndex: 'index.html',
   open: true,
+  plugins
 };

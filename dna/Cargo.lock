@@ -329,7 +329,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_turn_based_game"
-version = "0.2.2"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "473e4c4d88dc82563ddc1036cd58dea313bc6e03dc585d3f2a311e24af5f6f45"
 dependencies = [
  "chrono",
  "derive_more",

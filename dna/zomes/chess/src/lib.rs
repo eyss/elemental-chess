@@ -9,6 +9,11 @@ use entries::chess::MakeMoveInput;
 entry_defs![GameMoveEntry::entry_def(), GameEntry::entry_def()];
 
 #[hdk_extern]
+pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
+    holochain_turn_based_game::prelude::init_turn_based_games()
+}
+
+#[hdk_extern]
 pub fn create_game(opponent: AgentPubKeyB64) -> ExternResult<EntryHashB64> {
     holochain_turn_based_game::prelude::create_game(vec![
         opponent,

@@ -53,8 +53,8 @@ export class ChessApp extends BaseElement {
 
     router
       .on({
-        '/game/:gameHash': async params => {
-          this._activeGameHash = params.gameHash;
+        '/game/:game': async params => {
+          this._activeGameHash = params.game;
         },
         '*': async () => {
           this._activeGameHash = undefined;
@@ -73,7 +73,7 @@ export class ChessApp extends BaseElement {
     this._cellId = appInfo.cell_data[0].cell_id;
 
     const profilesService = new ProfilesService(
-      this._appWebsocket,
+      this._appWebsocket as any,
       this._cellId
     );
     this._profilesStore = new ProfilesStore(profilesService);
@@ -98,13 +98,15 @@ export class ChessApp extends BaseElement {
   async createGame() {
     await this._profilesStore.fetchAllProfiles();
     const allAgentPubKeys = Object.keys(this._profilesStore.profiles);
-    if (allAgentPubKeys.length > 1) {
+    console.log(allAgentPubKeys)
+    if (allAgentPubKeys.length > 1 && !this._activeGameHash) {
       const opponent: string = allAgentPubKeys.find(
         p => p !== serializeHash(this._cellId[1])
       ) as string;
-
+      
       const gameHash = await this._chessService.createGame(opponent);
       this._activeGameHash = gameHash;
+      console.log(this._activeGameHash)
     }
   }
 
@@ -125,7 +127,7 @@ export class ChessApp extends BaseElement {
         <div slot="title">Chess</div>
 
         <div class="fill row" style="width: 100vw; height: 100%; ">
-          <profile-prompt> ${this.renderContent()} </profile-prompt>
+          <profile-prompt style="flex: 1;"> ${this.renderContent()} </profile-prompt>
         </div>
       </mwc-top-app-bar>
     `;
