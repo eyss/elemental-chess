@@ -1,1 +1,1 @@
-export const APP_URL = 'ws://localhost:8888';
+export const APP_URL = `ws://localhost:${process.env.HC_PORT}`;

@@ -4,9 +4,7 @@ use holo_hash::{AgentPubKeyB64, EntryHashB64};
 use holochain_turn_based_game::prelude::TurnBasedGame;
 use std::str::FromStr;
 
-pub mod chess_handlers;
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct ChessGame {
     pub white_address: AgentPubKeyB64,
     pub black_address: AgentPubKeyB64,
@@ -36,7 +34,7 @@ impl TurnBasedGame<ChessGameMove> for ChessGame {
         Some(2)
     }
 
-    fn initial(players: &Vec<AgentPubKey>) -> Self {
+    fn initial(players: &Vec<AgentPubKeyB64>) -> Self {
         ChessGame {
             white_address: players[0].clone().into(),
             black_address: players[1].clone().into(),
@@ -47,7 +45,7 @@ impl TurnBasedGame<ChessGameMove> for ChessGame {
     fn apply_move(
         &mut self,
         game_move: &ChessGameMove,
-        _players: &Vec<AgentPubKey>,
+        _players: &Vec<AgentPubKeyB64>,
         author_index: usize,
     ) -> ExternResult<()> {
         match game_move {
@@ -83,7 +81,7 @@ impl TurnBasedGame<ChessGameMove> for ChessGame {
     }
 
     // Gets the winner for the game // remake this method
-    fn get_winner(&self, players: &Vec<AgentPubKey>) -> Option<AgentPubKey> {
+    fn get_winner(&self, players: &Vec<AgentPubKeyB64>) -> Option<AgentPubKeyB64> {
         match self.game.result() {
             Some(result) => match result {
                 GameResult::WhiteCheckmates | GameResult::BlackResigns => Some(players[0].clone()),
@@ -97,6 +95,6 @@ impl TurnBasedGame<ChessGameMove> for ChessGame {
 #[derive(Clone, SerializedBytes, Deserialize, Serialize, Debug)]
 pub struct MakeMoveInput {
     pub game_hash: EntryHashB64,
-    pub prev_movement: Option<EntryHashB64>,
+    pub previous_move_hash: Option<EntryHashB64>,
     pub game_move: ChessGameMove,
 }

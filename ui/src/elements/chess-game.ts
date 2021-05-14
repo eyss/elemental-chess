@@ -9,7 +9,7 @@ import { List } from 'scoped-material-components/mwc-list';
 
 import { sharedStyles } from './sharedStyles';
 import { ChessService } from '../chess.service';
-import { ChessMove, GameInfo, GameMoveEntry, MoveInfo } from '../types';
+import { ChessMove, GameEntry, GameMoveEntry, MoveInfo } from '../types';
 import { serializeHash } from '@holochain-open-dev/core-types';
 import { ProfilesStore } from '@holochain-open-dev/profiles';
 
@@ -23,7 +23,8 @@ export abstract class ChessGame
   gameHash!: string;
 
   @property()
-  _gameInfo!: GameInfo<ChessMove>;
+  _gameInfo!: GameEntry;
+  _moves: Array<MoveInfo<ChessMove>> = [];
 
   _chessGame!: Chess.ChessInstance;
   _chessStyles!: string;
@@ -63,7 +64,7 @@ export abstract class ChessGame
           const move_entry = payload.Move.move_entry;
           move_entry.game_move = msgpack.decode(move_entry.game_move);
 
-          this._gameInfo?.moves.push(move_entry);
+          this._moves.push(move_entry);
 
           const { from, to } = move_entry.game_move;
           const moveString = `${from}-${to}`;
@@ -78,7 +79,8 @@ export abstract class ChessGame
   }
 
   async firstUpdated() {
-    this._gameInfo = await this._deps.chess.getGameInfo(this.gameHash);
+    this._gameInfo = await this._deps.chess.getGame(this.gameHash);
+    this._moves = await this._deps.chess.getGameMoves(this.gameHash);
     await this._deps.profiles.fetchAgentProfile(this.getOpponent());
 
     this._chessGame = new Chess.Chess();
@@ -93,7 +95,7 @@ export abstract class ChessGame
   }
 
   amIWhite() {
-    return this._gameInfo?.game_entry.players[0] === this.myAddress;
+    return this._gameInfo.players[0] === this.myAddress;
   }
 
   isMyTurn() {
@@ -104,7 +106,7 @@ export abstract class ChessGame
   }
 
   getOpponent(): string {
-    return this._gameInfo.game_entry.players.find(
+    return this._gameInfo.players.find(
       player => player !== this.myAddress
     ) as string;
   }
@@ -169,7 +171,7 @@ export abstract class ChessGame
     }
   }
 
-  onMouseOverSquare(e) {
+  onMouseOverSquare(e: CustomEvent) {
     const { square, piece } = e.detail;
 
     if (!this.isMyTurn()) return;
@@ -200,7 +202,7 @@ export abstract class ChessGame
       from,
       to,
     };
-    const previousMove = this._gameInfo?.moves[this._gameInfo.moves.length - 1];
+    const previousMove = this._moves[this._moves.length - 1];
     const previousMoveHash = previousMove ? previousMove.move_hash : undefined;
 
     const move_entry: GameMoveEntry<ChessMove> = {
@@ -209,7 +211,7 @@ export abstract class ChessGame
       game_move: move,
       previous_move_hash: previousMoveHash,
     };
-    this._gameInfo?.moves.push({ move_hash: undefined, move_entry } as any);
+    this._moves.push({ move_hash: undefined, move_entry } as any);
     this._chessGame.move({ from, to });
     this.requestUpdate();
 
@@ -232,7 +234,7 @@ export abstract class ChessGame
       <h3>Move history</h3>
       <div class="row" style="overflow-y: auto;">
         <mwc-list>
-          ${this._gameInfo?.moves
+          ${this._moves
             .filter(m => m.move_entry.game_move.type === 'PlacePiece')
             .filter((_, i) => i % 2 === 0)
             .map(
@@ -243,7 +245,7 @@ export abstract class ChessGame
             )}
         </mwc-list>
         <mwc-list>
-          ${this._gameInfo?.moves
+          ${this._moves
             .filter((_, i) => i % 2 === 1)
             .map(
               (move, i) =>
@@ -277,7 +279,7 @@ export abstract class ChessGame
         <span
           >Created at:
           ${new Date(
-            this._gameInfo?.game_entry.created_at
+            this._gameInfo.created_at
           ).toLocaleString()}</span
         >
         ${this.renderMoveList()}

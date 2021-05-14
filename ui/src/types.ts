@@ -10,11 +10,6 @@ export interface GameMoveEntry<M> {
   previous_move_hash: string | undefined;
 }
 
-export interface GameInfo<M> {
-  game_entry: GameEntry;
-  moves: Array<MoveInfo<M>>;
-}
-
 export interface MoveInfo<M> {
   move_hash: string;
   move_entry: GameMoveEntry<M>;

@@ -10,3 +10,6 @@ opt-level = "z"
 
 [profile.release]
 opt-level = "z"
+
+[patch.crates-io]
+holochain_turn_based_game = {path="../../holochain-turn-based-game/"}

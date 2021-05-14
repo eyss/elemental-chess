@@ -41,10 +41,7 @@ export default merge(baseConfig, {
     }),
     replace({
       'process.env.NODE_ENV': '"production"',
-      'process.env.GH_PAGES': `"${!!process.env.GH_PAGES}"`,
-      'process.env.FILE_STORAGE_PROVIDER': process.env.FILE_STORAGE_PROVIDER
-        ? 'true'
-        : 'false',
+      'process.env.HC_PORT': `${process.env.HC_PORT}`,
     }),
     typescript({ experimentalDecorators: true }),
     commonjs({
