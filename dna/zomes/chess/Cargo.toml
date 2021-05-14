@@ -1,16 +1,17 @@
 [package]
+authors = ["manuel_puentes"]
+edition = "2018"
 name = "chess"
 version = "0.0.1"
-authors = [ "manuel_puentes" ]
-edition = "2018"
 
 [lib]
+crate-type = ["cdylib", "rlib"]
 name = "chess"
-crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
-serde = "1"
-hdk = "0.0.100"
 chess = "3.2.0"
 derive_more = "0"
-holochain_turn_based_game = "0.2.0"
+hdk = "0.0.100"
+holo_hash = "0.0.2-alpha.1"
+holochain_turn_based_game = "0.2.2"
+serde = "1"

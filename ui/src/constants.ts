@@ -1,0 +1,1 @@
+export const APP_URL = 'ws://localhost:8888';

@@ -1,35 +1,28 @@
 use hdk::prelude::*;
+use holo_hash::{AgentPubKeyB64, EntryHashB64};
 
 use super::{ChessGame, ChessGameMove};
 
-pub fn create_game(players: Vec<AgentPubKey>) -> ExternResult<EntryHash> {
-    holochain_turn_based_game::prelude::create_game(players)
+pub fn create_game(opponent: AgentPubKeyB64) -> ExternResult<EntryHashB64> {
+    holochain_turn_based_game::prelude::create_game(vec![
+        opponent,
+        agent_info()?.agent_initial_pubkey.into(),
+    ])
 }
+
 pub fn make_move(
-    game_address: EntryHash,
-    prev_movement: Option<EntryHash>,
+    game_address: EntryHashB64,
+    prev_movement: Option<EntryHashB64>,
     game_move: ChessGameMove,
-) -> ExternResult<EntryHash> {
+) -> ExternResult<EntryHashB64> {
     holochain_turn_based_game::prelude::create_move(game_address, prev_movement, game_move)
 }
 
-pub fn surrender(game_address: EntryHash, prev_mov: Option<EntryHash>) -> ExternResult<EntryHash> {
-    let game_mov = ChessGameMove::Resign;
-    holochain_turn_based_game::prelude::create_move(game_address, prev_mov, game_mov)
+pub fn get_game_info(
+    game_address: EntryHashB64,
+) -> ExternResult<GameInfo<ChessGame, ChessGameMove>> {
+    holochain_turn_based_game::prelude::get_game_info(game_address)
 }
-
-pub fn get_game_state(game_address: EntryHash) -> ExternResult<String> {
-    let chess_game_state: ChessGame =
-    holochain_turn_based_game::prelude::get_game_state(game_address)?;
-    Ok(chess_game_state.into())
-}
-
-pub fn get_game_moves(game_address: EntryHash) -> ExternResult<Vec<String>> {
-    let moves: Vec<ChessGameMove> =
-        holochain_turn_based_game::prelude::get_game_moves(game_address)?;
-    Ok(moves.into_iter().map(|m| m.into()).collect())
-}
-
 
 // fn get_my_games() -> ZomeApiResult<Vec<Address>> {
 //     holochain_turn_based_game::get_agent_games(agent_info()?.agent_latest_pubkey)
@@ -38,4 +31,3 @@ pub fn get_game_moves(game_address: EntryHash) -> ExternResult<Vec<String>> {
 // fn get_entry(entry_address: Address) -> ZomeApiResult<Option<Entry>> {
 //     hdk::get_entry(&entry_address)
 // }
-

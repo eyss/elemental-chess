@@ -1,0 +1,83 @@
+{
+  "name": "compository-app",
+  "version": "0.0.0",
+  "description": "Webcomponent ui-ui following open-wc recommendations",
+  "author": "guillem.cordoba@gmail.com",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "scripts": {
+    "start": "concurrently --kill-others --names tsc,web-dev-server \"npm run build-watch\" \"sleep 5 && web-dev-server --config web-dev-server.config.mjs\"",
+    "build-watch": "rollup -c rollup.config.js -w",
+    "build": "rimraf dist && rollup -c rollup.config.js",
+    "prepublish": "npm run build",
+    "lint": "eslint --ext .ts,.html . --ignore-path .gitignore",
+    "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
+    "test": "tsc && web-test-runner --coverage",
+    "test:watch": "web-test-runner --watch"
+  },
+  "dependencies": {
+    "@adobe/lit-mobx": "^2.0.0-rc.4",
+    "@holochain-open-dev/common": "git+https://github.com/holochain-open-dev/common.git#ui-build",
+    "@holochain-open-dev/core-types": "git+https://github.com/holochain-open-dev/core-types.git#build",
+    "@holochain-open-dev/profiles": "git+https://github.com/holochain-open-dev/profiles.git#ui-build",
+    "@holochain/conductor-api": "^0.0.4",
+    "@msgpack/msgpack": "^2.6.3",
+    "chess.js": "^0.11.0",
+    "lit-element": "^2.2.1",
+    "lit-html": "^1.1.2",
+    "mobx": "^6.3.0",
+    "navigo": "^7.1.2",
+    "scoped-material-components": "^0.1.6"
+  },
+  "devDependencies": {
+    "@open-wc/building-rollup": "^1.9.4",
+    "@open-wc/eslint-config": "^4.0.0",
+    "@open-wc/rollup-plugin-html": "^1.2.5",
+    "@open-wc/testing": "^2.0.0",
+    "@rollup/plugin-commonjs": "^15.1.0",
+    "@rollup/plugin-replace": "^2.3.4",
+    "@rollup/plugin-typescript": "^8.1.0",
+    "@types/chess.js": "^0.10.1",
+    "@types/navigo": "^7.0.1",
+    "@types/node": "13.11.1",
+    "@typescript-eslint/eslint-plugin": "^4.15.2",
+    "@typescript-eslint/parser": "^4.15.2",
+    "@web/dev-server": "0.0.19",
+    "@web/dev-server-rollup": "^0.2.12",
+    "@web/test-runner": "^0.7.41",
+    "concurrently": "^5.1.0",
+    "deepmerge": "^4.2.2",
+    "eslint": "^7.5.0",
+    "eslint-config-prettier": "^6.11.0",
+    "gh-pages": "^3.1.0",
+    "husky": "^1.0.0",
+    "lint-staged": "^10.0.0",
+    "prettier": "^2.0.4",
+    "rimraf": "^2.6.3",
+    "rollup": "^2.3.4",
+    "rollup-plugin-copy-assets": "^2.0.3",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "tslib": "^1.11.0",
+    "typescript": "~4.0.3"
+  },
+  "eslintConfig": {
+    "extends": [
+      "@open-wc/eslint-config",
+      "eslint-config-prettier"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "arrowParens": "avoid"
+  },
+  "husky": {
+    "hooks": {}
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
+}
