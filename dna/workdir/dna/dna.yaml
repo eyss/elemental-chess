@@ -6,6 +6,8 @@ properties: ~
 zomes: 
   - name: profiles
     bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm
+  - name: invitations
+    bundled: ../../target/wasm32-unknown-unknown/release/hc_zome_invitations.wasm
   - name: chess
     bundled: ../../target/wasm32-unknown-unknown/release/chess.wasm    
 
