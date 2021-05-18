@@ -34,10 +34,14 @@ import {
 import { ChessService } from './chess.service';
 import { ChessGame } from './elements/chess-game';
 import { ChessGameResultsHistory } from './elements/chess-game-results-history';
+import { styleMap } from 'lit-html/directives/style-map';
 
 export class ChessApp extends BaseElement {
   @property({ type: Array })
   _activeGameHash: string | undefined = undefined;
+
+  @property()
+  _gameEnded: boolean = false;
 
   @property({ type: Array })
   _loading = true;
@@ -56,6 +60,7 @@ export class ChessApp extends BaseElement {
       .on({
         '/game/:game': async params => {
           this._activeGameHash = params.game;
+          this._gameEnded = false;
         },
         '*': async () => {
           this._activeGameHash = undefined;
@@ -100,7 +105,7 @@ export class ChessApp extends BaseElement {
         profiles: this._profilesStore,
       })
     );
-    //this.createGame();
+    this.createGame();
   }
 
   async createGame() {
@@ -119,7 +124,25 @@ export class ChessApp extends BaseElement {
 
   renderContent() {
     if (this._activeGameHash)
-      return html`<chess-game .gameHash=${this._activeGameHash}></chess-game>`;
+      return html` <div class="row center-content " style="flex: 1;">
+        <mwc-button
+          style="align-self: start;"
+          @click=${() => router.navigate('/')}
+          label="Go back"
+          icon="arrow_back"
+          raised
+          id="back-button"
+          style=${styleMap({
+            display: this._gameEnded ? 'inherit' : 'none',
+            'align-self': 'start',
+            margin: '16px',
+          })}
+        ></mwc-button>
+        <chess-game
+          .gameHash=${this._activeGameHash}
+          @game-ended=${() => (this._gameEnded = true)}
+        ></chess-game>
+      </div>`;
     else return html`<chess-game-results-history></chess-game-results-history>`;
   }
 

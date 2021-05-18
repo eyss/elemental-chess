@@ -70,7 +70,7 @@ export abstract class ChessGame
 
   listenForOpponentMove() {
     const hcConnection = this._deps.chess.appWebsocket;
-    console.log(hcConnection.client.socket.url);
+
     ConductorApi.AppWebsocket.connect(
       hcConnection.client.socket.url,
       15000,
@@ -92,6 +92,8 @@ export abstract class ChessGame
             this._chessGame.move({ from, to });
             (this.shadowRoot?.getElementById('board') as any).move(moveString);
           }
+
+          this.announceIfGameEnded();
 
           this.requestUpdate();
         }
@@ -122,6 +124,8 @@ export abstract class ChessGame
     this.listenForOpponentMove();
 
     this._gameInfo = gameInfo;
+
+    this.announceIfGameEnded();
   }
 
   get myAddress() {
@@ -273,8 +277,18 @@ export abstract class ChessGame
         timestamp: Date.now(),
         winner: { [winner]: undefined } as any,
       };
-      console.log(result);
+
       await this._deps.chess.publishResult(result);
+    }
+
+    this.announceIfGameEnded();
+  }
+
+  announceIfGameEnded() {
+    if (this.isGameOver()) {
+      this.dispatchEvent(
+        new CustomEvent('game-ended', { bubbles: true, composed: true })
+      );
     }
   }
 
