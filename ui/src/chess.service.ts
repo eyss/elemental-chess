@@ -1,6 +1,6 @@
 import { AppWebsocket, CellId } from '@holochain/conductor-api';
 import * as msgpack from '@msgpack/msgpack';
-import { ChessMove, GameEntry, MoveInfo } from './types';
+import { ChessGameResult, ChessMove, GameEntry, MoveInfo } from './types';
 
 export class ChessService {
   constructor(
@@ -9,7 +9,7 @@ export class ChessService {
     public zomeName = 'chess'
   ) {}
 
-  createGame(opponentPubKey: string): Promise<string> {
+  async createGame(opponentPubKey: string): Promise<string> {
     return this.callZome('create_game', opponentPubKey);
   }
 
@@ -42,6 +42,14 @@ export class ChessService {
       previous_move_hash: previousMoveHash,
       game_move: move,
     });
+  }
+
+  async publishResult(result: ChessGameResult): Promise<string> {
+    return this.callZome('publish_result', result);
+  }
+
+  async getMyGameResults(): Promise<Array<[string, ChessGameResult]>> {
+    return this.callZome('get_my_game_results', null);
   }
 
   private callZome(fn_name: string, payload: any) {

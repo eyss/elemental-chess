@@ -10,17 +10,26 @@ import { List } from 'scoped-material-components/mwc-list';
 
 import { sharedStyles } from './sharedStyles';
 import { ChessService } from '../chess.service';
-import { ChessMove, GameEntry, GameMoveEntry, MoveInfo } from '../types';
+import {
+  ChessGameResult,
+  ChessMove,
+  GameEntry,
+  GameMoveEntry,
+  MoveInfo,
+} from '../types';
 import { serializeHash } from '@holochain-open-dev/core-types';
 import { ProfilesStore } from '@holochain-open-dev/profiles';
 import { ListItem } from 'scoped-material-components/mwc-list-item';
+import { Card } from 'scoped-material-components/mwc-card';
+import { Button } from 'scoped-material-components/mwc-button';
 
 const whiteSquareGrey = '#a9a9a9';
 const blackSquareGrey = '#696969';
 
 export abstract class ChessGame
   extends BaseElement
-  implements DepsElement<{ chess: ChessService; profiles: ProfilesStore }> {
+  implements DepsElement<{ chess: ChessService; profiles: ProfilesStore }>
+{
   @property()
   gameHash!: string;
 
@@ -42,11 +51,18 @@ export abstract class ChessGame
           flex: 1;
           flex-direction: column;
         }
-        .board {
-          height: 70vh;
+        #board {
+          height: 700px;
+          width: 700px;
         }
         .game-info > span {
           margin-bottom: 16px;
+        }
+        .horizontal-divider {
+          width: 100%;
+          opacity: 0.6;
+          margin-bottom: 16px;
+          margin-top: 4px;
         }
       `,
     ];
@@ -69,11 +85,13 @@ export abstract class ChessGame
 
           this._moves.push(move);
 
-          const { from, to } = move.move_entry.game_move;
-          const moveString = `${from}-${to}`;
+          if (move.move_entry.game_move.to) {
+            const { from, to } = move.move_entry.game_move;
+            const moveString = `${from}-${to}`;
 
-          this._chessGame.move({ from, to });
-          (this.shadowRoot?.getElementById('board') as any).move(moveString);
+            this._chessGame.move({ from, to });
+            (this.shadowRoot?.getElementById('board') as any).move(moveString);
+          }
 
           this.requestUpdate();
         }
@@ -183,14 +201,14 @@ export abstract class ChessGame
     if (move === null) {
       setAction('snapback');
     } else {
-      this.makeMove(source, target);
+      this.placePiece(source, target);
     }
   }
 
   onMouseOverSquare(e: CustomEvent) {
     const { square, piece } = e.detail;
 
-    if (!this.isMyTurn()) return;
+    if (!this.isMyTurn() || this.isGameOver()) return;
 
     // get list of possible moves for this square
     const moves = this._chessGame.moves({
@@ -212,23 +230,18 @@ export abstract class ChessGame
     }
   }
 
-  async makeMove(from: string, to: string) {
-    const move: ChessMove = {
-      type: 'PlacePiece',
-      from,
-      to,
-    };
+  async makeMove(move: ChessMove) {
     const previousMove = this._moves[this._moves.length - 1];
     const previousMoveHash = previousMove ? previousMove.move_hash : undefined;
-    console.log(previousMoveHash);
+
     const move_entry: GameMoveEntry<ChessMove> = {
       author_pub_key: this.myAddress,
       game_hash: this.gameHash,
       game_move: move,
       previous_move_hash: previousMoveHash,
     };
-    this._moves.push({ move_hash: undefined, move_entry } as any);
-    this._chessGame.move({ from, to });
+    const m: MoveInfo<ChessMove> = { move_hash: undefined as any, move_entry };
+    this._moves.push(m);
     this.requestUpdate();
 
     const hash = await this._deps.chess.makeMove(
@@ -237,67 +250,141 @@ export abstract class ChessGame
       move
     );
 
-    // TODO: insert hash
+    m.move_hash = hash;
+
+    if (this.isGameOver()) {
+      // Publish result
+      const amIWhite = this.amIWhite();
+      const myColor = amIWhite ? 'White' : 'Black';
+      const iResigned = m.move_entry.game_move.type === 'Resign';
+
+      let winner: 'Black' | 'White' | 'Draw' = myColor;
+      if (this._chessGame.in_draw() || this._chessGame.in_stalemate())
+        winner = 'Draw';
+      if (iResigned) winner = amIWhite ? 'Black' : 'White';
+
+      let num_of_moves = this._moves.length;
+      if (iResigned) num_of_moves--;
+
+      const result: ChessGameResult = {
+        white_player: amIWhite ? this.myAddress : this.getOpponent(),
+        black_player: amIWhite ? this.getOpponent() : this.myAddress,
+        num_of_moves,
+        timestamp: Date.now(),
+        winner: { [winner]: undefined } as any,
+      };
+      console.log(result);
+      await this._deps.chess.publishResult(result);
+    }
   }
 
-  renderMove(gameMove: ChessMove) {
-    if (gameMove.type === 'PlacePiece')
-      return `${gameMove.from}->${gameMove.to}`;
+  async placePiece(from: string, to: string) {
+    const move: ChessMove = {
+      type: 'PlacePiece',
+      from,
+      to,
+    };
+    this._chessGame.move({ from, to });
+    this.requestUpdate();
+
+    this.makeMove(move);
   }
 
   renderMoveList() {
     return html`
-      <h3>Move history</h3>
-      <div class="row" style="overflow-y: auto;">
-        <mwc-list>
-          ${this._moves
-            .filter(m => m.move_entry.game_move.type === 'PlacePiece')
-            .filter((_, i) => i % 2 === 0)
-            .map(
-              (move, i) =>
-                html`<mwc-list-item>
-                  ${i * 2 + 1}. ${this.renderMove(move.move_entry.game_move)}
-                </mwc-list-item>`
-            )}
-        </mwc-list>
-        <mwc-list>
-          ${this._moves
-            .filter((_, i) => i % 2 === 1)
-            .map(
-              (move, i) =>
-                html`<mwc-list-item>
-                  ${i * 2 + 2}.
-                  ${this.renderMove(move.move_entry.game_move)}</mwc-list-item
-                >`
-            )}
-        </mwc-list>
+      <div class="column" style="flex: 1;">
+        <span class="title">Move history</span>
+        ${this._chessGame.history().length > 0
+          ? html`
+              <div class="flex-scrollable-parent">
+                <div class="flex-scrollable-container">
+                  <div class="flex-scrollable-y">
+                    <div class="row" style="overflow-y: auto;">
+                      <mwc-list>
+                        ${this._chessGame
+                          .history()
+                          .filter((_: string, i: number) => i % 2 === 0)
+                          .map(
+                            (move: string, i: number) =>
+                              html`<mwc-list-item>
+                                ${i + 1}. ${move}
+                              </mwc-list-item>`
+                          )}
+                      </mwc-list>
+                      <mwc-list>
+                        ${this._chessGame
+                          .history()
+                          .filter((_: string, i: number) => i % 2 === 1)
+                          .map(
+                            (move: string, i: number) =>
+                              html`<mwc-list-item> ${move}</mwc-list-item>`
+                          )}
+                      </mwc-list>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `
+          : html`
+              <div class="container fill center-content">
+                <span class="placeholder">No moves played</span>
+              </div>
+            `}
       </div>
     `;
   }
 
   getResult() {
     if (this._chessGame.game_over()) {
-      if (!this._chessGame.in_checkmate()) return 'Game Over: Draw';
+      if (!this._chessGame.in_checkmate()) return 'Game Over: draw';
       if (this.isMyTurn())
-        return `Game Over: ${this.getOpponentNickname()} wins!`;
-      return `Game Over: You win!`;
+        return `Checkmate: ${this.getOpponentNickname()} wins`;
+      return `Checkmate: you win`;
+    } else if (
+      this._moves.length > 0 &&
+      this._moves[this._moves.length - 1].move_entry.game_move.type === 'Resign'
+    ) {
+      const lastMove = this._moves[this._moves.length - 1];
+
+      if (lastMove.move_entry.author_pub_key === this.myAddress)
+        return `You resigned: ${this.getOpponentNickname()} wins`;
+      else return `${this.getOpponentNickname()} resigned: you win`;
     } else {
       if (this.isMyTurn()) return `Your turn`;
       return `${this.getOpponentNickname()}'s turn`;
     }
   }
 
+  isGameOver() {
+    if (this._chessGame.game_over()) return true;
+    const lastMove = this._moves[this._moves.length - 1];
+
+    return lastMove && lastMove.move_entry.game_move.type === 'Resign';
+  }
+
   renderGameInfo() {
     return html`
-      <div class="column board game-info">
-        <span style="font-size: 24px;">${this.getResult()}</span>
-        <span>Opponent: ${this.getOpponentNickname()}</span>
-        <span
-          >Created at:
-          ${new Date(this._gameInfo.created_at).toLocaleString()}</span
-        >
-        ${this.renderMoveList()}
-      </div>
+      <mwc-card style="height: 500px; align-self: center;">
+        <div class="column board game-info" style="margin: 16px; flex: 1;">
+          <span class="title">Opponent: ${this.getOpponentNickname()}</span>
+          <span class="placeholder"
+            >Started at:
+            ${new Date(this._gameInfo.created_at).toLocaleString()}</span
+          >
+          <hr class="horizontal-divider" />
+          ${this.renderMoveList()}
+          <hr class="horizontal-divider" />
+          <span style="font-size: 20px; text-align: center;"
+            >${this.getResult()}</span
+          >
+          <mwc-button
+            raised
+            label="Resign"
+            .disabled=${this.isGameOver()}
+            @click=${() => this.makeMove({ type: 'Resign' })}
+          ></mwc-button>
+        </div>
+      </mwc-card>
     `;
   }
 
@@ -312,9 +399,9 @@ export abstract class ChessGame
       <div class="row board" style="justify-content: center">
         <chess-board
           id="board"
-          style="width: 700px; margin-right: 40px"
+          style="margin-right: 40px"
           .orientation=${this.amIWhite() ? 'white' : 'black'}
-          draggable-pieces
+          ?draggable-pieces=${!this.isGameOver()}
           position="${this._chessGame.fen()}"
           @drag-start=${this.onDragStart}
           @drop=${this.onDrop}
@@ -331,6 +418,8 @@ export abstract class ChessGame
       'mwc-circular-progress': CircularProgress,
       'mwc-list': List,
       'mwc-list-item': ListItem,
+      'mwc-card': Card,
+      'mwc-button': Button,
       'chess-board': ChessBoardElement,
     };
   }

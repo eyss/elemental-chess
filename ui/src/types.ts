@@ -30,3 +30,11 @@ export interface ChessGame {
 export interface ChessGameState {
   moves: Array<string>;
 }
+
+export interface ChessGameResult {
+  timestamp: number;
+  black_player: string;
+  white_player: string;
+  winner: { Black: undefined } | { White: undefined } | { Draw: undefined };
+  num_of_moves: number;
+}

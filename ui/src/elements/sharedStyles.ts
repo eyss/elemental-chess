@@ -28,10 +28,9 @@ export const sharedStyles = css`
   }
 
   .placeholder {
-    opacity: 0.7;
+    color: rgba(0, 0, 0, 0.6);
     text-align: center;
   }
-
 
   .flex-scrollable-parent {
     position: relative;

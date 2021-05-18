@@ -2,11 +2,18 @@ use hdk::prelude::*;
 use holo_hash::{AgentPubKeyB64, EntryHashB64};
 use holochain_turn_based_game::prelude::*;
 
-pub mod entries;
+pub mod chess_game;
+pub mod chess_game_result;
 
-use entries::chess::MakeMoveInput;
+use chess_game::MakeMoveInput;
 
-entry_defs![GameMoveEntry::entry_def(), GameEntry::entry_def()];
+use chess_game_result::ChessGameResult;
+
+entry_defs![
+    GameMoveEntry::entry_def(),
+    GameEntry::entry_def(),
+    ChessGameResult::entry_def()
+];
 
 #[hdk_extern]
 pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
@@ -38,4 +45,14 @@ pub fn get_game(game_hash: EntryHashB64) -> ExternResult<GameEntry> {
 #[hdk_extern]
 pub fn get_game_moves(game_hash: EntryHashB64) -> ExternResult<Vec<MoveInfo>> {
     holochain_turn_based_game::prelude::get_game_moves(game_hash)
+}
+
+#[hdk_extern]
+pub fn publish_result(result: ChessGameResult) -> ExternResult<()> {
+    chess_game_result::publish_result(result)
+}
+
+#[hdk_extern]
+pub fn get_my_game_results(_: ()) -> ExternResult<Vec<(EntryHashB64, ChessGameResult)>> {
+    chess_game_result::get_my_game_results()
 }
