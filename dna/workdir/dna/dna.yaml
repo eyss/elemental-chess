@@ -10,5 +10,3 @@ zomes:
     bundled: ../../target/wasm32-unknown-unknown/release/hc_zome_invitations.wasm
   - name: chess
     bundled: ../../target/wasm32-unknown-unknown/release/hc_chess_zome.wasm    
-
-

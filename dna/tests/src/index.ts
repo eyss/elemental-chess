@@ -18,7 +18,7 @@ const network = {
 
 const config = Config.gen({network});
 
-const scores_zome = path.join("../workdir/dna/HoloChess.dna");
+const scores_zome = path.join("../workdir/dna/chess.dna");
 
 const installAgent: InstallAgentsHapps = [[[scores_zome]]];
 
