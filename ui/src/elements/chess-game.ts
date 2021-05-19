@@ -26,6 +26,9 @@ import { Button } from 'scoped-material-components/mwc-button';
 const whiteSquareGrey = '#a9a9a9';
 const blackSquareGrey = '#696969';
 
+const sleep = (ms: number) =>
+  new Promise(resolve => setTimeout(() => resolve(null), ms));
+
 export abstract class ChessGame
   extends BaseElement
   implements DepsElement<{ chess: ChessService; profiles: ProfilesStore }>
@@ -101,8 +104,21 @@ export abstract class ChessGame
     );
   }
 
+  async getGameInfo(retriesLeft = 4): Promise<GameEntry> {
+    try {
+      const gameInfo = await this._deps.chess.getGame(this.gameHash);
+      return gameInfo;
+    } catch (e) {
+      if (retriesLeft === 0) throw new Error(`Couldn't get game`);
+
+      await sleep(200);
+      return this.getGameInfo(retriesLeft - 1);
+    }
+  }
+
   async firstUpdated() {
-    const gameInfo = await this._deps.chess.getGame(this.gameHash);
+    const gameInfo = await this.getGameInfo();
+
     this._moves = await this._deps.chess.getGameMoves(this.gameHash);
 
     const opponent = gameInfo.players.find(
@@ -341,7 +357,7 @@ export abstract class ChessGame
             `
           : html`
               <div class="container fill center-content">
-                <span class="placeholder">No moves played</span>
+                <span class="placeholder">No moves played yet</span>
               </div>
             `}
       </div>
@@ -378,7 +394,7 @@ export abstract class ChessGame
 
   renderGameInfo() {
     return html`
-      <mwc-card style="height: 500px; align-self: center;">
+      <mwc-card style="height: 500px; min-width: 300px; align-self: center;">
         <div class="column board game-info" style="margin: 16px; flex: 1;">
           <span class="title">Opponent: ${this.getOpponentNickname()}</span>
           <span class="placeholder"
@@ -404,8 +420,8 @@ export abstract class ChessGame
 
   render() {
     if (!this._gameInfo)
-      return html`<div class="container">
-        <mwc-circular-progress></mwc-circular-progress>
+      return html`<div class="column center-content" style="flex: 1;">
+        <mwc-circular-progress indeterminate></mwc-circular-progress>
       </div>`;
 
     return html`

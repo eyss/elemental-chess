@@ -73,10 +73,47 @@ export abstract class ChessGameResultsHistory
     return summary;
   }
 
+  renderResults() {
+    if (this._chessGameResults.length === 0)
+      return html`<div class="column center-content" style="flex: 1;">
+        <span class="placeholder">There are no games in your history yet</span>
+      </div>`;
+
+    return html`<div class="flex-scrollable-parent">
+      <div class="flex-scrollable-container">
+        <div class="flex-scrollable-y">
+          <mwc-list disabled>
+            ${this._chessGameResults.map(
+              result =>
+                html`<mwc-list-item twoline graphic="icon">
+                  <span
+                    >vs
+                    ${this._deps.profiles.profileOf(
+                      this.getOpponentAddress(result[1])
+                    ).nickname}
+                  </span>
+                  <span slot="secondary"
+                    >${new Date(result[1].timestamp).toLocaleString()}</span
+                  >
+                  <mwc-icon
+                    slot="graphic"
+                    style=${styleMap({
+                      color: this.getColor(result[1]),
+                    })}
+                    >${this.getIcon(result[1])}</mwc-icon
+                  >
+                </mwc-list-item>`
+            )}
+          </mwc-list>
+        </div>
+      </div>
+    </div>`;
+  }
+
   render() {
     if (!this._chessGameResults)
       return html`<div class="container">
-        <mwc-circular-progress></mwc-circular-progress>
+        <mwc-circular-progress indeterminate></mwc-circular-progress>
       </div>`;
 
     const summary = this.getSummary();
@@ -85,40 +122,10 @@ export abstract class ChessGameResultsHistory
       <mwc-card style="flex: 1; min-width: 270px;">
         <div class="column" style="margin: 16px; flex: 1;">
           <span class="title">Game History</span>
-          <div class="flex-scrollable-parent">
-            <div class="flex-scrollable-container">
-              <div class="flex-scrollable-y">
-                <mwc-list>
-                  ${this._chessGameResults.map(
-                    result =>
-                      html`<mwc-list-item twoline graphic="icon">
-                        <span
-                          >vs
-                          ${this._deps.profiles.profileOf(
-                            this.getOpponentAddress(result[1])
-                          ).nickname}
-                        </span>
-                        <span slot="secondary"
-                          >${new Date(
-                            result[1].timestamp
-                          ).toLocaleString()}</span
-                        >
-                        <mwc-icon
-                          slot="graphic"
-                          style=${styleMap({
-                            color: this.getColor(result[1]),
-                          })}
-                          >${this.getIcon(result[1])}</mwc-icon
-                        >
-                      </mwc-list-item>`
-                  )}
-                </mwc-list>
-              </div>
-            </div>
-          </div>
+          ${this.renderResults()}
           <div class="row center-content">
-            <span
-              >${summary.Won} ${summary.Won === 1 ? 'win' : 'wins'},
+            <span class="placeholder"
+              >Summary: ${summary.Won} ${summary.Won === 1 ? 'win' : 'wins'},
               ${summary.Lost} ${summary.Lost === 1 ? 'loss' : 'losses'},
               ${summary.Draw} ${summary.Draw === 1 ? 'draw' : 'draws'}</span
             >

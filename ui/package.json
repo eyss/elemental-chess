@@ -11,7 +11,7 @@
     "start-bob": "HC_PORT=8889 concurrently -k --names ui,hc \"npm run start-ui\" \"npm run start-holochain\"",
     "start-ui": "concurrently --kill-others --names tsc,web-dev-server \"npm run build-watch\" \"sleep 5 && web-dev-server --config web-dev-server.config.mjs\"",
     "start-holochain": "RUST_LOG=warn hc s generate -r=$HC_PORT ../dna/workdir/happ/chess.happ network -b https://bootstrap-staging.holo.host quic",
-    "build-watch": "rollup -c rollup.config.js -w",
+    "build-watch": "rimraf dist && rollup -c rollup.config.js -w",
     "build": "rimraf dist && rollup -c rollup.config.js",
     "prepublish": "npm run build",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore",
