@@ -36,6 +36,13 @@ import { ChessGame } from './elements/chess-game';
 import { ChessGameResultsHistory } from './elements/chess-game-results-history';
 import { styleMap } from 'lit-html/directives/style-map';
 
+
+import {InvitationsList} from '@eyss/invitations/dist';
+import {CreateInvitation} from '@eyss/invitations/dist';
+
+import {InvitationsStore, InvitationsService} from '@eyss/invitations/dist'
+import { sign } from 'crypto';
+
 export class ChessApp extends BaseElement {
   @property({ type: Array })
   _activeGameHash: string | undefined = undefined;
@@ -52,6 +59,10 @@ export class ChessApp extends BaseElement {
 
   _chessService!: ChessService;
   _profilesStore!: ProfilesStore;
+
+
+  _invitationStore!: InvitationsStore;
+  _invitationService!: InvitationsService;
 
   async firstUpdated() {
     await this.connectToHolochain();
@@ -71,18 +82,39 @@ export class ChessApp extends BaseElement {
   }
 
   async connectToHolochain() {
-    this._appWebsocket = await AppWebsocket.connect(APP_URL, 300000);
+    this._appWebsocket = await AppWebsocket.connect(APP_URL, 300000, (signal)=>{
+
+      if(signal.data.payload.GameStarted != undefined){
+
+        const gameHash = signal.data.payload.GameStarted[0];
+        router.navigate(`/game/${gameHash}`);
+      }else{
+        this._invitationStore.signalHandler(signal);
+      }
+
+    });
 
     const appInfo = await this._appWebsocket.appInfo({
       installed_app_id: 'test-app',
     });
     this._cellId = appInfo.cell_data[0].cell_id;
 
+
     const profilesService = new ProfilesService(
       this._appWebsocket as any,
       this._cellId
     );
     this._profilesStore = new ProfilesStore(profilesService);
+
+    this._invitationService = new InvitationsService(
+      this._appWebsocket as any,
+      this._cellId
+    );
+
+    this._invitationStore  = new InvitationsStore(
+      this._invitationService as any ,
+      this._profilesStore
+    );
 
     this._chessService = new ChessService(this._appWebsocket, this._cellId);
 
@@ -96,31 +128,41 @@ export class ChessApp extends BaseElement {
       connectDeps(ChessGame, {
         chess: this._chessService,
         profiles: this._profilesStore,
+
       })
     );
+    // this.defineScopedElement(
+    //   'chess-game-results-history',
+    //   connectDeps(ChessGameResultsHistory, {
+    //     chess: this._chessService,
+    //     profiles: this._profilesStore,
+    //   })
+    // );
+
     this.defineScopedElement(
-      'chess-game-results-history',
-      connectDeps(ChessGameResultsHistory, {
-        chess: this._chessService,
-        profiles: this._profilesStore,
-      })
+      'create-invitation',
+      connectDeps(CreateInvitation, this._invitationStore)
     );
-    this.createGame();
+
+    this.defineScopedElement(
+      'invitations-list',
+      connectDeps(InvitationsList, this._invitationStore)
+    );
+    
   }
 
-  async createGame() {
-    await this._profilesStore.fetchAllProfiles();
-    const allAgentPubKeys = Object.keys(this._profilesStore.profiles);
-    console.log(allAgentPubKeys);
-    if (allAgentPubKeys.length > 1 && !this._activeGameHash) {
-      const opponent: string = allAgentPubKeys.find(
-        p => p !== serializeHash(this._cellId[1])
-      ) as string;
-
+  async _eventListener(event:any){
+    
+    try{
+      const opponent = event.detail.invitees[0]; 
       const gameHash = await this._chessService.createGame(opponent);
       router.navigate(`/game/${gameHash}`);
-    }
+
+    }catch(e){}
+
   }
+
+
 
   renderContent() {
     if (this._activeGameHash)
@@ -143,7 +185,28 @@ export class ChessApp extends BaseElement {
           @game-ended=${() => (this._gameEnded = true)}
         ></chess-game>
       </div>`;
-    else return html`<chess-game-results-history></chess-game-results-history>`;
+    else return html`
+  
+        <div class="container">
+          <div class ="uno"> 
+            <create-invitation></create-invitation>
+          </div>
+          <div class ="dos"> 
+            <invitations-list @invitation-completed="${this._eventListener}"></invitations-list>
+          </div>
+        </div>
+  
+    `;
+
+    // <chess-game-results-history></chess-game-results-history>
+
+    //invitation item despliega un evento :
+    // crear el juego -> listo
+    // clear invitation
+    // router.navigate(set the game url) -> listo
+    // al momento del agent aceptar la invitation (el aceptador crea el juego) -> listo
+
+
   }
 
   render() {
@@ -172,6 +235,7 @@ export class ChessApp extends BaseElement {
       'mwc-button': Button,
       'mwc-icon-button': IconButton,
       'mwc-card': Card,
+ 
     };
   }
 
@@ -183,6 +247,26 @@ export class ChessApp extends BaseElement {
         }
         li {
           margin-bottom: 8px;
+        }
+
+        .container{
+          display: grid;
+          width: 100%;
+          height: 100%;
+          grid-template-columns: repeat(2, 1fr);
+          align-content: center;
+          overflow: hidden
+        }
+      
+        .uno{
+          display: flex;
+          justify-content: center;
+        }
+      
+        .dos{
+          // background-color: blue;
+          overflow-y:auto;
+          width: 100%;
         }
       `,
       sharedStyles,

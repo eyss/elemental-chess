@@ -10,3 +10,5 @@ name = "hc_zome_invitations"
 
 [dependencies]
 invitations = {path = "../../../../invitations_zome/zome/zomes/invitations/"}
+
+
