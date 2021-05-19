@@ -206,7 +206,7 @@ export class ChessApp extends BaseElement {
       <mwc-top-app-bar style="flex: 1; display: flex;">
         <div slot="title">Chess</div>
 
-        <div class="fill row" style="width: 100vw; height: 100%; ">
+        <div class="fill row" style="width: 100vw; height: 100%;">
           <profile-prompt style="flex: 1;">
             ${this.renderContent()}
           </profile-prompt>
