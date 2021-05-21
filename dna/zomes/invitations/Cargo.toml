@@ -9,6 +9,6 @@ crate-type = ["cdylib", "rlib"]
 name = "hc_zome_invitations"
 
 [dependencies]
-invitations = {path = "../../../../invitations_zome/zome/zomes/invitations/"}
+invitations = {git = "https://github.com/eyss/invitations_zome", branch="master", package = "invitations"}
 
 

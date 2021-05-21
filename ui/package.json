@@ -24,7 +24,7 @@
     "@holochain-open-dev/common": "git+https://github.com/holochain-open-dev/common.git#ui-build",
     "@holochain-open-dev/core-types": "git+https://github.com/holochain-open-dev/core-types.git#build",
     "@holochain-open-dev/profiles": "git+https://github.com/holochain-open-dev/profiles.git#ui-build",
-    "@eyss/invitations": "file:../../invitations_zome/ui/",
+    "@eyss/invitations": "git+https://github.com/eyss/invitations_zome.git#ui-build",
     "@holochain/conductor-api": "^0.0.4",
     "@msgpack/msgpack": "^2.6.3",
     "chess.js": "^0.11.0",
