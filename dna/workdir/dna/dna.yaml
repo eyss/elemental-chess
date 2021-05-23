@@ -1,12 +1,12 @@
 ---
 manifest_version: "1"
-name: chess
+name: elemental-chess
 uuid: 00000000-0000-0000-0000-000000000000
 properties: ~
 zomes: 
   - name: profiles
     bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm
   - name: invitations
-    bundled: ../../target/wasm32-unknown-unknown/release/hc_zome_invitations.wasm
+    bundled: ../../target/wasm32-unknown-unknown/release/invitations.wasm
   - name: chess
-    bundled: ../../target/wasm32-unknown-unknown/release/hc_chess_zome.wasm    
+    bundled: ../../target/wasm32-unknown-unknown/release/hc_zome_chess.wasm    

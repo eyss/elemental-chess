@@ -226,7 +226,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d7afe4a420e3fe79967a00898cc1f4db7c8a49a9333a29f8a4bd76a253d5cd04"
 
 [[package]]
-name = "hc_chess_zome"
+name = "hc_zome_chess"
 version = "0.0.1"
 dependencies = [
  "chess",
@@ -241,8 +241,12 @@ dependencies = [
 [[package]]
 name = "hc_zome_invitations"
 version = "0.0.1"
+source = "git+https://github.com/eyss/hc_zome_invitations?branch=main#c36315a20d8069d54528de70856509bec9c35532"
 dependencies = [
- "invitations",
+ "derive_more",
+ "hdk",
+ "holo_hash",
+ "serde",
 ]
 
 [[package]]
@@ -398,12 +402,8 @@ dependencies = [
 [[package]]
 name = "invitations"
 version = "0.0.1"
-source = "git+https://github.com/eyss/invitations_zome?branch=master#7f7ddda55a619503a0773a76de97d0878ddd1220"
 dependencies = [
- "derive_more",
- "hdk",
- "holo_hash",
- "serde",
+ "hc_zome_invitations",
 ]
 
 [[package]]

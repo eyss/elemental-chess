@@ -1,12 +1,12 @@
 [package]
 authors = ["manuel_puentes"]
 edition = "2018"
-name = "hc_chess_zome"
+name = "hc_zome_chess"
 version = "0.0.1"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "hc_chess_zome"
+name = "hc_zome_chess"
 
 [dependencies]
 serde = "1"

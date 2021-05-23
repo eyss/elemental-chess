@@ -1,1 +1,1 @@
-extern crate invitations;
+extern crate hc_zome_invitations;
