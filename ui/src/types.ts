@@ -38,3 +38,5 @@ export interface ChessGameResult {
   winner: { Black: undefined } | { White: undefined } | { Draw: undefined };
   num_of_moves: number;
 }
+
+export const CHESS_APP_STORE_CONTEXT = 'elemental-chess/store';
