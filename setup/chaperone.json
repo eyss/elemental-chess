@@ -1,0 +1,15 @@
+{
+    "app_id": "elemental-chess",
+    "log_level": true,
+    "connection": {
+      "secure": false,
+      "host": "localhost",
+      "port": 8888,
+      "path": "/"
+    },
+    "mode": 2,
+    "web_user_legend": {
+      "test@holo.host": "uhCAkdhEK0R6whkKLfNI77Q7F-mk4pkOIupAuOCA6aLORZMbMYYCT"
+    }
+  }
+  

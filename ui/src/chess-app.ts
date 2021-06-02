@@ -26,6 +26,9 @@ import { ChessService } from './chess.service';
 import { ChessGame } from './elements/chess-game';
 import { ChessGameResultsHistory } from './elements/chess-game-results-history';
 import { styleMap } from 'lit-html/directives/style-map';
+import '@holo-host/comb';
+//@ts-ignore
+import { Connection } from '@holo-host/web-sdk';
 
 import {
   CreateInvitation,
@@ -72,6 +75,9 @@ export class ChessApp extends BaseElement {
   }
 
   async connectToHolochain() {
+    const a = new Connection('http://localhost:24273');
+    console.log(a);
+
     this._appWebsocket = await AppWebsocket.connect(APP_URL, 300000, signal => {
       if (signal.data.payload.GameStarted != undefined) {
         const gameHash = signal.data.payload.GameStarted[0];
@@ -141,7 +147,7 @@ export class ChessApp extends BaseElement {
   }
 
   async _onInvitationCompleted(event: any) {
-    console.log(event)
+    console.log(event);
     const opponent = event.detail.invitation.inviter;
     const gameHash = await this._chessService.createGame(opponent);
     router.navigate(`/game/${gameHash}`);
@@ -204,7 +210,7 @@ export class ChessApp extends BaseElement {
 
     return html`
       <mwc-top-app-bar style="flex: 1; display: flex;">
-        <div slot="title">Chess</div>
+        <div slot="title">Elemental Chess</div>
 
         <div class="fill row" style="width: 100vw; height: 100%;">
           <profile-prompt style="flex: 1;">
