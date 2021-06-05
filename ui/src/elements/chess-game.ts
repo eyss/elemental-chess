@@ -1,8 +1,9 @@
-import { LitElement, html, css, property } from 'lit-element';
+import { html, css } from 'lit';
+import { property } from 'lit/decorators.js';
+import { requestContext } from '@holochain-open-dev/context';
 import { ChessBoardElement } from 'chessboard-element';
 // @ts-ignore
 import { Chess } from 'chess.js';
-import { BaseElement, DepsElement } from '@holochain-open-dev/common';
 import ConductorApi from '@holochain/conductor-api';
 import * as msgpack from '@msgpack/msgpack';
 import { CircularProgress } from 'scoped-material-components/mwc-circular-progress';
@@ -17,11 +18,16 @@ import {
   GameMoveEntry,
   MoveInfo,
 } from '../types';
-import { serializeHash } from '@holochain-open-dev/core-types';
-import { ProfilesStore } from '@holochain-open-dev/profiles';
+import {
+  ProfilesStore,
+  PROFILES_STORE_CONTEXT,
+} from '@holochain-open-dev/profiles';
 import { ListItem } from 'scoped-material-components/mwc-list-item';
 import { Card } from 'scoped-material-components/mwc-card';
 import { Button } from 'scoped-material-components/mwc-button';
+import { CHESS_SERVICE_CONTEXT } from '../constants';
+import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
+import { MobxLitElement } from '@adobe/lit-mobx';
 
 const whiteSquareGrey = '#a9a9a9';
 const blackSquareGrey = '#696969';
@@ -29,10 +35,7 @@ const blackSquareGrey = '#696969';
 const sleep = (ms: number) =>
   new Promise(resolve => setTimeout(() => resolve(null), ms));
 
-export abstract class ChessGame
-  extends BaseElement
-  implements DepsElement<{ chess: ChessService; profiles: ProfilesStore }>
-{
+export class ChessGame extends ScopedRegistryHost(MobxLitElement) {
   @property()
   gameHash!: string;
 
@@ -43,36 +46,14 @@ export abstract class ChessGame
   _chessGame!: any;
   _chessStyles!: string;
 
-  abstract get _deps(): { chess: ChessService; profiles: ProfilesStore };
+  @requestContext(CHESS_SERVICE_CONTEXT)
+  _chessService!: ChessService;
 
-  static get styles() {
-    return [
-      sharedStyles,
-      css`
-        :host {
-          display: flex;
-          flex: 1;
-          flex-direction: column;
-        }
-        #board {
-          height: 700px;
-          width: 700px;
-        }
-        .game-info > span {
-          margin-bottom: 16px;
-        }
-        .horizontal-divider {
-          width: 100%;
-          opacity: 0.6;
-          margin-bottom: 16px;
-          margin-top: 4px;
-        }
-      `,
-    ];
-  }
+  @requestContext(PROFILES_STORE_CONTEXT)
+  _profilesStore!: ProfilesStore;
 
   listenForOpponentMove() {
-    const hcConnection = this._deps.chess.appWebsocket;
+    const hcConnection = this._chessService.appWebsocket;
 
     ConductorApi.AppWebsocket.connect(
       hcConnection.client.socket.url,
@@ -106,7 +87,7 @@ export abstract class ChessGame
 
   async getGameInfo(retriesLeft = 4): Promise<GameEntry> {
     try {
-      const gameInfo = await this._deps.chess.getGame(this.gameHash);
+      const gameInfo = await this._chessService.getGame(this.gameHash);
       return gameInfo;
     } catch (e) {
       if (retriesLeft === 0) throw new Error(`Couldn't get game`);
@@ -119,13 +100,13 @@ export abstract class ChessGame
   async firstUpdated() {
     const gameInfo = await this.getGameInfo();
 
-    this._moves = await this._deps.chess.getGameMoves(this.gameHash);
+    this._moves = await this._chessService.getGameMoves(this.gameHash);
 
     const opponent = gameInfo.players.find(
       player => player !== this.myAddress
     ) as string;
 
-    await this._deps.profiles.fetchAgentProfile(opponent);
+    await this._profilesStore.fetchAgentProfile(opponent);
 
     this._chessGame = new Chess();
     for (const move of this._moves) {
@@ -145,7 +126,7 @@ export abstract class ChessGame
   }
 
   get myAddress() {
-    return serializeHash(this._deps.chess.cellId[1]);
+    return this._profilesStore.myAgentPubKey;
   }
 
   amIWhite() {
@@ -166,7 +147,7 @@ export abstract class ChessGame
   }
 
   getOpponentNickname(): string {
-    return this._deps.profiles.profileOf(this.getOpponent()).nickname;
+    return this._profilesStore.profileOf(this.getOpponent()).nickname;
   }
 
   removeGreySquares() {
@@ -264,7 +245,7 @@ export abstract class ChessGame
     this._moves.push(m);
     this.requestUpdate();
 
-    const hash = await this._deps.chess.makeMove(
+    const hash = await this._chessService.makeMove(
       this.gameHash,
       previousMoveHash,
       move
@@ -294,7 +275,7 @@ export abstract class ChessGame
         winner: { [winner]: undefined } as any,
       };
 
-      await this._deps.chess.publishResult(result);
+      await this._chessService.publishResult(result);
     }
 
     this.announceIfGameEnded();
@@ -443,14 +424,38 @@ export abstract class ChessGame
     `;
   }
 
-  getScopedElements() {
-    return {
-      'mwc-circular-progress': CircularProgress,
-      'mwc-list': List,
-      'mwc-list-item': ListItem,
-      'mwc-card': Card,
-      'mwc-button': Button,
-      'chess-board': ChessBoardElement,
-    };
+  static elementDefintions = {
+    'mwc-circular-progress': CircularProgress,
+    'mwc-list': List,
+    'mwc-list-item': ListItem,
+    'mwc-card': Card,
+    'mwc-button': Button,
+    'chess-board': ChessBoardElement,
+  };
+
+  static get styles() {
+    return [
+      sharedStyles,
+      css`
+        :host {
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+        }
+        #board {
+          height: 700px;
+          width: 700px;
+        }
+        .game-info > span {
+          margin-bottom: 16px;
+        }
+        .horizontal-divider {
+          width: 100%;
+          opacity: 0.6;
+          margin-bottom: 16px;
+          margin-top: 4px;
+        }
+      `,
+    ];
   }
 }

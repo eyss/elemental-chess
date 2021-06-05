@@ -1,18 +1,14 @@
-import {
-  Constructor,
-  css,
-  html,
-  LitElement,
-  property,
-  query,
-} from 'lit-element';
+import { LitElement, css, html } from 'lit';
+import { property, query } from 'lit/decorators.js';
+import { styleMap } from 'lit/directives/style-map.js';
+
 import { AppWebsocket, AdminWebsocket, CellId } from '@holochain/conductor-api';
 import { Card } from 'scoped-material-components/mwc-card';
-import { BaseElement, connectDeps } from '@holochain-open-dev/common';
+import { ContextProvider } from '@holochain-open-dev/context';
 import { CircularProgress } from 'scoped-material-components/mwc-circular-progress';
 import { sharedStyles } from './elements/sharedStyles';
 import { router } from './router';
-import { APP_URL } from './constants';
+import { APP_URL, CHESS_SERVICE_CONTEXT } from './constants';
 import { TopAppBar } from 'scoped-material-components/mwc-top-app-bar';
 import { Button } from 'scoped-material-components/mwc-button';
 import { IconButton } from 'scoped-material-components/mwc-icon-button';
@@ -21,11 +17,11 @@ import {
   ProfilesService,
   ProfilesStore,
   ListProfiles,
+  PROFILES_STORE_CONTEXT,
 } from '@holochain-open-dev/profiles';
 import { ChessService } from './chess.service';
 import { ChessGame } from './elements/chess-game';
 import { ChessGameResultsHistory } from './elements/chess-game-results-history';
-import { styleMap } from 'lit-html/directives/style-map';
 
 import {
   CreateInvitation,
@@ -33,8 +29,10 @@ import {
   InvitationsService,
   InvitationsList,
 } from '@eyss/invitations';
+import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
+import { INVITATIONS_STORE_CONTEXT } from '@eyss/invitations/types';
 
-export class ChessApp extends BaseElement {
+export class ChessApp extends ScopedRegistryHost(LitElement) {
   @property({ type: Array })
   _activeGameHash: string | undefined = undefined;
 
@@ -48,11 +46,10 @@ export class ChessApp extends BaseElement {
   _adminWebsocket!: AdminWebsocket;
   _cellId!: CellId;
 
-  _chessService!: ChessService;
-  _profilesStore!: ProfilesStore;
+  _profilesStore!: ContextProvider<never>;
+  _chessService!: ContextProvider<never>;
 
-  _invitationStore!: InvitationsStore;
-  _invitationService!: InvitationsService;
+  _invitationStore!: ContextProvider<never>;
 
   async firstUpdated() {
     await this.connectToHolochain();
@@ -76,8 +73,6 @@ export class ChessApp extends BaseElement {
       if (signal.data.payload.GameStarted != undefined) {
         const gameHash = signal.data.payload.GameStarted[0];
         router.navigate(`/game/${gameHash}`);
-      } else {
-        this._invitationStore.signalHandler(signal);
       }
     });
 
@@ -90,60 +85,36 @@ export class ChessApp extends BaseElement {
       this._appWebsocket as any,
       this._cellId
     );
-    this._profilesStore = new ProfilesStore(profilesService);
+    this._profilesStore = new ContextProvider(
+      this,
+      PROFILES_STORE_CONTEXT as never,
+      new ProfilesStore(profilesService) as any
+    );
 
-    this._invitationService = new InvitationsService(
+    const invitationService = new InvitationsService(
       this._appWebsocket as any,
       this._cellId
     );
 
-    this._invitationStore = new InvitationsStore(
-      this._invitationService as any,
-      this._profilesStore,
-      true
+    this._invitationStore = new ContextProvider(
+      this,
+      INVITATIONS_STORE_CONTEXT as never,
+      new InvitationsStore(invitationService, true) as any
     );
 
-    this._chessService = new ChessService(this._appWebsocket, this._cellId);
-
-    this.defineScopedElement(
-      'profile-prompt',
-      connectDeps(ProfilePrompt, this._profilesStore)
-    );
-    this.defineScopedElement(
-      'list-profiles',
-      connectDeps(ListProfiles, this._profilesStore)
-    );
-
-    this.defineScopedElement(
-      'chess-game',
-      connectDeps(ChessGame, {
-        chess: this._chessService,
-        profiles: this._profilesStore,
-      })
-    );
-    this.defineScopedElement(
-      'chess-game-results-history',
-      connectDeps(ChessGameResultsHistory, {
-        chess: this._chessService,
-        profiles: this._profilesStore,
-      })
-    );
-
-    this.defineScopedElement(
-      'create-invitation',
-      connectDeps(CreateInvitation, this._invitationStore)
-    );
-
-    this.defineScopedElement(
-      'invitations-list',
-      connectDeps(InvitationsList, this._invitationStore)
+    this._chessService = new ContextProvider(
+      this,
+      CHESS_SERVICE_CONTEXT as never,
+      new ChessService(this._appWebsocket, this._cellId) as any
     );
   }
 
   async _onInvitationCompleted(event: any) {
-    console.log(event)
+    console.log(event);
     const opponent = event.detail.invitation.inviter;
-    const gameHash = await this._chessService.createGame(opponent);
+    const gameHash = await (
+      this._chessService.value as ChessService
+    ).createGame(opponent);
     router.navigate(`/game/${gameHash}`);
   }
 
@@ -215,15 +186,19 @@ export class ChessApp extends BaseElement {
     `;
   }
 
-  getScopedElements(): any {
-    return {
-      'mwc-circular-progress': CircularProgress,
-      'mwc-top-app-bar': TopAppBar,
-      'mwc-button': Button,
-      'mwc-icon-button': IconButton,
-      'mwc-card': Card,
-    };
-  }
+  static elementDefinitions = {
+    'mwc-circular-progress': CircularProgress,
+    'mwc-top-app-bar': TopAppBar,
+    'mwc-button': Button,
+    'mwc-icon-button': IconButton,
+    'mwc-card': Card,
+    'profile-prompt': ProfilePrompt,
+    'list-profiles': ListProfiles,
+    'chess-game': ChessGame,
+    'chess-game-results-history': ChessGameResultsHistory,
+    'create-invitation': CreateInvitation,
+    'invitations-list': InvitationsList,
+  };
 
   static get styles() {
     return [
