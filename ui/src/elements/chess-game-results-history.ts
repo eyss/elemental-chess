@@ -1,36 +1,46 @@
-import { BaseElement, DepsElement } from '@holochain-open-dev/common';
-import { ProfilesStore } from '@holochain-open-dev/profiles';
-import { property } from 'lit-element';
-import { html } from 'lit-html';
+import { html } from 'lit';
+import { state } from 'lit/decorators.js';
+import { requestContext } from '@holochain-open-dev/context';
+import { styleMap } from 'lit/directives/style-map.js';
+
+import {
+  ProfilesStore,
+  PROFILES_STORE_CONTEXT,
+} from '@holochain-open-dev/profiles';
 import { Card } from 'scoped-material-components/mwc-card';
 import { List } from 'scoped-material-components/mwc-list';
 import { ListItem } from 'scoped-material-components/mwc-list-item';
 import { ChessService } from '../chess.service';
 import { ChessGameResult } from '../types';
-import { styleMap } from 'lit-html/directives/style-map';
 import { Icon } from 'scoped-material-components/mwc-icon';
 import { sharedStyles } from './sharedStyles';
+import { CHESS_SERVICE_CONTEXT } from '../constants';
+import { MobxLitElement } from '@adobe/lit-mobx';
+import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 
-export abstract class ChessGameResultsHistory
-  extends BaseElement
-  implements DepsElement<{ chess: ChessService; profiles: ProfilesStore }>
-{
-  @property()
+export class ChessGameResultsHistory extends ScopedRegistryHost(
+  MobxLitElement
+) {
+  @state()
   _chessGameResults!: Array<[string, ChessGameResult]>;
 
-  abstract get _deps(): { chess: ChessService; profiles: ProfilesStore };
+  @requestContext(CHESS_SERVICE_CONTEXT)
+  _chessService!: ChessService;
+
+  @requestContext(PROFILES_STORE_CONTEXT)
+  _profilesStore!: ProfilesStore;
 
   async firstUpdated() {
-    this._chessGameResults = await this._deps.chess.getMyGameResults();
+    this._chessGameResults = await this._chessService.getMyGameResults();
 
     const promises = this._chessGameResults.map(r =>
-      this._deps.profiles.fetchAgentProfile(this.getOpponentAddress(r[1]))
+      this._profilesStore.fetchAgentProfile(this.getOpponentAddress(r[1]))
     );
     await Promise.all(promises);
   }
 
   getOpponentAddress(result: ChessGameResult) {
-    const myAddress = this._deps.profiles.myAgentPubKey;
+    const myAddress = this._profilesStore.myAgentPubKey;
     return result.black_player === myAddress
       ? result.black_player
       : result.white_player;
@@ -40,7 +50,7 @@ export abstract class ChessGameResultsHistory
     const winner = Object.keys(result.winner)[0];
     if (winner === 'Draw') return 'Draw';
 
-    const myAddress = this._deps.profiles.myAgentPubKey;
+    const myAddress = this._profilesStore.myAgentPubKey;
 
     const winnerAddress =
       winner === 'White' ? result.white_player : result.black_player;
@@ -88,7 +98,7 @@ export abstract class ChessGameResultsHistory
                 html`<mwc-list-item twoline graphic="icon">
                   <span
                     >vs
-                    ${this._deps.profiles.profileOf(
+                    ${this._profilesStore.profileOf(
                       this.getOpponentAddress(result[1])
                     ).nickname}
                   </span>
@@ -135,14 +145,12 @@ export abstract class ChessGameResultsHistory
     `;
   }
 
-  getScopedElements() {
-    return {
-      'mwc-icon': Icon,
-      'mwc-card': Card,
-      'mwc-list': List,
-      'mwc-list-item': ListItem,
-    };
-  }
+  static elementDefinitions = {
+    'mwc-icon': Icon,
+    'mwc-card': Card,
+    'mwc-list': List,
+    'mwc-list-item': ListItem,
+  };
 
   static styles = [sharedStyles];
 }
