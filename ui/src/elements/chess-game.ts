@@ -1,14 +1,14 @@
 import { html, css } from 'lit';
 import { state, property } from 'lit/decorators.js';
-import { styleMap } from 'lit/directives/style-map.js';
 import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import { MobxLitElement } from '@adobe/lit-mobx';
+import { requestContext } from '@holochain-open-dev/context';
 
 import ConductorApi from '@holochain/conductor-api';
 import { serializeHash } from '@holochain-open-dev/core-types';
 import { ProfilesStore } from '@holochain-open-dev/profiles';
-
-const { Chess } = require('./chess.js')
+// @ts-ignore
+import { Chess } from 'chess.js';
 import { ChessBoardElement } from 'chessboard-element';
 import * as msgpack from '@msgpack/msgpack';
 
@@ -18,6 +18,11 @@ import { Card } from 'scoped-material-components/mwc-card';
 import { Button } from 'scoped-material-components/mwc-button';
 import { ListItem } from 'scoped-material-components/mwc-list-item';
 import { CircularProgress } from 'scoped-material-components/mwc-circular-progress';
+
+
+
+import {CHESS_APP_STORE_CONTEXT } from '../types';
+
 
 import {
   ChessGameResult,
@@ -52,9 +57,9 @@ const sleep = (ms: number) =>
   _chessGame!: any;
   _chessStyles!: string;
 
-  //  @requestContext(CHESS_APP_STORE_CONTEXT)
-  _store!:any;
-
+  @requestContext(CHESS_APP_STORE_CONTEXT)
+  _store!: { chess: ChessService; profiles: ProfilesStore };
+  
   listenForOpponentMove() {
     const hcConnection = this._store.chess.appWebsocket;
 

@@ -1,10 +1,13 @@
 import { html, css } from 'lit';
-import { state } from 'lit/decorators.js';
+import { state, query, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import { MobxLitElement } from '@adobe/lit-mobx';
 
 import { AppWebsocket, AdminWebsocket, CellId } from '@holochain/conductor-api';
+
+import { ContextProviderElement } from '@holochain-open-dev/context';
+
 
 import { sharedStyles } from './elements/sharedStyles';
 import { router } from './router';
@@ -13,6 +16,8 @@ import { APP_URL } from './constants';
 import { ChessService } from './chess.service';
 import { ChessGame } from './elements/chess-game';
 import { ChessGameResultsHistory } from './elements/chess-game-results-history';
+import { CHESS_APP_STORE_CONTEXT } from './types';
+
 /**mwc-elements imports */
 import { Card } from 'scoped-material-components/mwc-card';
 import { Button } from 'scoped-material-components/mwc-button';
@@ -25,6 +30,7 @@ import {
   ProfilesService,
   ProfilesStore,
   ListProfiles,
+  PROFILES_STORE_CONTEXT,
 } from '@holochain-open-dev/profiles';
 
 import {
@@ -33,6 +39,7 @@ import {
   InvitationsService,
   InvitationsList,
 } from '@eyss/invitations';
+import { INVITATIONS_STORE_CONTEXT } from '@eyss/invitations/types';
 
 /**
  * @element chess-app
@@ -56,6 +63,42 @@ export class ChessApp extends ScopedRegistryHost(MobxLitElement) {
 
   _invitationStore!: InvitationsStore;
   _invitationService!: InvitationsService;
+
+  /**providers */
+
+  @query('#invitations',true)
+  invitations_provider:any;
+
+  @query('#profiles',true)
+  profiles_provider:any;
+
+  @query('#chess',true)
+  chess_provider:any;
+
+
+
+
+
+  async firstUpdated() {
+
+    await this.connectToHolochain();
+    
+
+
+    router
+      .on({
+        '/game/:game': async params => {
+          this._activeGameHash = params.game;
+          this._gameEnded = false;
+        },
+        '*': async () => {
+          this._activeGameHash = undefined;
+        },
+      })
+      .resolve();
+    this._loading = false;
+  }
+
 
   async connectToHolochain() {
     this._appWebsocket = await AppWebsocket.connect(APP_URL, 300000, signal => {
@@ -90,6 +133,16 @@ export class ChessApp extends ScopedRegistryHost(MobxLitElement) {
     );
 
     this._chessService = new ChessService(this._appWebsocket, this._cellId);
+
+    this.chess_provider.name = CHESS_APP_STORE_CONTEXT;
+    this.chess_provider.value = this._chessService;
+
+    this.profiles_provider.name = PROFILES_STORE_CONTEXT;
+    this.profiles_provider.value = this._profilesStore;
+    
+    this.invitations_provider.name = INVITATIONS_STORE_CONTEXT;
+    this.invitations_provider.value = this._invitationStore;
+      
   }
 
   async _onInvitationCompleted(event: any) {
@@ -148,9 +201,13 @@ export class ChessApp extends ScopedRegistryHost(MobxLitElement) {
       `;
   }
 
+  
+  
   render() {
     if (this._loading)
+    
       return html`<div class="fill center-content">
+      
         <mwc-circular-progress indeterminate></mwc-circular-progress>
       </div>`;
 
@@ -159,9 +216,19 @@ export class ChessApp extends ScopedRegistryHost(MobxLitElement) {
         <div slot="title">Chess</div>
 
         <div class="fill row" style="width: 100vw; height: 100%;">
-          <profile-prompt style="flex: 1;">
-            ${this.renderContent()}
-          </profile-prompt>
+
+          <context-provider id="chess">
+            <context-provider id="invitations">
+              <context-provider id="profiles">
+          
+                  <profile-prompt style="flex: 1;">
+                    ${this.renderContent()}
+                  </profile-prompt>
+          
+              </context-provider>
+            </context-provider>
+          </context-provider>
+          
         </div>
       </mwc-top-app-bar>
     `;
@@ -181,7 +248,8 @@ export class ChessApp extends ScopedRegistryHost(MobxLitElement) {
       'mwc-top-app-bar': TopAppBar,
       'mwc-icon-button': IconButton,
       'mwc-circular-progress': CircularProgress,
-
+      /**context-provider*/
+      'context-provider': ContextProviderElement,
     }
   }
 

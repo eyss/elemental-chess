@@ -1,8 +1,13 @@
-import { html, css } from 'lit';
+import { html } from 'lit';
 import { state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import { MobxLitElement } from '@adobe/lit-mobx';
+
+import { ProfilesStore } from '@holochain-open-dev/profiles';
+import { ChessService } from '../chess.service';
+import { requestContext } from '@holochain-open-dev/context';
+
 
 import { sharedStyles } from './sharedStyles';
 
@@ -10,8 +15,8 @@ import { Icon } from 'scoped-material-components/mwc-icon';
 import { Card } from 'scoped-material-components/mwc-card';
 import { List } from 'scoped-material-components/mwc-list';
 import { ListItem } from 'scoped-material-components/mwc-list-item';
-
 import { ChessGameResult, CHESS_APP_STORE_CONTEXT } from '../types';
+
 
 /**
  * @element chess-game-result-history
@@ -21,8 +26,8 @@ import { ChessGameResult, CHESS_APP_STORE_CONTEXT } from '../types';
    @state()
    _chessGameResults!: Array<[string, ChessGameResult]>;
 
-  //  @requestContext(CHESS_APP_STORE_CONTEXT)
-   _store!:any;
+   @requestContext(CHESS_APP_STORE_CONTEXT)
+   _store!:{ chess: ChessService; profiles: ProfilesStore };;
 
 
   async firstUpdated() {
@@ -157,9 +162,9 @@ import { ChessGameResult, CHESS_APP_STORE_CONTEXT } from '../types';
 
 
 // import { BaseElement, DepsElement } from '@holochain-open-dev/common';
-// import { ProfilesStore } from '@holochain-open-dev/profiles';
 // import { property } from 'lit-element';
 // import { html } from 'lit-html';
+// import { ProfilesStore } from '@holochain-open-dev/profiles';
 // import { ChessService } from '../chess.service';
 // import { ChessGameResult } from '../types';
 // import { styleMap } from 'lit-html/directives/style-map';
