@@ -1,5 +1,5 @@
 {
-    "app_id": "elemental-chess",
+    "app_id": "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL",
     "log_level": true,
     "connection": {
       "secure": false,
@@ -9,7 +9,8 @@
     },
     "mode": 2,
     "web_user_legend": {
-      "test@holo.host": "uhCAkdhEK0R6whkKLfNI77Q7F-mk4pkOIupAuOCA6aLORZMbMYYCT"
+      "alice": "uhCAk9ZLWVXDTCQcrF70zz1ekv1sTLBv7YsEVF_rrIUFSynp1rzX2",
+      "bob": "uhCAkM2SbKdznJ8PNILKIKiYsesC3BLEbnghnSeXXByhwchTK04PA"
     }
   }
   

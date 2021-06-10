@@ -10,7 +10,7 @@
     "start-alice": "HC_PORT=8888 concurrently -k --names ui,hc \"npm run start-ui\" \"npm run start-holochain\"",
     "start-bob": "HC_PORT=8889 concurrently -k --names ui,hc \"npm run start-ui\" \"npm run start-holochain\"",
     "start-ui": "concurrently -k --names tsc,web-dev-server \"npm run build-watch\" \"sleep 5 && web-dev-server --config web-dev-server.config.mjs\"",
-    "start-holochain": "RUST_LOG=warn hc s generate -r=$HC_PORT ../dna/workdir/happ/elemental-chess.happ network -b https://bootstrap-staging.holo.host quic",
+    "start-holochain": "RUST_LOG=warn hc s generate -r=$HC_PORT ../dna/workdir/happ/elemental-chess.happ -a='uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL' network -b https://bootstrap-staging.holo.host quic",
     "build-watch": "rimraf dist && rollup -c rollup.config.js -w",
     "build": "rimraf dist && rollup -c rollup.config.js",
     "prepublish": "npm run build",
@@ -18,7 +18,8 @@
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
     "test": "tsc && web-test-runner --coverage",
     "test:watch": "web-test-runner --watch",
-    "start-holo": "concurrently -k \"npm:chaperone\" \"npm:start-alice\"",
+    "start-holo": "HC_PORT=8888 concurrently -k \"npm:chaperone\" \"npm:start-hcc\" \"npm:start-ui\"",
+    "start-hcc": "hc s run 0",
     "chaperone": "chaperone-server --config ../setup/chaperone.json"
   },
   "dependencies": {

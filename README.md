@@ -47,6 +47,14 @@ npm run start-bob
 
 If a page with "Not found" appears, wait for the UI to finish compilation and refresh the page.
 
+## Starting with Holo's HCC mode
+
+```bash
+npm run start-holo
+```
+
+Go to the page that opens, and login with email: "alice". Any password will work.
+
 ## Building the UI
 
 ```bash

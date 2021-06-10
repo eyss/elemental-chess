@@ -3,7 +3,7 @@ manifest_version: "1"
 name: elemental-chess
 description: ~
 slots:
-  - id: sample-slot
+  - id: elemental-chess
     provisioning:
       strategy: create
       deferred: false

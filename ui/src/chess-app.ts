@@ -75,6 +75,13 @@ export class ChessApp extends ScopedRegistryHost(LitElement) {
     const a = new Connection('http://localhost:24273');
     console.log(a);
 
+    await a.ready()
+    await a.signIn()
+
+    console.log(await a.appInfo('elemental-chess'))
+
+    console.log(await a.zomeCall('elemental-chess', 'chess', 'get_my_game_results',null))
+
     this._appWebsocket = await AppWebsocket.connect(APP_URL, 300000, signal => {
       if (signal.data.payload.GameStarted != undefined) {
         const gameHash = signal.data.payload.GameStarted[0];
