@@ -3,18 +3,23 @@ use hc_joining_code;
 
 entry_defs![Path::entry_def()];
 
-#[hdk_extern]
-fn init(_: ()) -> ExternResult<InitCallbackResult> {
+
+// TODO: uncomment when joining code is merged
+//#[hdk_extern]
+pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
     return hc_joining_code::init_validate_and_create_joining_code();
 }
 
-#[hdk_extern]
-fn genesis_self_check(data: GenesisSelfCheckData) -> ExternResult<ValidateCallbackResult> {
+
+// TODO: uncomment when joining code is merged
+//#[hdk_extern]
+pub fn genesis_self_check(data: GenesisSelfCheckData) -> ExternResult<ValidateCallbackResult> {
     hc_joining_code::validate_joining_code( data.agent_key, data.membrane_proof)
 }
 
-#[hdk_extern]
-fn validate_create_agent(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
+// TODO: uncomment when joining code is merged
+//#[hdk_extern]
+pub fn validate_create_agent(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
     let element = data.element.clone();
     let entry = element.entry();
     let entry = match entry {
