@@ -5,7 +5,7 @@ use holochain_turn_based_game::prelude::*;
 pub mod chess_game;
 pub mod chess_game_result;
 
-use chess_game::MakeMoveInput;
+use chess_game::{ChessGame, ChessGameMove, MakeMoveInput};
 
 use chess_game_result::ChessGameResult;
 
@@ -55,4 +55,10 @@ pub fn publish_result(result: ChessGameResult) -> ExternResult<()> {
 #[hdk_extern]
 pub fn get_my_game_results(_: ()) -> ExternResult<Vec<(EntryHashB64, ChessGameResult)>> {
     chess_game_result::get_my_game_results()
+}
+
+#[hdk_extern]
+fn validate_create_entry_game_entry(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
+    holochain_turn_based_game::prelude::validate_game_entry::<ChessGame, ChessGameMove>(data)
+    // TODO: add validation for read-only agents
 }

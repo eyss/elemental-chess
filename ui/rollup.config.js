@@ -40,7 +40,6 @@ export default merge(baseConfig, {
   plugins: [
     replace({
       'process.env.NODE_ENV': '"production"',
-      'COMB=build.COMB;': 'window.COMB = build.COMB;',
     }),
     builtins(),
     typescript({ experimentalDecorators: true }),
@@ -52,7 +51,6 @@ export default merge(baseConfig, {
         'node_modules/navigo/**/*',
         'node_modules/@msgpack/**/*',
         'node_modules/@holochain/conductor-api/**/*',
-        'node_modules/@holo-host/**/*',
         'node_modules/chess.js/**/*',
       ],
     }),

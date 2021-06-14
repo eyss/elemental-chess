@@ -1,0 +1,13 @@
+[package]
+name = "joining_code"
+version = "0.0.1"
+authors = [ "guillem_cordoba" ]
+edition = "2018"
+
+[lib]
+name = "joining_code"
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+hc_joining_code = {git = "https://github.com/holochain/elemental-chat", package = "hc_joining_code", rev =  "ff058891b7ea71414c3ee8dedfa43933114133e8"}
+hdk = "0.0.101-alpha.0"
