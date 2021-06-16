@@ -1,0 +1,12 @@
+[package]
+authors = ["manuel_puentes"]
+edition = "2018"
+name = "invitations"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "invitations"
+
+[dependencies]
+hc_zome_invitations = {git = "https://github.com/eyss/hc_zome_invitations", branch = "main", package = "hc_zome_invitations"}

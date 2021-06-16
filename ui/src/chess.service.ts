@@ -1,13 +1,10 @@
-import { AppWebsocket, CellId } from '@holochain/conductor-api';
 import * as msgpack from '@msgpack/msgpack';
+import { CellClient } from '@holochain-open-dev/cell-client';
 import { ChessGameResult, ChessMove, GameEntry, MoveInfo } from './types';
 
 export class ChessService {
-  constructor(
-    public appWebsocket: AppWebsocket,
-    public cellId: CellId,
-    public zomeName = 'chess'
-  ) {}
+
+  constructor(public cellClient: CellClient, public zomeName = 'invitations') {}
 
   async createGame(opponentPubKey: string): Promise<string> {
     return this.callZome('create_game', opponentPubKey);
@@ -53,13 +50,6 @@ export class ChessService {
   }
 
   private callZome(fn_name: string, payload: any) {
-    return this.appWebsocket.callZome({
-      cap: null as any,
-      cell_id: this.cellId,
-      zome_name: this.zomeName,
-      fn_name: fn_name,
-      payload: payload,
-      provenance: this.cellId[1],
-    });
+    return this.cellClient.callZome(this.zomeName, fn_name, payload);
   }
 }

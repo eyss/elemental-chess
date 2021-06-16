@@ -25,11 +25,10 @@
   "dependencies": {
     "@adobe/lit-mobx": "^2.0.0-rc.4",
     "@eyss/invitations": "git+https://github.com/eyss/hc_zome_invitations.git#ui-build",
-    "@holo-host/web-sdk": "^0.5.0",
+    "@holochain-open-dev/cell-client": "git+https://github.com/holochain-open-dev/cell-client.git#build",
     "@holochain-open-dev/context": "git+https://github.com/holochain-open-dev/context.git#ui-build",
     "@holochain-open-dev/core-types": "git+https://github.com/holochain-open-dev/core-types.git#build",
     "@holochain-open-dev/profiles": "git+https://github.com/holochain-open-dev/profiles.git#ui-build",
-    "@holochain/conductor-api": "^0.0.4",
     "@lit-labs/scoped-registry-mixin": "^1.0.0-rc.1",
     "@msgpack/msgpack": "^2.6.3",
     "@webcomponents/scoped-custom-element-registry": "=0.0.1",

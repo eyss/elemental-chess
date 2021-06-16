@@ -54,36 +54,35 @@ export class ChessGame extends ScopedRegistryHost(MobxLitElement) {
   _profilesStore!: ProfilesStore;
 
   listenForOpponentMove() {
-    const hcConnection = this._chessService.appWebsocket;
 
-    ConductorApi.AppWebsocket.connect(
-      hcConnection.client.socket.url,
-      15000,
-      signal => {
-        const payload = signal.data.payload;
-        if (payload.Move) {
-          const game_hash = payload.Move.move_entry.game_hash;
-          if (game_hash !== this.gameHash) return;
+    const hcConnection = this._chessService.cellClient;
 
-          const move = payload.Move;
-          move.move_entry.game_move = msgpack.decode(move.move_entry.game_move);
+    hcConnection.addSignalHandler( signal =>{
 
-          this._moves.push(move);
+      const payload = signal.data.payload;
+      if (payload.Move) {
+        const game_hash = payload.Move.move_entry.game_hash;
+        if (game_hash !== this.gameHash) return;
 
-          if (move.move_entry.game_move.to) {
-            const { from, to } = move.move_entry.game_move;
-            const moveString = `${from}-${to}`;
+        const move = payload.Move;
+        move.move_entry.game_move = msgpack.decode(move.move_entry.game_move);
 
-            this._chessGame.move({ from, to });
-            (this.shadowRoot?.getElementById('board') as any).move(moveString);
-          }
+        this._moves.push(move);
 
-          this.announceIfGameEnded();
+        if (move.move_entry.game_move.to) {
+          const { from, to } = move.move_entry.game_move;
+          const moveString = `${from}-${to}`;
 
-          this.requestUpdate();
+          this._chessGame.move({ from, to });
+          (this.shadowRoot?.getElementById('board') as any).move(moveString);
         }
+
+        this.announceIfGameEnded();
+
+        this.requestUpdate();
       }
-    );
+    });
+
   }
 
   async getGameInfo(retriesLeft = 4): Promise<GameEntry> {
