@@ -62,3 +62,10 @@ fn validate_create_entry_game_entry(data: ValidateData) -> ExternResult<Validate
     holochain_turn_based_game::prelude::validate_game_entry::<ChessGame, ChessGameMove>(data)
     // TODO: add validation for read-only agents
 }
+
+#[hdk_extern]
+fn prueba(_:u16)-> ExternResult<String>{
+
+    return Ok(String::from("prueba"));
+
+}

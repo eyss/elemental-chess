@@ -12,7 +12,7 @@ const makeMove = (make_move_input: MakeMoveInput) => (conductor) =>
 
 type MakeMoveInput = {
   game_hash: string;
-  previous_move_hash: string | undefined;
+  previous_move_hash: string | null;
   game_move: any;
 };
 
@@ -50,26 +50,33 @@ export function ChessZomeTest(config, installables) {
         console.log("Hola bobby:", signal);
       });
 
-      const new_game_address: string = await createGame(bobbyPubKey)(
+      const new_game_address:string = await createGame(bobbyPubKey)(
         alice_conductor
       );
-      await delay(1000);
+      await delay(3000);
+
+
+        console.log("the result is this:");
+        console.log(new_game_address);
+
+
       const movement_input: MakeMoveInput = {
         game_hash: new_game_address,
-        previous_move_hash: undefined,
+        previous_move_hash: null,
         game_move: { type: "PlacePiece", from: "e2", to: "e4" },
       };
 
       const make_move = await makeMove(movement_input)(bobby_conductor);
       await delay(1000);
 
-      await delay(10000);
-      const links = await alice_conductor.call(
-        "chess",
-        "get_game_moves",
-        new_game_address
-      );
 
+      const links = await alice_conductor.call(
+          "chess",
+          "get_game_moves",
+          new_game_address
+        );
+        
+        await delay(10000);
       t.equal(links.length, 1);
     }
   );
