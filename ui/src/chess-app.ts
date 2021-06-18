@@ -84,7 +84,6 @@
 
 //     console.log(await a.zomeCall('elemental-chess', 'chess', 'get_my_game_results',null))
 
-
 //     // this._appWebsocket = await AppWebsocket.connect(APP_URL, 300000, signal => {
 //     //   if (signal.data.payload.GameStarted != undefined) {
 //     //     const gameHash = signal.data.payload.GameStarted[0];
@@ -252,12 +251,9 @@ import { property, query } from 'lit/decorators.js';
 import { router } from './router';
 
 import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
-import { HoloClient, WebSdkConnection } from "@holochain-open-dev/cell-client";
-
+import { HoloClient, WebSdkConnection } from '@holochain-open-dev/cell-client';
 
 export class ChessApp extends ScopedRegistryHost(LitElement) {
-
-
   @property({ type: Array })
   _activeGameHash: string | undefined = undefined;
 
@@ -268,7 +264,6 @@ export class ChessApp extends ScopedRegistryHost(LitElement) {
   _loading = true;
 
   async firstUpdated() {
-
     await this.connectToHolochain();
 
     router
@@ -283,18 +278,15 @@ export class ChessApp extends ScopedRegistryHost(LitElement) {
       })
       .resolve();
     this._loading = false;
-
   }
 
   async connectToHolochain() {
-
     // const appWebsocket = await ConductorApi.AppWebsocket.connect(
     //   'ws://localhost:8888', 12000
     // );
     // const appInfo = await appWebsocket.appInfo({
     //   installed_app_id: 'uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL',
     // });
-
 
     // const cellData = appInfo.cell_data[0];
     // const cellClient = new HolochainClient(appWebsocket, cellData);
@@ -308,17 +300,9 @@ export class ChessApp extends ScopedRegistryHost(LitElement) {
     // );
     // console.log("this callzome result is :", result);
 
-
-
-
-
-
-
-
-    const connection:any = new WebSdkConnection(
-      
+    const connection = new WebSdkConnection(
       'http://localhost:24273',
-      
+
       (signal: any) => {
         if (signal.data.payload.GameStarted != undefined) {
           const gameHash = signal.data.payload.GameStarted[0];
@@ -330,39 +314,25 @@ export class ChessApp extends ScopedRegistryHost(LitElement) {
       }
     );
 
-
     await connection.ready();
     await connection.signIn();
 
-    const appInfo = await connection.appInfo('test-app');
+    const appInfo = await connection.appInfo(
+      'uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL'
+    );
+    console.log(appInfo);
     const cellData = appInfo.cell_data[0];
 
+    console.log('Hola');
+    console.log(appInfo);
 
-      console.log("Hola");
-      console.log((appInfo))
+    const cellClient = new HoloClient(connection, cellData, {
+      app_name: 'elemental-chess',
+    });
 
+    console.log('before the zome call execution');
 
-    const cellClient = new HoloClient(
-      connection, 
-      cellData, 
-      {
-        app_name: 'elemental-chess',
-      }
-    );
-
-    console.log("before the zome call execution");
-
-    let result =  await cellClient.callZome(
-      'chess',
-      'prueba',
-      null
-    );
-    console.log("this callzome result is :", result);
-
+    let result = await cellClient.callZome('chess', 'prueba', null);
+    console.log('this callzome result is :', result);
   }
-
-
 }
-
-
-

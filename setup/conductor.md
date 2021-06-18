@@ -15,6 +15,10 @@ this will create the empty sandbox in the especific dir and
 
 in order to install an happ to an especific agent, you need first have created an agent, you can do it with this command 
 
+```bash
 hc s call new-agent
 
-hc s call install-app-bundle happ_bundle_path --app-id your_happ_id --agent-key especific_agent_key 
+hc s call install-app-bundle happ_bundle_path --app-id your_happ_id --agent-key specific_agent_key 
+
+hc s call add-app-ws 8888
+```
