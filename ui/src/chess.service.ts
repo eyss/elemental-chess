@@ -4,7 +4,7 @@ import { ChessGameResult, ChessMove, GameEntry, MoveInfo } from './types';
 
 export class ChessService {
 
-  constructor(public cellClient: CellClient, public zomeName = 'invitations') {}
+  constructor(public cellClient: CellClient, public zomeName = 'chess') {}
 
   async createGame(opponentPubKey: string): Promise<string> {
     return this.callZome('create_game', opponentPubKey);
