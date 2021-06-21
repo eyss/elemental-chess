@@ -99,7 +99,7 @@ export class ChessApp extends ScopedRegistryHost(LitElement) {
     this._invitationStore = new ContextProvider(
       this,
       INVITATIONS_STORE_CONTEXT as never,
-      new InvitationsStore(invitationService, new ProfilesStore(profilesService), true) as any
+      new InvitationsStore(invitationService, true) as any
     );
 
     this._chessService = new ContextProvider(
