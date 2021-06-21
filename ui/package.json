@@ -12,7 +12,7 @@
     "start-ui": "concurrently -k --names tsc,web-dev-server \"npm run build-watch\" \"sleep 5 && web-dev-server --config web-dev-server.config.mjs\"",
     "start-holochain": "RUST_LOG=warn hc s generate -r=$HC_PORT ../dna/workdir/happ/elemental-chess.happ -a='uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL' network -b https://bootstrap-staging.holo.host quic",
     "build-watch": "rimraf dist && rollup -c rollup.config.js -w",
-    "build": "rimraf dist && rollup -c rollup.config.js",
+    "build": "rimraf dist && HC_PORT=8888 rollup -c rollup.config.js",
     "prepublish": "npm run build",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
