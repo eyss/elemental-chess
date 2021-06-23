@@ -16,9 +16,9 @@ import { Icon } from 'scoped-material-components/mwc-icon';
 import { sharedStyles } from './sharedStyles';
 import { CHESS_SERVICE_CONTEXT } from '../constants';
 import { MobxLitElement } from '@adobe/lit-mobx';
-import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements';
 
-export class ChessGameResultsHistory extends ScopedRegistryHost(
+export class ChessGameResultsHistory extends ScopedElementsMixin(
   MobxLitElement
 ) {
   @state()
@@ -145,12 +145,14 @@ export class ChessGameResultsHistory extends ScopedRegistryHost(
     `;
   }
 
-  static elementDefinitions = {
-    'mwc-icon': Icon,
-    'mwc-card': Card,
-    'mwc-list': List,
-    'mwc-list-item': ListItem,
-  };
+  static get scopedElements() {
+    return {
+      'mwc-icon': Icon,
+      'mwc-card': Card,
+      'mwc-list': List,
+      'mwc-list-item': ListItem,
+    };
+  }
 
   static styles = [sharedStyles];
 }

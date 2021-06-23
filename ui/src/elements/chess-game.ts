@@ -27,7 +27,7 @@ import {
   PROFILES_STORE_CONTEXT,
 } from '@holochain-open-dev/profiles';
 import { CHESS_SERVICE_CONTEXT } from '../constants';
-import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements';
 import { MobxLitElement } from '@adobe/lit-mobx';
 
 const whiteSquareGrey = '#a9a9a9';
@@ -36,7 +36,7 @@ const blackSquareGrey = '#696969';
 const sleep = (ms: number) =>
   new Promise(resolve => setTimeout(() => resolve(null), ms));
 
-export class ChessGame extends ScopedRegistryHost(MobxLitElement) {
+export class ChessGame extends ScopedElementsMixin(MobxLitElement) {
   @property()
   gameHash!: string;
 
@@ -54,11 +54,9 @@ export class ChessGame extends ScopedRegistryHost(MobxLitElement) {
   _profilesStore!: ProfilesStore;
 
   listenForOpponentMove() {
-
     const hcConnection = this._chessService.cellClient;
 
-    hcConnection.addSignalHandler( signal =>{
-
+    hcConnection.addSignalHandler(signal => {
       const payload = signal.data.payload;
       if (payload.Move) {
         const game_hash = payload.Move.move_entry.game_hash;
@@ -82,7 +80,6 @@ export class ChessGame extends ScopedRegistryHost(MobxLitElement) {
         this.requestUpdate();
       }
     });
-
   }
 
   async getGameInfo(retriesLeft = 4): Promise<GameEntry> {
@@ -424,14 +421,16 @@ export class ChessGame extends ScopedRegistryHost(MobxLitElement) {
     `;
   }
 
-  static elementDefinitions = {
-    'mwc-circular-progress': CircularProgress,
-    'mwc-list': List,
-    'mwc-list-item': ListItem,
-    'mwc-card': Card,
-    'mwc-button': Button,
-    'chess-board': ChessBoardElement,
-  };
+  static get scopedElements() {
+    return {
+      'mwc-circular-progress': CircularProgress,
+      'mwc-list': List,
+      'mwc-list-item': ListItem,
+      'mwc-card': Card,
+      'mwc-button': Button,
+      'chess-board': ChessBoardElement,
+    };
+  }
 
   static get styles() {
     return [
@@ -443,7 +442,7 @@ export class ChessGame extends ScopedRegistryHost(MobxLitElement) {
           flex-direction: column;
         }
         #board {
-          height: 700px;
+          height: 70vh;
           width: 700px;
         }
         .game-info > span {

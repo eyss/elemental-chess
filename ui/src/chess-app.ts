@@ -19,35 +19,26 @@ import {
 import { ChessService } from './chess.service';
 import { ChessGame } from './elements/chess-game';
 import { ChessGameResultsHistory } from './elements/chess-game-results-history';
-// import '@holo-host/comb';
 
 import {
   CreateInvitation,
   InvitationsStore,
   InvitationsService,
   InvitationsList,
-  
 } from '@eyss/invitations';
 import { INVITATIONS_STORE_CONTEXT } from '@eyss/invitations/types';
-
-// export class ChessApp extends ScopedRegistryHost(LitElement) {
-
-//   _appWebsocket!: AppWebsocket;
-//   _adminWebsocket!: AdminWebsocket;
-//   _cellId!: CellId;
-
-// }
-
-
 
 import { LitElement, css, html } from 'lit';
 import { property, query } from 'lit/decorators.js';
 import { router } from './router';
-import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
-import { HoloClient, HolochainClient, WebSdkConnection } from '@holochain-open-dev/cell-client';
-import { create } from 'domain';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements';
+import {
+  HoloClient,
+  HolochainClient,
+  WebSdkConnection,
+} from '@holochain-open-dev/cell-client';
 
-export class ChessApp extends ScopedRegistryHost(LitElement) {
+export class ChessApp extends ScopedElementsMixin(LitElement) {
   @property({ type: Array })
   _activeGameHash: string | undefined = undefined;
 
@@ -79,22 +70,22 @@ export class ChessApp extends ScopedRegistryHost(LitElement) {
   }
 
   async connectToHolochain() {
+    const cellClient = await this.createHolochainClient();
 
-    const cellClient = await this.createHoloClient();
+    const profilesService = new ProfilesService(cellClient);
 
-    const profilesService = new ProfilesService(
-      cellClient,
-    );
+    const store = new ProfilesStore(profilesService);
+
+    // Fetching our profile has a side-effect of executing init
+    await store.fetchMyProfile();
 
     this._profilesStore = new ContextProvider(
       this,
       PROFILES_STORE_CONTEXT as never,
-      new ProfilesStore(profilesService) as any
+      store as any
     );
 
-    const invitationService = new InvitationsService(
-      cellClient,
-    );
+    const invitationService = new InvitationsService(cellClient);
 
     this._invitationStore = new ContextProvider(
       this,
@@ -107,11 +98,9 @@ export class ChessApp extends ScopedRegistryHost(LitElement) {
       CHESS_SERVICE_CONTEXT as never,
       new ChessService(cellClient) as any
     );
-
   }
 
   async _onInvitationCompleted(event: any) {
-    console.log(event);
     const opponent = event.detail.invitation.inviter;
     const gameHash = await (
       this._chessService.value as ChessService
@@ -119,8 +108,7 @@ export class ChessApp extends ScopedRegistryHost(LitElement) {
     router.navigate(`/game/${gameHash}`);
   }
 
-  async createHoloClient(){
-
+  async createHoloClient() {
     const connection = new WebSdkConnection(
       'http://localhost:24273',
 
@@ -150,18 +138,24 @@ export class ChessApp extends ScopedRegistryHost(LitElement) {
     return cellClient;
   }
 
-  async createHolochainClient(){
-
+  async createHolochainClient() {
     const appWebsocket = await AppWebsocket.connect(
-      'ws://localhost:8888', 12000
+      APP_URL,
+      12000,
+      (signal: any) => {
+        if (signal.data.payload.GameStarted != undefined) {
+          const gameHash = signal.data.payload.GameStarted[0];
+          router.navigate(`/game/${gameHash}`);
+        }
+      }
     );
     const appInfo = await appWebsocket.appInfo({
-      installed_app_id: 'uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL',
+      installed_app_id: 'elemental-chess',
     });
 
     const cellData = appInfo.cell_data[0];
     const cellClient = new HolochainClient(appWebsocket, cellData);
-    
+
     return cellClient;
   }
 
@@ -233,19 +227,21 @@ export class ChessApp extends ScopedRegistryHost(LitElement) {
     `;
   }
 
-  static elementDefinitions = {
-    'mwc-circular-progress': CircularProgress,
-    'mwc-top-app-bar': TopAppBar,
-    'mwc-button': Button,
-    'mwc-icon-button': IconButton,
-    'mwc-card': Card,
-    'profile-prompt': ProfilePrompt,
-    'list-profiles': ListProfiles,
-    'chess-game': ChessGame,
-    'chess-game-results-history': ChessGameResultsHistory,
-    'create-invitation': CreateInvitation,
-    'invitations-list': InvitationsList,
-  };
+  static get scopedElements() {
+    return {
+      'mwc-circular-progress': CircularProgress,
+      'mwc-top-app-bar': TopAppBar,
+      'mwc-button': Button,
+      'mwc-icon-button': IconButton,
+      'mwc-card': Card,
+      'profile-prompt': ProfilePrompt,
+      'list-profiles': ListProfiles,
+      'chess-game': ChessGame,
+      'chess-game-results-history': ChessGameResultsHistory,
+      'create-invitation': CreateInvitation,
+      'invitations-list': InvitationsList,
+    };
+  }
 
   static get styles() {
     return [
@@ -276,5 +272,4 @@ export class ChessApp extends ScopedRegistryHost(LitElement) {
       sharedStyles,
     ];
   }
-
 }
