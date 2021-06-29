@@ -16,6 +16,11 @@ entry_defs![
 ];
 
 #[hdk_extern]
+pub fn test(_: ()) -> ExternResult<()> {
+    Ok(())
+}
+
+#[hdk_extern]
 pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
     holochain_turn_based_game::prelude::init_turn_based_games()
 }

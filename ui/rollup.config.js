@@ -40,6 +40,7 @@ export default merge(baseConfig, {
   plugins: [
     replace({
       'process.env.NODE_ENV': '"production"',
+      'process.env.ENV': `"${process.env.ENV}"`,
       'process.env.HC_PORT': `"${process.env.HC_PORT}"`,
     }),
     builtins(),

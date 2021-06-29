@@ -11,6 +11,6 @@ const globals = fromRollup(rollupGlobals);
 
 export default [
   replace({
-    'process.env.HC_PORT': process.env.HC_PORT,
+    'process.env.PORT': process.env.PORT,
   }),
 ];

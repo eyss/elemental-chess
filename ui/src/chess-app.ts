@@ -5,7 +5,12 @@ import { Card } from 'scoped-material-components/mwc-card';
 import { ContextProvider } from '@holochain-open-dev/context';
 import { CircularProgress } from 'scoped-material-components/mwc-circular-progress';
 import { sharedStyles } from './elements/sharedStyles';
-import { APP_URL, CHESS_SERVICE_CONTEXT } from './constants';
+import {
+  appId,
+  appUrl,
+  CHESS_SERVICE_CONTEXT,
+  isHoloEnv,
+} from './constants';
 import { TopAppBar } from 'scoped-material-components/mwc-top-app-bar';
 import { Button } from 'scoped-material-components/mwc-button';
 import { IconButton } from 'scoped-material-components/mwc-icon-button';
@@ -25,8 +30,8 @@ import {
   InvitationsStore,
   InvitationsService,
   InvitationsList,
+  INVITATIONS_STORE_CONTEXT,
 } from '@eyss/invitations';
-import { INVITATIONS_STORE_CONTEXT } from '@eyss/invitations/types';
 
 import { LitElement, css, html } from 'lit';
 import { property, query } from 'lit/decorators.js';
@@ -36,6 +41,7 @@ import {
   HoloClient,
   HolochainClient,
   WebSdkConnection,
+  CellClient,
 } from '@holochain-open-dev/cell-client';
 
 export class ChessApp extends ScopedElementsMixin(LitElement) {
@@ -69,8 +75,13 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     this._loading = false;
   }
 
+  createClient(): Promise<CellClient> {
+    if (isHoloEnv()) return this.createHoloClient();
+    else return this.createHolochainClient();
+  }
+
   async connectToHolochain() {
-    const cellClient = await this.createHolochainClient();
+    const cellClient = await this.createClient();
 
     const profilesService = new ProfilesService(cellClient);
 
@@ -110,7 +121,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
   async createHoloClient() {
     const connection = new WebSdkConnection(
-      'http://localhost:24273',
+      appUrl(),
 
       (signal: any) => {
         if (signal.data.payload.GameStarted != undefined) {
@@ -126,9 +137,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     await connection.ready();
     await connection.signIn();
 
-    const appInfo = await connection.appInfo(
-      'uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL'
-    );
+    const appInfo = await connection.appInfo(appId());
     const cellData = appInfo.cell_data[0];
 
     const cellClient = new HoloClient(connection, cellData, {
@@ -140,7 +149,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
   async createHolochainClient() {
     const appWebsocket = await AppWebsocket.connect(
-      APP_URL,
+      appUrl() as string,
       12000,
       (signal: any) => {
         if (signal.data.payload.GameStarted != undefined) {
@@ -150,7 +159,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       }
     );
     const appInfo = await appWebsocket.appInfo({
-      installed_app_id: 'elemental-chess',
+      installed_app_id: appId() as string,
     });
 
     const cellData = appInfo.cell_data[0];

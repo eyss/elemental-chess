@@ -442,7 +442,7 @@ export class ChessGame extends ScopedElementsMixin(MobxLitElement) {
           flex-direction: column;
         }
         #board {
-          height: 70vh;
+          height: 700px;
           width: 700px;
         }
         .game-info > span {
