@@ -53,6 +53,16 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   _profilesStore!: ContextProvider<never>;
   _invitationStore!: ContextProvider<never>;
 
+  signalHandler = (signal: any) => {
+    if (signal.data.payload.GameStarted != undefined) {
+      const gameHash = signal.data.payload.GameStarted[0];
+      router.navigate(`/game/${gameHash}`);
+    }
+    if (this._invitationStore.value) {
+      (this._invitationStore.value as InvitationsStore).signalHandler(signal);
+    }
+  };
+
   async firstUpdated() {
     await this.connectToHolochain();
 
@@ -93,10 +103,12 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
     const invitationService = new InvitationsService(cellClient);
 
+    const invitationsStore = new InvitationsStore(invitationService, true);
+
     this._invitationStore = new ContextProvider(
       this,
       INVITATIONS_STORE_CONTEXT as never,
-      new InvitationsStore(invitationService, true) as any
+      invitationsStore as any
     );
 
     this._chessService = new ContextProvider(
@@ -117,13 +129,8 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   async createHoloClient() {
     const connection = new WebSdkConnection(
       appUrl(),
+      this.signalHandler,
 
-      (signal: any) => {
-        if (signal.data.payload.GameStarted != undefined) {
-          const gameHash = signal.data.payload.GameStarted[0];
-          router.navigate(`/game/${gameHash}`);
-        }
-      },
       {
         app_name: 'elemental-chess',
       }

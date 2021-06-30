@@ -27,7 +27,7 @@
   "dependencies": {
     "@adobe/lit-mobx": "^2.0.0-rc.4",
     "@eyss/invitations": "git+https://github.com/eyss/hc_zome_invitations.git#ui-build",
-    "@holo-host/chaperone": "github:Holo-Host/chaperone#hcc-signals-06-30",
+    "@holo-host/chaperone": "github:Holo-Host/chaperone#develop",
     "@holo-host/web-sdk": "github:guillemcordoba/web-sdk#develop",
     "@holochain-open-dev/cell-client": "github:holochain-open-dev/cell-client#build",
     "@holochain-open-dev/context": "git+https://github.com/holochain-open-dev/context.git#ui-build",
