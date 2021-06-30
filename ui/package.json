@@ -27,6 +27,8 @@
   "dependencies": {
     "@adobe/lit-mobx": "^2.0.0-rc.4",
     "@eyss/invitations": "git+https://github.com/eyss/hc_zome_invitations.git#ui-build",
+    "@holo-host/chaperone": "github:Holo-Host/chaperone#hcc-signals-06-30",
+    "@holo-host/web-sdk": "github:guillemcordoba/web-sdk#develop",
     "@holochain-open-dev/cell-client": "github:holochain-open-dev/cell-client#build",
     "@holochain-open-dev/context": "git+https://github.com/holochain-open-dev/context.git#ui-build",
     "@holochain-open-dev/core-types": "git+https://github.com/holochain-open-dev/core-types.git#build",
@@ -41,7 +43,6 @@
     "scoped-material-components": "^0.1.6"
   },
   "devDependencies": {
-    "@holo-host/chaperone": "git+https://github.com/holo-host/chaperone.git#develop",
     "@holo-host/comb": "^0.2.0",
     "@open-wc/building-rollup": "^1.9.4",
     "@open-wc/eslint-config": "^4.0.0",

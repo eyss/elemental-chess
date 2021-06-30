@@ -55,6 +55,7 @@ export default merge(baseConfig, {
         'node_modules/navigo/**/*',
         'node_modules/@msgpack/**/*',
         'node_modules/@holochain/conductor-api/**/*',
+        'node_modules/@holo-host/**/*',
         'node_modules/chess.js/**/*',
       ],
     }),

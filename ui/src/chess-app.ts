@@ -5,12 +5,7 @@ import { Card } from 'scoped-material-components/mwc-card';
 import { ContextProvider } from '@holochain-open-dev/context';
 import { CircularProgress } from 'scoped-material-components/mwc-circular-progress';
 import { sharedStyles } from './elements/sharedStyles';
-import {
-  appId,
-  appUrl,
-  CHESS_SERVICE_CONTEXT,
-  isHoloEnv,
-} from './constants';
+import { appId, appUrl, CHESS_SERVICE_CONTEXT, isHoloEnv } from './constants';
 import { TopAppBar } from 'scoped-material-components/mwc-top-app-bar';
 import { Button } from 'scoped-material-components/mwc-button';
 import { IconButton } from 'scoped-material-components/mwc-icon-button';
@@ -40,9 +35,9 @@ import { ScopedElementsMixin } from '@open-wc/scoped-elements';
 import {
   HoloClient,
   HolochainClient,
-  WebSdkConnection,
   CellClient,
 } from '@holochain-open-dev/cell-client';
+import { Connection as WebSdkConnection } from '@holo-host/web-sdk';
 
 export class ChessApp extends ScopedElementsMixin(LitElement) {
   @property({ type: Array })
@@ -124,7 +119,6 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       appUrl(),
 
       (signal: any) => {
-        console.log(signal)
         if (signal.data.payload.GameStarted != undefined) {
           const gameHash = signal.data.payload.GameStarted[0];
           router.navigate(`/game/${gameHash}`);
