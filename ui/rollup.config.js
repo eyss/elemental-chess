@@ -10,9 +10,11 @@ import globals from 'rollup-plugin-node-globals';
 // use createBasicConfig to do regular JS to JS bundling
 // import { createBasicConfig } from '@open-wc/building-rollup';
 
+const outputDir =
+  process.env.ENV === 'holodev' ? `dist-${process.env.HC_PORT}` : 'dist';
 const baseConfig = createSpaConfig({
   // use the outputdir option to modify where files are output
-  // outputDir: 'dist',
+  outputDir,
 
   // if you need to support older browsers, such as IE11, set the legacyBuild
   // option to generate an additional build just for this browser
@@ -44,7 +46,7 @@ export default merge(baseConfig, {
       'process.env.HC_PORT': `"${process.env.HC_PORT}"`,
     }),
     builtins(),
-    typescript({ experimentalDecorators: true }),
+    typescript({ experimentalDecorators: true, outDir: outputDir }),
     commonjs({
       include: [
         'node_modules/base64-js/**/*',

@@ -19,9 +19,10 @@
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
     "test": "tsc && web-test-runner --coverage",
     "test:watch": "web-test-runner --watch",
-    "start-holo": "ENV=holodev concurrently -k \"npm:chaperone\" \"npm:start-hcc\" \"npm:start-ui\"",
-    "start-hcc": "hc s run 0",
-    "chaperone": "chaperone-server --config ../setup/chaperone.json"
+    "start-holo-alice": "HC_PORT=24273 ENV=holodev concurrently -k \"npm:chaperone-alice\" \"hc s run 0\" \"npm:start-ui\"",
+    "start-holo-bob": "HC_PORT=24274 ENV=holodev concurrently -k \"npm:chaperone-bob\" \"hc s run 1\" \"npm:start-ui\"",
+    "chaperone-alice": "chaperone-server --config ../setup/chaperone_alice.json",
+    "chaperone-bob": "chaperone-server --config ../setup/chaperone_bob.json"
   },
   "dependencies": {
     "@adobe/lit-mobx": "^2.0.0-rc.4",
@@ -40,7 +41,7 @@
     "scoped-material-components": "^0.1.6"
   },
   "devDependencies": {
-    "@holo-host/chaperone": "^7.1.1",
+    "@holo-host/chaperone": "git+https://github.com/holo-host/chaperone.git#develop",
     "@holo-host/comb": "^0.2.0",
     "@open-wc/building-rollup": "^1.9.4",
     "@open-wc/eslint-config": "^4.0.0",

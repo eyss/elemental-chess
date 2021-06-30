@@ -1,0 +1,16 @@
+{
+    "app_id": "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL",
+    "log_level": true,
+    "connection": {
+      "secure": false,
+      "host": "localhost",
+      "port": 8889,
+      "path": "/"
+    },
+    "port": 24274,
+    "mode": 2,
+    "web_user_legend": {
+      "bob": "uhCAkV_iOuDRp2VB9Jf8rUXE1jE6-G4FXf_hbTqWLhU9Wk5VPeEZJ"
+    }
+  }
+  

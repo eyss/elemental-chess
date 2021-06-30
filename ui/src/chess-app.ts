@@ -124,6 +124,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       appUrl(),
 
       (signal: any) => {
+        console.log(signal)
         if (signal.data.payload.GameStarted != undefined) {
           const gameHash = signal.data.payload.GameStarted[0];
           router.navigate(`/game/${gameHash}`);

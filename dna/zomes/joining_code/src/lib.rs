@@ -5,20 +5,20 @@ entry_defs![Path::entry_def()];
 
 
 // TODO: uncomment when joining code is merged
-#[hdk_extern]
+//#[hdk_extern]
 pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
     return hc_joining_code::init_validate_and_create_joining_code();
 }
 
 
 // TODO: uncomment when joining code is merged
-#[hdk_extern]
+//#[hdk_extern]
 pub fn genesis_self_check(data: GenesisSelfCheckData) -> ExternResult<ValidateCallbackResult> {
     hc_joining_code::validate_joining_code( data.agent_key, data.membrane_proof)
 }
 
 // TODO: uncomment when joining code is merged
-#[hdk_extern]
+//#[hdk_extern]
 pub fn validate_create_agent(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
     let element = data.element.clone();
     let entry = element.entry();

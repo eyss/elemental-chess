@@ -19,3 +19,4 @@
 /_site/
 /dist/
 /out-tsc/
+/dist-*

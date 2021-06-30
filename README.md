@@ -50,10 +50,18 @@ If a page with "Not found" appears, wait for the UI to finish compilation and re
 ## Starting with Holo's HCC mode
 
 ```bash
-npm run start-holo
+npm run start-holo-alice
 ```
 
 Go to the page that opens, and login with email: "alice". Any password will work.
+
+In another terminal:
+
+```bash
+npm run start-holo-bob
+```
+
+Go to the page that opens, and login with email: "bob". Any password will work.
 
 ## Building the UI
 
