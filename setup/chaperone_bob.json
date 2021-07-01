@@ -9,8 +9,6 @@
     },
     "port": 24274,
     "mode": 2,
-    "web_user_legend": {
-      "bob": "uhCAkV_iOuDRp2VB9Jf8rUXE1jE6-G4FXf_hbTqWLhU9Wk5VPeEZJ"
-    }
+    "hcc_admin_port_for_agent_autodetection": 9001
   }
   

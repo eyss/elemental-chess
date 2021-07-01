@@ -8,8 +8,6 @@
       "path": "/"
     },
     "mode": 2,
-    "web_user_legend": {
-      "alice": "uhCAkGNTWu96TQ35YlfXK-9YJOJHMWVwO88v3ZVhcvUmFD1fibPGj"
-    }
+    "hcc_admin_port_for_agent_autodetection": 9000
   }
   

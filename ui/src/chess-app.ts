@@ -58,7 +58,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       const gameHash = signal.data.payload.GameStarted[0];
       router.navigate(`/game/${gameHash}`);
     }
-    if (this._invitationStore.value) {
+    if (this._invitationStore.value && isHoloEnv()) {
       (this._invitationStore.value as InvitationsStore).signalHandler(signal);
     }
   };
