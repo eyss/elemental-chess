@@ -10,9 +10,13 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
 
 #[hdk_extern]
 pub fn genesis_self_check(data: GenesisSelfCheckData) -> ExternResult<ValidateCallbackResult> {
-    let holo_agent_key =
-        hc_joining_code::holo_agent(&SerializedBytes::from(UnsafeBytes::from(vec![])))?;
-    hc_joining_code::validate_joining_code(holo_agent_key, data.agent_key, data.membrane_proof)
+    /*     let holo_agent_key =
+    hc_joining_code::holo_agent(&SerializedBytes::from(UnsafeBytes::from(vec![])))?; */
+    hc_joining_code::validate_joining_code(
+        AgentPubKey::try_from("uhCAkRHEsXSAebzKJtPsLY1XcNePAFIieFBtz2ATanlokxnSC1Kkz").unwrap(),
+        data.agent_key,
+        data.membrane_proof,
+    )
 }
 
 #[hdk_extern]
@@ -35,7 +39,10 @@ pub fn validate_create_agent(data: ValidateData) -> ExternResult<ValidateCallbac
                         Some(element_pkg) => match element_pkg.signed_header().header() {
                             Header::AgentValidationPkg(pkg) => {
                                 return hc_joining_code::validate_joining_code(
-                                    hc_joining_code::holo_agent(&zome_info()?.properties)?,
+                                    AgentPubKey::try_from(
+                                        "uhCAkRHEsXSAebzKJtPsLY1XcNePAFIieFBtz2ATanlokxnSC1Kkz",
+                                    )
+                                    .unwrap(),
                                     pkg.author.clone(),
                                     pkg.membrane_proof.clone(),
                                 )
