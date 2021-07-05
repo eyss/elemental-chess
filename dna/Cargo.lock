@@ -306,28 +306,17 @@ checksum = "0e4075386626662786ddb0ec9081e7c7eeb1ba31951f447ca780ef9f5d568189"
 
 [[package]]
 name = "hashbrown"
-version = "0.9.1"
+version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7afe4a420e3fe79967a00898cc1f4db7c8a49a9333a29f8a4bd76a253d5cd04"
+checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
 
 [[package]]
 name = "hc_joining_code"
 version = "0.0.1-alpha.1"
-source = "git+https://github.com/holochain/elemental-chat?rev=88cf1cbc8aff4e5a070280983d649ea7a7a08952#88cf1cbc8aff4e5a070280983d649ea7a7a08952"
+source = "git+https://github.com/holochain/elemental-chat?rev=c4842945880338512b110d31e80f979ba0f03f02#c4842945880338512b110d31e80f979ba0f03f02"
 dependencies = [
  "derive_more",
  "hdk",
- "serde",
-]
-
-[[package]]
-name = "hc_joining_code"
-version = "0.0.1-alpha.1"
-source = "git+https://github.com/holochain/elemental-chat?rev=ff058891b7ea71414c3ee8dedfa43933114133e8#ff058891b7ea71414c3ee8dedfa43933114133e8"
-dependencies = [
- "derive_more",
- "hdk",
- "holo_hash",
  "serde",
 ]
 
@@ -338,9 +327,7 @@ dependencies = [
  "chess",
  "chrono",
  "derive_more",
- "hc_joining_code 0.0.1-alpha.1 (git+https://github.com/holochain/elemental-chat?rev=88cf1cbc8aff4e5a070280983d649ea7a7a08952)",
  "hdk",
- "holo_hash",
  "holochain_turn_based_game",
  "serde",
 ]
@@ -348,22 +335,20 @@ dependencies = [
 [[package]]
 name = "hc_zome_invitations"
 version = "0.0.1"
-source = "git+https://github.com/eyss/hc_zome_invitations?branch=main#7a68048b5669ad683ee8949374ebe1b81455cf00"
+source = "git+https://github.com/eyss/hc_zome_invitations?rev=811c072bca4200b023e225899d01e2ae93096eaa#811c072bca4200b023e225899d01e2ae93096eaa"
 dependencies = [
  "derive_more",
  "hdk",
- "holo_hash",
  "serde",
 ]
 
 [[package]]
 name = "hc_zome_profiles"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/profiles?branch=main#ba033c25b9800a78c14bceec889bc4c14b410875"
+source = "git+https://github.com/holochain-open-dev/profiles?rev=12f14e63813bd534807df24108d8dbc4b3390785#12f14e63813bd534807df24108d8dbc4b3390785"
 dependencies = [
  "derive_more",
  "hdk",
- "holo_hash",
  "serde",
 ]
 
@@ -450,12 +435,11 @@ dependencies = [
 [[package]]
 name = "holochain_turn_based_game"
 version = "0.2.3"
-source = "git+http://github.com/eyss/holochain-turn-based-game?rev=9f901d799b995a656ec275b4fe9c4c0be54e9361#9f901d799b995a656ec275b4fe9c4c0be54e9361"
+source = "git+http://github.com/eyss/holochain-turn-based-game?rev=5e07a5f7c3d12d246eede978b65ce0d5f7f15f49#5e07a5f7c3d12d246eede978b65ce0d5f7f15f49"
 dependencies = [
  "chrono",
  "derive_more",
  "hdk",
- "holo_hash",
  "serde",
 ]
 
@@ -513,9 +497,9 @@ checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
 
 [[package]]
 name = "indexmap"
-version = "1.6.2"
+version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "824845a0bf897a9042383849b02c1bc219c2383772efcd5c6f9766fa4b81aef3"
+checksum = "bc633605454125dec4b66843673f01c7df2b89479b32e0ed634e43a91cff62a5"
 dependencies = [
  "autocfg 1.0.1",
  "hashbrown",
@@ -547,7 +531,7 @@ checksum = "dd25036021b0de88a0aff6b850051563c6516d0bf53f8638938edbb9de732736"
 name = "joining_code"
 version = "0.0.1"
 dependencies = [
- "hc_joining_code 0.0.1-alpha.1 (git+https://github.com/holochain/elemental-chat?rev=ff058891b7ea71414c3ee8dedfa43933114133e8)",
+ "hc_joining_code",
  "hdk",
 ]
 
@@ -687,9 +671,9 @@ checksum = "acbf547ad0c65e31259204bd90935776d1c693cec2f4ff7abb7a1bbbd40dfe58"
 
 [[package]]
 name = "pin-project-lite"
-version = "0.2.6"
+version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc0e1f259c92177c30a4c9d177246edd0a3568b25756a977d0632cf8fa37e905"
+checksum = "8d31d11c69a6b52a174b42bdc0c30e5e11670f90788b2c471c31c1d17d449443"
 
 [[package]]
 name = "ppv-lite86"
@@ -941,9 +925,9 @@ dependencies = [
 
 [[package]]
 name = "rustc-demangle"
-version = "0.1.19"
+version = "0.1.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "410f7acf3cb3a44527c5d9546bad4bf4e6c460915d5f9f2fc524498bfe8f70ce"
+checksum = "dead70b0b5e03e9c814bcb6b01e03e68f7c57a80aa48c72ec92152ab3e818d49"
 
 [[package]]
 name = "ryu"
@@ -1090,18 +1074,18 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.25"
+version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa6f76457f59514c7eeb4e59d891395fab0b2fd1d40723ae737d64153392e9c6"
+checksum = "93119e4feac1cbe6c798c34d3a53ea0026b0b1de6a120deef895137c0529bfe2"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.25"
+version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a36768c0fbf1bb15eca10defa29526bda730a2376c2ab4393ccfa16fb1a318d"
+checksum = "060d69a0afe7796bf42e9e2ff91f5ee691fb15c53d38b4b62a9a53eb23164745"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1183,9 +1167,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-subscriber"
-version = "0.2.18"
+version = "0.2.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa5553bf0883ba7c9cbe493b085c29926bd41b66afc31ff72cf17ff4fb60dcd5"
+checksum = "ab69019741fca4d98be3c62d2b75254528b5432233fd8a4d2739fec20278de48"
 dependencies = [
  "ansi_term",
  "chrono",
@@ -1205,9 +1189,9 @@ dependencies = [
 
 [[package]]
 name = "unicode-segmentation"
-version = "1.7.1"
+version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb0d2e7be6ae3a5fa87eed5fb451aff96f2573d2694942e40543ae0bbe19c796"
+checksum = "8895849a949e7845e06bd6dc1aa51731a103c42707010a5b591c0038fb73385b"
 
 [[package]]
 name = "unicode-xid"

@@ -13,9 +13,7 @@ serde = "1"
 derive_more = "0"
 chrono = {version = "0.4", features = ["serde"]}
 
-hdk = "0.0.101-alpha.0"
-holo_hash = "0.0.2-alpha.1"
+hdk = {git = "https://github.com/holochain/holochain", rev = "363af6d8af8d18e4616f6aa56ad4d1f0fabaafb7", package = "hdk", version = "0.0.101-alpha.0"}
 
-holochain_turn_based_game = {git ="http://github.com/eyss/holochain-turn-based-game", rev ="9f901d799b995a656ec275b4fe9c4c0be54e9361"}
+holochain_turn_based_game = {git ="http://github.com/eyss/holochain-turn-based-game", rev ="5e07a5f7c3d12d246eede978b65ce0d5f7f15f49"}
 chess = "3.2.0"
-hc_joining_code = {git = "https://github.com/holochain/elemental-chat", package = "hc_joining_code", rev =  "88cf1cbc8aff4e5a070280983d649ea7a7a08952"}

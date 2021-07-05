@@ -1,6 +1,6 @@
 use chess::{ChessMove, Color, Game, GameResult, Square};
 use hdk::prelude::*;
-use holo_hash::{AgentPubKeyB64, EntryHashB64};
+use hdk::prelude::holo_hash::{AgentPubKeyB64, EntryHashB64};
 use holochain_turn_based_game::prelude::TurnBasedGame;
 use std::str::FromStr;
 

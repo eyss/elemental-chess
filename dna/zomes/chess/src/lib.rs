@@ -1,5 +1,5 @@
 use hdk::prelude::*;
-use holo_hash::{AgentPubKeyB64, EntryHashB64};
+use hdk::prelude::holo_hash::{AgentPubKeyB64, EntryHashB64};
 use holochain_turn_based_game::prelude::*;
 
 pub mod chess_game;
@@ -65,5 +65,11 @@ pub fn get_my_game_results(_: ()) -> ExternResult<Vec<(EntryHashB64, ChessGameRe
 #[hdk_extern]
 fn validate_create_entry_game_entry(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
     holochain_turn_based_game::prelude::validate_game_entry::<ChessGame, ChessGameMove>(data)
+    // TODO: add validation for read-only agents
+}
+
+#[hdk_extern]
+fn validate_create_entry_game_move_entry(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
+    holochain_turn_based_game::prelude::validate_game_move_entry::<ChessGame, ChessGameMove>(data)
     // TODO: add validation for read-only agents
 }

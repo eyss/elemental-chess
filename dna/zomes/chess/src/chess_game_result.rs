@@ -1,7 +1,7 @@
 use chrono::serde::ts_milliseconds;
 use chrono::{DateTime, Utc};
 use hdk::prelude::*;
-use holo_hash::{AgentPubKeyB64, EntryHashB64};
+use hdk::prelude::holo_hash::{AgentPubKeyB64, EntryHashB64};
 
 #[hdk_entry(id = "chess_game_result")]
 #[derive(Clone)]

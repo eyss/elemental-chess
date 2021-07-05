@@ -1,7 +1,7 @@
 [workspace]
 members = [
-"zomes/chess",
 "zomes/profiles",
+"zomes/chess",
 "zomes/invitations",
 "zomes/joining_code",
 ]
@@ -13,5 +13,5 @@ opt-level = "z"
 opt-level = "z"
 
 [patch.crates-io]
-hdk = {git = "https://github.com/holochain/holochain", rev = "363af6d8af8d18e4616f6aa56ad4d1f0fabaafb7", package = "hdk"}
-holo_hash = {git = "https://github.com/holochain/holochain.git", rev = "363af6d8af8d18e4616f6aa56ad4d1f0fabaafb7", package = "holo_hash"}
+hdk = {git = "https://github.com/holochain/holochain", rev = "363af6d8af8d18e4616f6aa56ad4d1f0fabaafb7", package = "hdk", version = "0.0.101-alpha.0"}
+holo_hash = {git = "https://github.com/holochain/holochain", rev = "363af6d8af8d18e4616f6aa56ad4d1f0fabaafb7", package = "holo_hash"}
