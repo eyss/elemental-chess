@@ -1,6 +1,7 @@
 import * as msgpack from '@msgpack/msgpack';
 import { CellClient } from '@holochain-open-dev/cell-client';
 import { ChessGameResult, ChessMove, GameEntry, MoveInfo } from './types';
+import { EntryHashB64 } from '@holochain-open-dev/core-types';
 
 export class ChessService {
 
@@ -45,7 +46,11 @@ export class ChessService {
     return this.callZome('publish_result', result);
   }
 
-  async getMyGameResults(): Promise<Array<[string, ChessGameResult]>> {
+  async getMyCurrentGames(): Promise<Array<EntryHashB64>> {
+    return this.callZome('get_my_current_games', null);
+  }
+
+  async getMyGameResults(): Promise<Array<[EntryHashB64, ChessGameResult]>> {
     return this.callZome('get_my_game_results', null);
   }
 

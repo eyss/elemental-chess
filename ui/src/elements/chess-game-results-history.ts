@@ -17,6 +17,7 @@ import { sharedStyles } from './sharedStyles';
 import { CHESS_SERVICE_CONTEXT } from '../constants';
 import { MobxLitElement } from '@adobe/lit-mobx';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements';
+import { CircularProgress } from 'scoped-material-components/mwc-circular-progress';
 
 export class ChessGameResultsHistory extends ScopedElementsMixin(
   MobxLitElement
@@ -122,7 +123,7 @@ export class ChessGameResultsHistory extends ScopedElementsMixin(
 
   render() {
     if (!this._chessGameResults)
-      return html`<div class="container">
+      return html`<div class="column center-content" style="flex: 1;">
         <mwc-circular-progress indeterminate></mwc-circular-progress>
       </div>`;
 
@@ -151,6 +152,7 @@ export class ChessGameResultsHistory extends ScopedElementsMixin(
       'mwc-card': Card,
       'mwc-list': List,
       'mwc-list-item': ListItem,
+      'mwc-circular-progress': CircularProgress,
     };
   }
 

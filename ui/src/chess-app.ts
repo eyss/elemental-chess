@@ -38,6 +38,8 @@ import {
   CellClient,
 } from '@holochain-open-dev/cell-client';
 import { Connection as WebSdkConnection } from '@holo-host/web-sdk';
+import { EntryHashB64 } from '@holochain-open-dev/core-types';
+import { ChessCurrentGames } from './elements/chess-current-games';
 
 export class ChessApp extends ScopedElementsMixin(LitElement) {
   @property({ type: Array })
@@ -123,6 +125,10 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     const gameHash = await (
       this._chessService.value as ChessService
     ).createGame(opponent);
+    this.openGame(gameHash);
+  }
+
+  openGame(gameHash: EntryHashB64) {
     router.navigate(`/game/${gameHash}`);
   }
 
@@ -174,17 +180,11 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     if (this._activeGameHash)
       return html` <div class="row center-content " style="flex: 1;">
         <mwc-button
-          style="align-self: start;"
           @click=${() => router.navigate('/')}
           label="Go back"
           icon="arrow_back"
           raised
-          id="back-button"
-          style=${styleMap({
-            display: this._gameEnded ? 'inherit' : 'none',
-            'align-self': 'start',
-            margin: '16px',
-          })}
+          style="align-self: start; margin: 16px;"
         ></mwc-button>
         <chess-game
           .gameHash=${this._activeGameHash}
@@ -212,8 +212,12 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
               </div>
             </mwc-card>
             <chess-game-results-history
-              style="flex: 1;"
+              style="flex: 1; margin-right: 42px;"
             ></chess-game-results-history>
+            <chess-current-games
+              style="flex: 1;"
+              @open-game=${(e: CustomEvent) => this.openGame(e.detail.gameHash)}
+            ></chess-current-games>
           </div>
         </div>
       `;
@@ -248,6 +252,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       'profile-prompt': ProfilePrompt,
       'list-profiles': ListProfiles,
       'chess-game': ChessGame,
+      'chess-current-games': ChessCurrentGames,
       'chess-game-results-history': ChessGameResultsHistory,
       'create-invitation': CreateInvitation,
       'invitations-list': InvitationsList,

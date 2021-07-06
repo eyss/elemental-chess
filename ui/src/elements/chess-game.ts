@@ -265,6 +265,7 @@ export class ChessGame extends ScopedElementsMixin(MobxLitElement) {
       if (iResigned) num_of_moves--;
 
       const result: ChessGameResult = {
+        game_hash: this.gameHash,
         white_player: amIWhite ? this.myAddress : this.getOpponent(),
         black_player: amIWhite ? this.getOpponent() : this.myAddress,
         num_of_moves,

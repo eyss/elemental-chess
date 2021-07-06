@@ -1,3 +1,5 @@
+import { EntryHashB64 } from "@holochain-open-dev/core-types";
+
 export interface GameEntry {
   players: Array<string>;
   created_at: number;
@@ -32,6 +34,7 @@ export interface ChessGameState {
 }
 
 export interface ChessGameResult {
+  game_hash: EntryHashB64;
   timestamp: number;
   black_player: string;
   white_player: string;

@@ -6,12 +6,13 @@ use hdk::prelude::holo_hash::{AgentPubKeyB64, EntryHashB64};
 #[hdk_entry(id = "chess_game_result")]
 #[derive(Clone)]
 pub struct ChessGameResult {
+    pub game_hash: EntryHashB64,
     #[serde(with = "ts_milliseconds")]
-    timestamp: DateTime<Utc>,
-    white_player: AgentPubKeyB64,
-    black_player: AgentPubKeyB64,
-    winner: ChessResult,
-    num_of_moves: usize,
+    pub timestamp: DateTime<Utc>,
+    pub white_player: AgentPubKeyB64,
+    pub black_player: AgentPubKeyB64,
+    pub winner: ChessResult,
+    pub num_of_moves: usize,
 }
 
 /// Represent a color.
@@ -28,7 +29,9 @@ pub fn publish_result(result: ChessGameResult) -> ExternResult<()> {
     let result_hash = hash_entry(result.clone())?;
 
     for player in vec![result.white_player, result.black_player] {
-        create_link(AgentPubKey::from(player).into(), result_hash.clone(), ())?;      
+        create_link(AgentPubKey::from(player).into(), result_hash.clone(), ())?;
+        
+        
     }
 
     Ok(())

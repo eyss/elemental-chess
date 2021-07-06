@@ -19,8 +19,8 @@
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
     "test": "tsc && web-test-runner --coverage",
     "test:watch": "web-test-runner --watch",
-    "start-holo-alice": "HC_PORT=24273  concurrently -k \"npm:chaperone-alice\" \"APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9000 npm run start-holochain\" \"ENV=holodev npm:start-ui\"",
-    "start-holo-bob": "HC_PORT=24274 concurrently -k \"npm:chaperone-bob\" \"APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9001 npm run start-holochain\" \"ENV=holodev npm:start-ui\"",
+    "start-holo-alice": "concurrently -k \"npm:chaperone-alice\" \"HC_PORT=8888 APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9000 npm run start-holochain\" \"HC_PORT=24273 ENV=holodev npm run start-ui\"",
+    "start-holo-bob": "concurrently -k \"npm:chaperone-bob\" \"HC_PORT=8889 APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9001 npm run start-holochain\" \"HC_PORT=24274 ENV=holodev npm run start-ui\"",
     "chaperone-alice": "chaperone-server --config ../setup/chaperone_alice.json",
     "chaperone-bob": "chaperone-server --config ../setup/chaperone_bob.json"
   },
