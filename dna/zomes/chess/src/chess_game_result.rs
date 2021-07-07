@@ -1,7 +1,7 @@
 use chrono::serde::ts_milliseconds;
 use chrono::{DateTime, Utc};
-use hdk::prelude::*;
 use hdk::prelude::holo_hash::{AgentPubKeyB64, EntryHashB64};
+use hdk::prelude::*;
 
 #[hdk_entry(id = "chess_game_result")]
 #[derive(Clone)]
@@ -29,9 +29,11 @@ pub fn publish_result(result: ChessGameResult) -> ExternResult<()> {
     let result_hash = hash_entry(result.clone())?;
 
     for player in vec![result.white_player, result.black_player] {
-        create_link(AgentPubKey::from(player).into(), result_hash.clone(), ())?;
-        
-        
+        create_link(
+            AgentPubKey::from(player).into(),
+            result_hash.clone(),
+            game_result_tag(),
+        )?;
     }
 
     Ok(())
@@ -40,7 +42,7 @@ pub fn publish_result(result: ChessGameResult) -> ExternResult<()> {
 pub fn get_my_game_results() -> ExternResult<Vec<(EntryHashB64, ChessGameResult)>> {
     let agent_pub_key = agent_info()?.agent_initial_pubkey;
 
-    let links = get_links(agent_pub_key.into(), None)?;
+    let links = get_links(agent_pub_key.into(), Some(game_result_tag()))?;
 
     let results = links
         .into_inner()
@@ -64,4 +66,8 @@ fn get_game_result(game_result_hash: EntryHash) -> ExternResult<ChessGameResult>
         .ok_or(WasmError::Guest("Could not get game result".into()))?;
 
     Ok(game_result)
+}
+
+fn game_result_tag() -> LinkTag {
+    LinkTag::new("game_result")
 }

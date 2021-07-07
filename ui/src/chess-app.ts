@@ -27,7 +27,7 @@ import {
 } from '@eyss/invitations';
 
 import { LitElement, css, html } from 'lit';
-import { property, query } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { router } from './router';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements';
 import {
@@ -46,8 +46,11 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   @property()
   _gameEnded: boolean = false;
 
-  @property({ type: Array })
+  @state()
   _loading = true;
+
+  @state()
+  _signedIn = false;
 
   _cellClient!: CellClient;
 
@@ -97,6 +100,8 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     // Fetching our profile has a side-effect of executing init
     await store.fetchMyProfile();
 
+    console.log(await this._cellClient.callZome('chess', 'test', null));
+
     this._profilesStore = new ContextProvider(
       this,
       PROFILES_STORE_CONTEXT as never,
@@ -144,6 +149,8 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
     await connection.ready();
     await connection.signIn();
+
+    this._signedIn = true;
 
     const appInfo = await connection.appInfo(appId());
     const cellData = appInfo.cell_data[0];
@@ -231,16 +238,17 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   }
 
   renderLogout() {
-    if (!isHoloEnv()) return html``;
+    if (!isHoloEnv() || !this._signedIn) return html``;
     return html`
       <mwc-button
         label="LOGOUT"
         icon="logout"
         style="--mdc-theme-primary: white;"
-        @click=${() => {
+        @click=${async () => {
           const c = (this._cellClient as any).connection;
-          c.signOut();
-          c.signIn();
+          await c.signOut();
+          await c.signIn();
+          this._signedIn = false;
         }}
         slot="actionItems"
       ></mwc-button>

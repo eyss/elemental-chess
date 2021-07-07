@@ -32,7 +32,6 @@ export class ChessCurrentGames extends ScopedElementsMixin(MobxLitElement) {
 
   async firstUpdated() {
     const gameHashes = await this._chessService.getMyCurrentGames();
-    console.log(gameHashes);
     const games: Dictionary<GameEntry> = {};
 
     const promises = gameHashes.map(async gameHash => {
@@ -44,7 +43,6 @@ export class ChessCurrentGames extends ScopedElementsMixin(MobxLitElement) {
 
     await Promise.all(promises);
     this._chessGames = games;
-    console.log(this._chessGames);
   }
 
   getOpponentAddress(game: GameEntry): string {

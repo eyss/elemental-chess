@@ -20,3 +20,5 @@
 /dist/
 /out-tsc/
 /dist-*
+.hc*
+.hc
