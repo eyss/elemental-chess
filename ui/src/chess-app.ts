@@ -1,5 +1,3 @@
-import { styleMap } from 'lit/directives/style-map.js';
-
 import { AppWebsocket, AdminWebsocket, CellId } from '@holochain/conductor-api';
 import { Card } from 'scoped-material-components/mwc-card';
 import { ContextProvider } from '@holochain-open-dev/context';
@@ -51,6 +49,8 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   @property({ type: Array })
   _loading = true;
 
+  _cellClient!: CellClient;
+
   _chessService!: ContextProvider<never>;
   _profilesStore!: ContextProvider<never>;
   _invitationStore!: ContextProvider<never>;
@@ -88,9 +88,9 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   }
 
   async connectToHolochain() {
-    const cellClient = await this.createClient();
+    this._cellClient = await this.createClient();
 
-    const profilesService = new ProfilesService(cellClient);
+    const profilesService = new ProfilesService(this._cellClient);
 
     const store = new ProfilesStore(profilesService);
 
@@ -103,7 +103,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       store as any
     );
 
-    const invitationService = new InvitationsService(cellClient);
+    const invitationService = new InvitationsService(this._cellClient);
 
     const invitationsStore = new InvitationsStore(invitationService, true);
 
@@ -116,7 +116,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     this._chessService = new ContextProvider(
       this,
       CHESS_SERVICE_CONTEXT as never,
-      new ChessService(cellClient) as any
+      new ChessService(this._cellClient) as any
     );
   }
 
@@ -148,6 +148,13 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     const appInfo = await connection.appInfo(appId());
     const cellData = appInfo.cell_data[0];
 
+    // TODO: remove this when chaperone is fixed
+    if (!(cellData.cell_id[0] instanceof Uint8Array)) {
+      cellData.cell_id = [
+        new Uint8Array((cellData.cell_id[0] as any).data),
+        new Uint8Array((cellData.cell_id[1] as any).data),
+      ] as any;
+    }
     const cellClient = new HoloClient(connection, cellData, {
       app_name: 'elemental-chess',
     });
@@ -194,9 +201,9 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     else
       return html`
         <div class="column center-content" style="flex: 1; margin: 100px;">
-          <div class="row" style="flex: 1; width: 1200px; margin-bottom: 42px;">
+          <div class="row" style="flex: 1; width: 1200px; margin-bottom: 24px;">
             <create-invitation
-              style="flex: 1; margin-right: 42px;"
+              style="flex: 1; margin-right: 24px;"
             ></create-invitation>
             <invitations-list
               style="flex: 1;"
@@ -205,14 +212,14 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
             ></invitations-list>
           </div>
           <div class="row" style="flex: 1; width: 1200px;">
-            <mwc-card style="flex: 1; margin-right: 42px;">
-              <div class="column" style="flex: 1; margin: 16px;">
-                <span class="title" style="margin-bottom: 16px;">Players </span>
+            <mwc-card style="flex: 1; margin-right: 24px;">
+              <div class="column" style="flex: 1; margin: 12px;">
+                <span class="title" style="margin-bottom: 12px;">Players </span>
                 <list-profiles></list-profiles>
               </div>
             </mwc-card>
             <chess-game-results-history
-              style="flex: 1; margin-right: 42px;"
+              style="flex: 1; margin-right: 24px;"
             ></chess-game-results-history>
             <chess-current-games
               style="flex: 1;"
@@ -221,6 +228,23 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
           </div>
         </div>
       `;
+  }
+
+  renderLogout() {
+    if (!isHoloEnv()) return html``;
+    return html`
+      <mwc-button
+        label="LOGOUT"
+        icon="logout"
+        style="--mdc-theme-primary: white;"
+        @click=${() => {
+          const c = (this._cellClient as any).connection;
+          c.signOut();
+          c.signIn();
+        }}
+        slot="actionItems"
+      ></mwc-button>
+    `;
   }
 
   render() {
@@ -238,6 +262,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
             ${this.renderContent()}
           </profile-prompt>
         </div>
+        ${this.renderLogout()}
       </mwc-top-app-bar>
     `;
   }
