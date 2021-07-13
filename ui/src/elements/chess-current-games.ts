@@ -42,6 +42,7 @@ export class ChessCurrentGames extends ScopedElementsMixin(MobxLitElement) {
     });
 
     await Promise.all(promises);
+    console.log(this._profilesStore.profiles)
     this._chessGames = games;
   }
 

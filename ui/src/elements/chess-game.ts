@@ -389,7 +389,7 @@ export class ChessGame extends ScopedElementsMixin(MobxLitElement) {
           <mwc-button
             raised
             label="Resign"
-            .disabled=${this.isGameOver()}
+            .disabled=${this.isGameOver() || !this.isMyTurn()}
             @click=${() => this.makeMove({ type: 'Resign' })}
           ></mwc-button>
         </div>

@@ -32,19 +32,21 @@ export class ChessGameResultsHistory extends ScopedElementsMixin(
   _profilesStore!: ProfilesStore;
 
   async firstUpdated() {
-    this._chessGameResults = await this._chessService.getMyGameResults();
+    const results = await this._chessService.getMyGameResults();
 
-    const promises = this._chessGameResults.map(r =>
+    const promises = results.map(async r =>
       this._profilesStore.fetchAgentProfile(this.getOpponentAddress(r[1]))
     );
     await Promise.all(promises);
+    this._chessGameResults = results;
   }
 
   getOpponentAddress(result: ChessGameResult) {
     const myAddress = this._profilesStore.myAgentPubKey;
+
     return result.black_player === myAddress
-      ? result.black_player
-      : result.white_player;
+      ? result.white_player
+      : result.black_player;
   }
 
   getResult(result: ChessGameResult) {

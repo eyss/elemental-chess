@@ -64,7 +64,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       router.navigate(`/game/${gameHash}`);
     }
     if (this._invitationStore.value && isHoloEnv()) {
-      (this._invitationStore.value as InvitationsStore).signalHandler(signal);
+      //(this._invitationStore.value as InvitationsStore).signalHandler(signal);
     }
   };
 
@@ -99,8 +99,6 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
     // Fetching our profile has a side-effect of executing init
     await store.fetchMyProfile();
-
-    console.log(await this._cellClient.callZome('chess', 'test', null));
 
     this._profilesStore = new ContextProvider(
       this,
@@ -153,6 +151,10 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     this._signedIn = true;
 
     const appInfo = await connection.appInfo(appId());
+
+    if (!appInfo.cell_data)
+      throw new Error(`Holo appInfo() failed: ${JSON.stringify(appInfo)}`);
+
     const cellData = appInfo.cell_data[0];
 
     // TODO: remove this when chaperone is fixed
@@ -222,7 +224,13 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
             <mwc-card style="flex: 1; margin-right: 24px;">
               <div class="column" style="flex: 1; margin: 12px;">
                 <span class="title" style="margin-bottom: 12px;">Players </span>
-                <list-profiles></list-profiles>
+                <div class="flex-scrollable-parent">
+                  <div class="flex-scrollable-container">
+                    <div class="flex-scrollable-y">
+                      <list-profiles></list-profiles>
+                    </div>
+                  </div>
+                </div>
               </div>
             </mwc-card>
             <chess-game-results-history
