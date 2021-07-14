@@ -71,7 +71,7 @@ export class ChessGame extends ScopedElementsMixin(MobxLitElement) {
           const { from, to } = move.move_entry.game_move;
           const moveString = `${from}-${to}`;
 
-          this._chessGame.move({ from, to });
+          this._chessGame.move({ from, to, promotion: 'q' });
           (this.shadowRoot?.getElementById('board') as any).move(moveString);
         }
 
@@ -109,7 +109,7 @@ export class ChessGame extends ScopedElementsMixin(MobxLitElement) {
     for (const move of this._moves) {
       if (move.move_entry.game_move.type === 'PlacePiece') {
         const { from, to } = move.move_entry.game_move;
-        this._chessGame.move({ from, to });
+        this._chessGame.move({ from, to, promotion: 'q' });
       }
     }
 
@@ -199,7 +199,8 @@ export class ChessGame extends ScopedElementsMixin(MobxLitElement) {
     if (move === null) {
       setAction('snapback');
     } else {
-      this.placePiece(source, target);
+      const promotion = move.flags.includes('p') ? 'Queen' : undefined;
+      this.placePiece(source, target, promotion);
     }
   }
 
@@ -287,13 +288,14 @@ export class ChessGame extends ScopedElementsMixin(MobxLitElement) {
     }
   }
 
-  async placePiece(from: string, to: string) {
+  async placePiece(from: string, to: string, promotion: string | undefined) {
     const move: ChessMove = {
       type: 'PlacePiece',
       from,
       to,
+      promotion,
     };
-    this._chessGame.move({ from, to });
+    this._chessGame.move({ from, to, promotion: 'q' });
     this.requestUpdate();
 
     this.makeMove(move);

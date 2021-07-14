@@ -21,7 +21,7 @@ export type ChessMove =
   | {
       type: 'Resign';
     }
-  | { type: 'PlacePiece'; from: string; to: string };
+  | { type: 'PlacePiece'; from: string; to: string, promotion: string | undefined };
 
 export interface ChessGame {
   white_address: string;

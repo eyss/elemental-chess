@@ -1,6 +1,6 @@
-use chess::{ChessMove, Color, Game, GameResult, Square};
-use hdk::prelude::*;
+use chess::{ChessMove, Color, Game, GameResult, Piece, Square};
 use hdk::prelude::holo_hash::{AgentPubKeyB64, EntryHashB64};
+use hdk::prelude::*;
 use holochain_turn_based_game::prelude::TurnBasedGame;
 use std::str::FromStr;
 
@@ -20,10 +20,23 @@ impl Into<String> for ChessGame {
 #[derive(Clone, SerializedBytes, Deserialize, Serialize, Debug)]
 #[serde(tag = "type")]
 pub enum ChessGameMove {
-    PlacePiece { from: String, to: String },
+    PlacePiece {
+        from: String,
+        to: String,
+        promotion: Option<String>,
+    },
     Resign,
 }
 
+fn promotion_piece(piece: String) -> ExternResult<Piece> {
+    match piece.as_str() {
+        "Queen" => Ok(Piece::Queen),
+        "Rook" => Ok(Piece::Rook),
+        "Knight" => Ok(Piece::Knight),
+        "Bishop" => Ok(Piece::Bishop),
+        _ => Err(WasmError::Guest("Invalid piece to promote to".into())),
+    }
+}
 
 impl TurnBasedGame<ChessGameMove> for ChessGame {
     fn min_players() -> Option<usize> {
@@ -49,13 +62,22 @@ impl TurnBasedGame<ChessGameMove> for ChessGame {
         author_index: usize,
     ) -> ExternResult<()> {
         match game_move {
-            ChessGameMove::PlacePiece { from, to } => {
+            ChessGameMove::PlacePiece {
+                from,
+                to,
+                promotion,
+            } => {
                 let from = Square::from_str(from.as_str())
                     .or(Err(WasmError::Guest("Malformed move".into())))?;
                 let to = Square::from_str(to.as_str())
                     .or(Err(WasmError::Guest("Malformed move".into())))?;
 
-                let chess_move: ChessMove = ChessMove::new(from, to, None);
+                let promotion_piece = match promotion {
+                    Some(p) => Some(promotion_piece(p.clone())?),
+                    None => None,
+                };
+
+                let chess_move: ChessMove = ChessMove::new(from, to, promotion_piece);
 
                 if !self.game.current_position().legal(chess_move.clone()) {
                     return Err(WasmError::Guest("Illegal move".into()));
