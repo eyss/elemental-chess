@@ -1,6 +1,6 @@
 use hdk::prelude::holo_hash::{AgentPubKeyB64, EntryHashB64};
 use hdk::prelude::*;
-use holochain_turn_based_game::prelude::*;
+use hc_turn_based_game::prelude::*;
 
 use chrono::serde::ts_milliseconds;
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -44,7 +44,7 @@ entry_defs![
 
 #[hdk_extern]
 pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    holochain_turn_based_game::prelude::init_turn_based_games()
+    hc_turn_based_game::prelude::init_turn_based_games()
 }
 
 #[hdk_extern]
@@ -52,7 +52,7 @@ pub fn create_game(opponent: AgentPubKeyB64) -> ExternResult<EntryHashB64> {
     let my_pub_key = agent_info()?.agent_initial_pubkey;
     let players = vec![opponent.clone(), AgentPubKeyB64::from(my_pub_key.clone())];
 
-    let game_hash = holochain_turn_based_game::prelude::create_game(players.clone())?;
+    let game_hash = hc_turn_based_game::prelude::create_game(players.clone())?;
 
     current_games::add_current_game(
         game_hash.clone().into(),
@@ -64,7 +64,7 @@ pub fn create_game(opponent: AgentPubKeyB64) -> ExternResult<EntryHashB64> {
 
 #[hdk_extern]
 pub fn make_move(input: MakeMoveInput) -> ExternResult<EntryHashB64> {
-    holochain_turn_based_game::prelude::create_move(
+    hc_turn_based_game::prelude::create_move(
         input.game_hash,
         input.previous_move_hash,
         input.game_move,
@@ -73,12 +73,12 @@ pub fn make_move(input: MakeMoveInput) -> ExternResult<EntryHashB64> {
 
 #[hdk_extern]
 pub fn get_game(game_hash: EntryHashB64) -> ExternResult<GameEntry> {
-    holochain_turn_based_game::prelude::get_game(game_hash)
+    hc_turn_based_game::prelude::get_game(game_hash)
 }
 
 #[hdk_extern]
 pub fn get_game_moves(game_hash: EntryHashB64) -> ExternResult<Vec<MoveInfo>> {
-    holochain_turn_based_game::prelude::get_game_moves(game_hash)
+    hc_turn_based_game::prelude::get_game_moves(game_hash)
 }
 
 #[hdk_extern]
@@ -104,7 +104,7 @@ pub fn get_my_current_games(_: ()) -> ExternResult<Vec<EntryHashB64>> {
 
 #[hdk_extern]
 fn validate_create_entry_game_entry(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
-    holochain_turn_based_game::prelude::validate_game_entry::<ChessGame, ChessGameMove>(data)
+    hc_turn_based_game::prelude::validate_game_entry::<ChessGame, ChessGameMove>(data)
     // TODO: add validation for read-only agents
 }
 
@@ -112,6 +112,6 @@ fn validate_create_entry_game_entry(data: ValidateData) -> ExternResult<Validate
 fn validate_create_entry_game_move_entry(
     data: ValidateData,
 ) -> ExternResult<ValidateCallbackResult> {
-    holochain_turn_based_game::prelude::validate_game_move_entry::<ChessGame, ChessGameMove>(data)
+    hc_turn_based_game::prelude::validate_game_move_entry::<ChessGame, ChessGameMove>(data)
     // TODO: add validation for read-only agents
 }

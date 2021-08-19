@@ -321,14 +321,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "hc_turn_based_game"
+version = "0.0.1"
+source = "git+http://github.com/eyss/hc-turn-based-game?rev=4a34bf9fd1e008fb13cffe7ef591b45da6a4560a#4a34bf9fd1e008fb13cffe7ef591b45da6a4560a"
+dependencies = [
+ "chrono",
+ "derive_more",
+ "hdk",
+ "serde",
+]
+
+[[package]]
 name = "hc_zome_chess"
 version = "0.0.1"
 dependencies = [
  "chess",
  "chrono",
  "derive_more",
+ "hc_turn_based_game",
  "hdk",
- "holochain_turn_based_game",
  "serde",
 ]
 
@@ -430,17 +441,6 @@ checksum = "085fe272d95591beeffe3e37c2996372c399baf33bc60ca88ae0906ce4d52207"
 dependencies = [
  "quote",
  "syn",
-]
-
-[[package]]
-name = "holochain_turn_based_game"
-version = "0.2.3"
-source = "git+http://github.com/eyss/holochain-turn-based-game?rev=5e07a5f7c3d12d246eede978b65ce0d5f7f15f49#5e07a5f7c3d12d246eede978b65ce0d5f7f15f49"
-dependencies = [
- "chrono",
- "derive_more",
- "hdk",
- "serde",
 ]
 
 [[package]]

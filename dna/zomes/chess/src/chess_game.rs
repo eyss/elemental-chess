@@ -1,7 +1,7 @@
 use chess::{ChessMove, Color, Game, GameResult, Piece, Square};
 use hdk::prelude::holo_hash::{AgentPubKeyB64, EntryHashB64};
 use hdk::prelude::*;
-use holochain_turn_based_game::prelude::TurnBasedGame;
+use hc_turn_based_game::prelude::TurnBasedGame;
 use std::str::FromStr;
 
 #[derive(Clone, Debug)]
