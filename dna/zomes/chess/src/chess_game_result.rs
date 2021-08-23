@@ -36,6 +36,8 @@ pub fn publish_result(result: ChessGameResult) -> ExternResult<()> {
         )?;
     }
 
+    create_link(result.game_hash.into(), result_hash, game_result_tag())?;
+
     Ok(())
 }
 
@@ -68,6 +70,6 @@ fn get_game_result(game_result_hash: EntryHash) -> ExternResult<ChessGameResult>
     Ok(game_result)
 }
 
-fn game_result_tag() -> LinkTag {
+pub fn game_result_tag() -> LinkTag {
     LinkTag::new("game_result")
 }

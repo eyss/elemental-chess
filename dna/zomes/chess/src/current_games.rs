@@ -1,6 +1,8 @@
 use hdk::prelude::holo_hash::EntryHashB64;
 use hdk::prelude::*;
 
+use crate::chess_game_result::game_result_tag;
+
 pub fn get_my_current_games() -> ExternResult<Vec<EntryHashB64>> {
     let links = get_current_games_for(agent_info()?.agent_initial_pubkey)?;
 
@@ -42,5 +44,20 @@ fn get_current_games_for(agent: AgentPubKey) -> ExternResult<Vec<Link>> {
     let links = get_links(agent.clone().into(), Some(current_games_tag()))?;
     warn!("Current games for {} {:?}", agent, links);
 
-    Ok(links.into_inner())
+    let current_games = links
+        .into_inner()
+        .into_iter()
+        .filter(|link| {
+            let links_result = get_links(link.target.clone(), Some(game_result_tag()));
+            match links_result {
+                Ok(links) => match links.into_inner().len() {
+                    0 => true,
+                    _ => false,
+                },
+                Err(_) => false,
+            }
+        })
+        .collect();
+
+    Ok(current_games)
 }

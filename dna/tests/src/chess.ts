@@ -1,14 +1,22 @@
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
 import { Orchestrator } from "@holochain/tryorama";
-import { Conductor } from "@holochain/tryorama/lib/conductor";
 import Base64 from "js-base64";
-import { installAgents, MEM_PROOF1, MEM_PROOF2, MEM_PROOF_READ_ONLY } from "./install";
+import {
+  installAgents,
+  MEM_PROOF1,
+  MEM_PROOF2,
+  MEM_PROOF_READ_ONLY,
+} from "./install";
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 const createGame = (opponent: string) => (conductor) =>
   conductor.call("chess", "create_game", opponent);
 const makeMove = (make_move_input: MakeMoveInput) => (conductor) =>
   conductor.call("chess", "make_move", make_move_input);
+const getCurrentGames = () => (conductor) =>
+  conductor.call("chess", "get_my_current_games", null);
+const getMyGameResults = () => (conductor) =>
+  conductor.call("chess", "get_my_game_results", null);
 //const getMovement = (conductor) =>  conductor.call("chess", "get_movement",);
 
 type MakeMoveInput = {
@@ -32,7 +40,7 @@ export default function (config) {
       const [alice_happ, bobby_happ] = await installAgents(
         conductor,
         ["alice", "bob"],
-        [MEM_PROOF1,MEM_PROOF2]
+        [MEM_PROOF1, MEM_PROOF2]
       );
 
       const alicePubKey = serializeHash(alice_happ.agent);
@@ -66,8 +74,45 @@ export default function (config) {
         new_game_address
       );
 
-      await delay(10000);
       t.equal(links.length, 1);
+
+      const aliceCurrentGames = await getCurrentGames()(alice_conductor);
+      t.equal(aliceCurrentGames.length, 1);
+      const aliceGamesResults = await getMyGameResults()(alice_conductor);
+      t.equal(aliceGamesResults.length, 0);
+
+      const bobCurrentGames = await getCurrentGames()(bobby_conductor);
+      t.equal(bobCurrentGames.length, 1);
+      const bobGamesResults = await getMyGameResults()(bobby_conductor);
+      t.equal(bobGamesResults.length, 0);
+
+      const resign_move: MakeMoveInput = {
+        game_hash: new_game_address,
+        previous_move_hash: make_move,
+        game_move: { type: "Resign" },
+      };
+      await makeMove(resign_move)(alice_conductor);
+      await alice_conductor.call("chess", "publish_result", {
+        game_hash: new_game_address,
+        timestamp: Date.now(),
+        white_player: bobbyPubKey,
+        black_player: alicePubKey,
+        winner: {
+          White: null,
+        },
+        num_of_moves: 1,
+      });
+      await delay(1000);
+
+      const aliceCurrentGames1 = await getCurrentGames()(alice_conductor);
+      t.equal(aliceCurrentGames1.length, 0);
+      const aliceGamesResults1 = await getMyGameResults()(alice_conductor);
+      t.equal(aliceGamesResults1.length, 1);
+
+      const bobCurrentGames1 = await getCurrentGames()(bobby_conductor);
+      t.equal(bobCurrentGames1.length, 0);
+      const bobGamesResults1 = await getMyGameResults()(bobby_conductor);
+      t.equal(bobGamesResults1.length, 1);
     }
   );
 
