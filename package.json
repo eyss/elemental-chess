@@ -1,5 +1,5 @@
 {
-  "name": "@eyss/invitations-dev",
+  "name": "@eyss/elemental-chess-dev",
   "private": true,
   "workspaces": [
     "ui",

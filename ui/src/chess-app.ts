@@ -78,7 +78,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
     router
       .on({
-        '/game/:game': async params => {
+        '/game/:game': async (params: any) => {
           this._activeGameHash = params.game;
           this._gameEnded = false;
         },

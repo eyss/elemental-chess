@@ -1,4 +1,4 @@
-  {
+{
   "compilerOptions": {
     "target": "es2018",
     "module": "esnext",
@@ -10,11 +10,11 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "outDir": "dist",
+    "outDir": "out-tsc",
     "sourceMap": true,
     "inlineSources": true,
-    "rootDir": "src",
-    "declaration": true
+    "rootDir": "./",
+    "incremental": true
   },
   "include": ["**/*.ts"]
 }
