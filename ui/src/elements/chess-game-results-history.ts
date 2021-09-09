@@ -1,35 +1,41 @@
-import { html } from 'lit';
+import { html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
-import { requestContext } from '@holochain-open-dev/context';
 import { styleMap } from 'lit/directives/style-map.js';
+import { contextProvided } from '@lit-labs/context';
 
 import {
   ProfilesStore,
-  PROFILES_STORE_CONTEXT,
+  profilesStoreContext,
 } from '@holochain-open-dev/profiles';
-import { Card } from 'scoped-material-components/mwc-card';
-import { List } from 'scoped-material-components/mwc-list';
-import { ListItem } from 'scoped-material-components/mwc-list-item';
+import {
+  Card,
+  List,
+  ListItem,
+  Icon,
+  CircularProgress,
+} from '@scoped-elements/material-web';
+import { DynamicStore } from 'lit-svelte-stores';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements';
+
 import { ChessService } from '../chess.service';
 import { ChessGameResult } from '../types';
-import { Icon } from 'scoped-material-components/mwc-icon';
 import { sharedStyles } from './sharedStyles';
-import { CHESS_SERVICE_CONTEXT } from '../constants';
-import { MobxLitElement } from '@adobe/lit-mobx';
-import { ScopedElementsMixin } from '@open-wc/scoped-elements';
-import { CircularProgress } from 'scoped-material-components/mwc-circular-progress';
+import { chessServiceContext } from '../context';
 
-export class ChessGameResultsHistory extends ScopedElementsMixin(
-  MobxLitElement
-) {
+export class ChessGameResultsHistory extends ScopedElementsMixin(LitElement) {
   @state()
   _chessGameResults!: Array<[string, ChessGameResult]>;
 
-  @requestContext(CHESS_SERVICE_CONTEXT)
+  @contextProvided({ context: chessServiceContext })
   _chessService!: ChessService;
 
-  @requestContext(PROFILES_STORE_CONTEXT)
+  @contextProvided({ context: profilesStoreContext })
   _profilesStore!: ProfilesStore;
+
+  _knownProfiles = new DynamicStore(
+    this,
+    () => this._profilesStore.knownProfiles
+  );
 
   async firstUpdated() {
     const results = await this._chessService.getMyGameResults();
@@ -101,9 +107,9 @@ export class ChessGameResultsHistory extends ScopedElementsMixin(
                 html`<mwc-list-item twoline graphic="icon">
                   <span
                     >vs
-                    ${this._profilesStore.profileOf(
+                    ${this._knownProfiles.value[
                       this.getOpponentAddress(result[1])
-                    ).nickname}
+                    ].nickname}
                   </span>
                   <span slot="secondary"
                     >${new Date(result[1].timestamp).toLocaleString()}</span

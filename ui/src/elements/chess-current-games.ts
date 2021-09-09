@@ -1,34 +1,46 @@
-import { html } from 'lit';
+import { html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
-import { requestContext } from '@holochain-open-dev/context';
+import { contextProvided } from '@lit-labs/context';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements';
+import { AgentPubKeyB64, Dictionary } from '@holochain-open-dev/core-types';
 
 import {
   ProfilesStore,
-  PROFILES_STORE_CONTEXT,
+  profilesStoreContext,
 } from '@holochain-open-dev/profiles';
-import { Card } from 'scoped-material-components/mwc-card';
-import { List } from 'scoped-material-components/mwc-list';
-import { ListItem } from 'scoped-material-components/mwc-list-item';
+import {
+  Card,
+  List,
+  ListItem,
+  Icon,
+  Button,
+  CircularProgress,
+} from '@scoped-elements/material-web';
+import { DynamicStore } from 'lit-svelte-stores';
+
 import { ChessService } from '../chess.service';
 import { ChessGameResult, GameEntry } from '../types';
-import { Icon } from 'scoped-material-components/mwc-icon';
 import { sharedStyles } from './sharedStyles';
-import { CHESS_SERVICE_CONTEXT } from '../constants';
-import { MobxLitElement } from '@adobe/lit-mobx';
-import { ScopedElementsMixin } from '@open-wc/scoped-elements';
-import { Dictionary } from '@holochain-open-dev/core-types';
-import { Button } from 'scoped-material-components/mwc-button';
-import { CircularProgress } from 'scoped-material-components/mwc-circular-progress';
+import { chessServiceContext } from '../context';
 
-export class ChessCurrentGames extends ScopedElementsMixin(MobxLitElement) {
+export class ChessCurrentGames extends ScopedElementsMixin(LitElement) {
   @state()
   _chessGames!: Dictionary<GameEntry>;
 
-  @requestContext(CHESS_SERVICE_CONTEXT)
+  @contextProvided({ context: chessServiceContext })
   _chessService!: ChessService;
 
-  @requestContext(PROFILES_STORE_CONTEXT)
+  @contextProvided({ context: profilesStoreContext })
   _profilesStore!: ProfilesStore;
+
+  _knownProfiles = new DynamicStore(
+    this,
+    () => this._profilesStore.knownProfiles
+  );
+
+  nicknameOf(agent: AgentPubKeyB64) {
+    return this._knownProfiles.value[agent].nickname;
+  }
 
   async firstUpdated() {
     const gameHashes = await this._chessService.getMyCurrentGames();
@@ -67,10 +79,7 @@ export class ChessCurrentGames extends ScopedElementsMixin(MobxLitElement) {
                 html` <div class="row center-content">
                   <mwc-list-item twoline style="flex: 1;">
                     <span
-                      >vs
-                      ${this._profilesStore.profileOf(
-                        this.getOpponentAddress(game)
-                      ).nickname}
+                      >vs ${this.nicknameOf(this.getOpponentAddress(game))}
                     </span>
                     <span slot="secondary"
                       >Started at

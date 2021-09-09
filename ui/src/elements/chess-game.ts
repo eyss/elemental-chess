@@ -1,17 +1,24 @@
-import { html, css } from 'lit';
+import { html, css, LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
-import { requestContext } from '@holochain-open-dev/context';
+import { contextProvided } from '@lit-labs/context';
 import { ChessBoardElement } from 'chessboard-element';
 // @ts-ignore
 import { Chess } from 'chess.js';
+import { DynamicStore } from 'lit-svelte-stores';
 
-import ConductorApi from '@holochain/conductor-api';
 import * as msgpack from '@msgpack/msgpack';
-import { CircularProgress } from 'scoped-material-components/mwc-circular-progress';
-import { List } from 'scoped-material-components/mwc-list';
-import { ListItem } from 'scoped-material-components/mwc-list-item';
-import { Card } from 'scoped-material-components/mwc-card';
-import { Button } from 'scoped-material-components/mwc-button';
+import {
+  CircularProgress,
+  List,
+  ListItem,
+  Card,
+  Button,
+} from '@scoped-elements/material-web';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements';
+import {
+  ProfilesStore,
+  profilesStoreContext,
+} from '@holochain-open-dev/profiles';
 
 import { sharedStyles } from './sharedStyles';
 import { ChessService } from '../chess.service';
@@ -22,13 +29,7 @@ import {
   GameMoveEntry,
   MoveInfo,
 } from '../types';
-import {
-  ProfilesStore,
-  PROFILES_STORE_CONTEXT,
-} from '@holochain-open-dev/profiles';
-import { CHESS_SERVICE_CONTEXT } from '../constants';
-import { ScopedElementsMixin } from '@open-wc/scoped-elements';
-import { MobxLitElement } from '@adobe/lit-mobx';
+import { chessServiceContext } from '../context';
 
 const whiteSquareGrey = '#a9a9a9';
 const blackSquareGrey = '#696969';
@@ -36,7 +37,7 @@ const blackSquareGrey = '#696969';
 const sleep = (ms: number) =>
   new Promise(resolve => setTimeout(() => resolve(null), ms));
 
-export class ChessGame extends ScopedElementsMixin(MobxLitElement) {
+export class ChessGame extends ScopedElementsMixin(LitElement) {
   @property()
   gameHash!: string;
 
@@ -47,11 +48,16 @@ export class ChessGame extends ScopedElementsMixin(MobxLitElement) {
   _chessGame!: any;
   _chessStyles!: string;
 
-  @requestContext(CHESS_SERVICE_CONTEXT)
+  @contextProvided({ context: chessServiceContext })
   _chessService!: ChessService;
 
-  @requestContext(PROFILES_STORE_CONTEXT)
+  @contextProvided({ context: profilesStoreContext })
   _profilesStore!: ProfilesStore;
+
+  _knownProfiles = new DynamicStore(
+    this,
+    () => this._profilesStore.knownProfiles
+  );
 
   listenForOpponentMove() {
     const hcConnection = this._chessService.cellClient;
@@ -144,7 +150,7 @@ export class ChessGame extends ScopedElementsMixin(MobxLitElement) {
   }
 
   getOpponentNickname(): string {
-    return this._profilesStore.profileOf(this.getOpponent()).nickname;
+    return this._knownProfiles.value[this.getOpponent()].nickname;
   }
 
   removeGreySquares() {

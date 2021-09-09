@@ -13,4 +13,5 @@ export default [
   replace({
     'process.env.PORT': process.env.PORT,
   }),
+  commonjs()
 ];

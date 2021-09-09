@@ -1,10 +1,19 @@
+# Example: Custom Holochain And Binaries
+# 
+# The following `shell.nix` file can be used in your project's root folder and activated with `nix-shell`.
+# It uses a custom revision and a custom set of binaries to be installed.
+
+{ 
+  holonixPath ?  builtins.fetchTarball { url = "https://github.com/holochain/holonix/archive/develop.tar.gz"; }
+}:
+
 let
-  holonixPath = builtins.fetchTarball {
-    url = "https://github.com/holochain/holonix/archive/014d28000c8ed021eb84000edfe260c22e90af8c.tar.gz";
-    sha256 = "sha256:0hl5xxxjg2a6ymr44rf5dfvsb0c33dq4s6vibva6yb76yvl6gwfi";
-  };
   holonix = import (holonixPath) {
-    includeHolochainBinaries = true;
+    include = {
+        # making this explicit even though it's the default
+        holochainBinaries = true;
+    };
+
     holochainVersionId = "custom";
 
     holochainVersion = {
@@ -15,7 +24,18 @@ let
        holochain = "holochain";
        hc = "hc";
      };
+
+     lairKeystoreHashes = {
+       sha256 = "sha256:05p8j1yfvwqg2amnbqaphc6cd92k65dq10v3afdj0k0kj42gd6ic";
+       cargoSha256 = "sha256:0bd1sjx4lngi543l0bnchmpz4qb3ysf8gisary1bhxzq47b286cf";
+     };
     };
-    holochainOtherDepsNames = ["lair-keystore"];
   };
-in holonix.main
+
+  nixpkgs = holonix.pkgs;
+in nixpkgs.mkShell {
+  inputsFrom = [ holonix.main ];
+  buildInputs = with nixpkgs; [
+    nodejs-16_x
+  ];
+}

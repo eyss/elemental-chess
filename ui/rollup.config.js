@@ -47,18 +47,7 @@ export default merge(baseConfig, {
     }),
     builtins(),
     typescript({ experimentalDecorators: true, outDir: outputDir }),
-    commonjs({
-      include: [
-        'node_modules/base64-js/**/*',
-        'node_modules/isomorphic-ws/**/*',
-        'node_modules/buffer/**/*',
-        'node_modules/navigo/**/*',
-        'node_modules/@msgpack/**/*',
-        'node_modules/@holochain/conductor-api/**/*',
-        'node_modules/@holo-host/**/*',
-        'node_modules/chess.js/**/*',
-      ],
-    }),
+    commonjs({}),
     globals(),
   ],
 });

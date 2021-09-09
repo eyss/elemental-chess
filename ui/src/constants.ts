@@ -1,4 +1,3 @@
-export const CHESS_SERVICE_CONTEXT = 'chess/service';
 export const ENV: 'hcdev' | 'holodev' | 'hc' | 'holo' = process.env.ENV as any;
 
 export function appId(): string | undefined {

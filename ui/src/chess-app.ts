@@ -1,34 +1,31 @@
 import { AppWebsocket, AdminWebsocket, CellId } from '@holochain/conductor-api';
-import { Card } from 'scoped-material-components/mwc-card';
-import { ContextProvider } from '@holochain-open-dev/context';
-import { CircularProgress } from 'scoped-material-components/mwc-circular-progress';
-import { sharedStyles } from './elements/sharedStyles';
-import { appId, appUrl, CHESS_SERVICE_CONTEXT, isHoloEnv } from './constants';
-import { TopAppBar } from 'scoped-material-components/mwc-top-app-bar';
-import { Button } from 'scoped-material-components/mwc-button';
-import { IconButton } from 'scoped-material-components/mwc-icon-button';
+import {
+  Card,
+  TopAppBar,
+  CircularProgress,
+  Button,
+  IconButton,
+} from '@scoped-elements/material-web';
+import { ContextProvider, Context } from '@lit-labs/context';
 import {
   ProfilePrompt,
   ProfilesService,
-  ProfilesStore,
+  createProfilesStore,
   ListProfiles,
-  PROFILES_STORE_CONTEXT,
+  profilesStoreContext,
+  ProfilesStore,
 } from '@holochain-open-dev/profiles';
-import { ChessService } from './chess.service';
-import { ChessGame } from './elements/chess-game';
-import { ChessGameResultsHistory } from './elements/chess-game-results-history';
 
 import {
   CreateInvitation,
   InvitationsStore,
   InvitationsService,
   InvitationsList,
-  INVITATIONS_STORE_CONTEXT,
+  invitationsStoreContext,
 } from '@eyss/invitations';
 
 import { LitElement, css, html } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
-import { router } from './router';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements';
 import {
   HoloClient,
@@ -37,7 +34,15 @@ import {
 } from '@holochain-open-dev/cell-client';
 import { Connection as WebSdkConnection } from '@holo-host/web-sdk';
 import { EntryHashB64 } from '@holochain-open-dev/core-types';
+
+import { router } from './router';
 import { ChessCurrentGames } from './elements/chess-current-games';
+import { ChessService } from './chess.service';
+import { ChessGame } from './elements/chess-game';
+import { ChessGameResultsHistory } from './elements/chess-game-results-history';
+import { sharedStyles } from './elements/sharedStyles';
+import { appId, appUrl, isHoloEnv } from './constants';
+import { chessServiceContext } from './context';
 
 export class ChessApp extends ScopedElementsMixin(LitElement) {
   @property({ type: Array })
@@ -54,9 +59,9 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
   _cellClient!: CellClient;
 
-  _chessService!: ContextProvider<never>;
-  _profilesStore!: ContextProvider<never>;
-  _invitationStore!: ContextProvider<never>;
+  _chessService!: ContextProvider<Context<ChessService>>;
+  _profilesStore!: ContextProvider<Context<ProfilesStore>>;
+  _invitationStore!: ContextProvider<Context<InvitationsStore>>;
 
   signalHandler = (signal: any) => {
     if (signal.data.payload.GameStarted != undefined) {
@@ -93,33 +98,29 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   async connectToHolochain() {
     this._cellClient = await this.createClient();
 
-    const profilesService = new ProfilesService(this._cellClient);
-
-    const store = new ProfilesStore(profilesService);
+    const store = createProfilesStore(this._cellClient);
 
     // Fetching our profile has a side-effect of executing init
     await store.fetchMyProfile();
 
     this._profilesStore = new ContextProvider(
       this,
-      PROFILES_STORE_CONTEXT as never,
-      store as any
+      profilesStoreContext,
+      store
     );
 
-    const invitationService = new InvitationsService(this._cellClient);
-
-    const invitationsStore = new InvitationsStore(invitationService, true);
+    const invitationsStore = new InvitationsStore(this._cellClient, true);
 
     this._invitationStore = new ContextProvider(
       this,
-      INVITATIONS_STORE_CONTEXT as never,
-      invitationsStore as any
+      invitationsStoreContext,
+      invitationsStore
     );
 
     this._chessService = new ContextProvider(
       this,
-      CHESS_SERVICE_CONTEXT as never,
-      new ChessService(this._cellClient) as any
+      chessServiceContext,
+      new ChessService(this._cellClient)
     );
   }
 
