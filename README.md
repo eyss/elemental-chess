@@ -10,13 +10,16 @@ nix-shell
 
 **You need to be inside this nix-shell to run any of the instructions below.**
 
+From the root folder of the repo:
+
+```bash
+npm install
+```
+
 ## Building the DNA
 
 ```bash
-cd dna
-CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown
-hc dna pack workdir/dna
-hc app pack workdir/happ
+npm run build:happ
 ```
 
 ## Starting the UI
@@ -25,12 +28,6 @@ Enter the UI folder:
 
 ```bash
 cd ui
-```
-
-If you haven't yet:
-
-```bash
-npm install
 ```
 
 Then, run this inside the nix-shell in one terminal:
