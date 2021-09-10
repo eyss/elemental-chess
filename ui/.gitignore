@@ -20,6 +20,6 @@
 /dist/
 /out-tsc/
 /.rollup.cache
-/dist-*
+.dist*
 
 storybook-static
