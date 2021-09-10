@@ -54,6 +54,7 @@ export default {
     /** Compile JS to a lower language target */
     babel({
       babelHelpers: 'bundled',
+      exclude: /node_modules/,
       presets: [
         [
           require.resolve('@babel/preset-env'),
