@@ -16,7 +16,7 @@ import {
   Button,
   CircularProgress,
 } from '@scoped-elements/material-web';
-import { DynamicStore } from 'lit-svelte-stores';
+import { StoreSubscriber } from 'lit-svelte-stores';
 
 import { ChessService } from '../chess.service';
 import { ChessGameResult, GameEntry } from '../types';
@@ -33,7 +33,7 @@ export class ChessCurrentGames extends ScopedElementsMixin(LitElement) {
   @contextProvided({ context: profilesStoreContext })
   _profilesStore!: ProfilesStore;
 
-  _knownProfiles = new DynamicStore(
+  _knownProfiles = new StoreSubscriber(
     this,
     () => this._profilesStore.knownProfiles
   );

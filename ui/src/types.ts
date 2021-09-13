@@ -1,4 +1,4 @@
-import { EntryHashB64 } from "@holochain-open-dev/core-types";
+import { EntryHashB64 } from '@holochain-open-dev/core-types';
 
 export interface GameEntry {
   players: Array<string>;
@@ -21,7 +21,12 @@ export type ChessMove =
   | {
       type: 'Resign';
     }
-  | { type: 'PlacePiece'; from: string; to: string, promotion: string | undefined };
+  | {
+      type: 'PlacePiece';
+      from: string;
+      to: string;
+      promotion: string | undefined;
+    };
 
 export interface ChessGame {
   white_address: string;

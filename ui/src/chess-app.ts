@@ -1,20 +1,19 @@
-import { AppWebsocket, AdminWebsocket, CellId } from "@holochain/conductor-api";
+import { AppWebsocket, AdminWebsocket, CellId } from '@holochain/conductor-api';
 import {
   Card,
   TopAppBar,
   CircularProgress,
   Button,
   IconButton,
-} from "@scoped-elements/material-web";
-import { ContextProvider, Context } from "@lit-labs/context";
+} from '@scoped-elements/material-web';
+import { ContextProvider, Context } from '@lit-labs/context';
 import {
   ProfilePrompt,
   ProfilesService,
-  createProfilesStore,
   ListProfiles,
   profilesStoreContext,
   ProfilesStore,
-} from "@holochain-open-dev/profiles";
+} from '@holochain-open-dev/profiles';
 
 import {
   CreateInvitation,
@@ -22,27 +21,27 @@ import {
   InvitationsService,
   InvitationsList,
   invitationsStoreContext,
-} from "@eyss/invitations";
+} from '@eyss/invitations';
 
-import { LitElement, css, html } from "lit";
-import { property, query, state } from "lit/decorators.js";
-import { ScopedElementsMixin } from "@open-wc/scoped-elements";
+import { LitElement, css, html } from 'lit';
+import { property, query, state } from 'lit/decorators.js';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements';
 import {
   HoloClient,
   HolochainClient,
   CellClient,
-} from "@holochain-open-dev/cell-client";
-import { Connection as WebSdkConnection } from "@holo-host/web-sdk";
-import { EntryHashB64 } from "@holochain-open-dev/core-types";
+} from '@holochain-open-dev/cell-client';
+import { Connection as WebSdkConnection } from '@holo-host/web-sdk';
+import { EntryHashB64 } from '@holochain-open-dev/core-types';
 
-import { router } from "./router";
-import { ChessCurrentGames } from "./elements/chess-current-games";
-import { ChessService } from "./chess.service";
-import { ChessGame } from "./elements/chess-game";
-import { ChessGameResultsHistory } from "./elements/chess-game-results-history";
-import { sharedStyles } from "./elements/sharedStyles";
-import { appId, appUrl, isHoloEnv } from "./constants";
-import { chessServiceContext } from "./context";
+import { router } from './router';
+import { ChessCurrentGames } from './elements/chess-current-games';
+import { ChessService } from './chess.service';
+import { ChessGame } from './elements/chess-game';
+import { ChessGameResultsHistory } from './elements/chess-game-results-history';
+import { sharedStyles } from './elements/sharedStyles';
+import { appId, appUrl, isHoloEnv } from './constants';
+import { chessServiceContext } from './context';
 
 export class ChessApp extends ScopedElementsMixin(LitElement) {
   @state()
@@ -77,13 +76,13 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     await this.connectToHolochain();
 
     router
-      .on("/game/:game", (params: any) => {
+      .on('/game/:game', (params: any) => {
         console.log(params);
         this._activeGameHash = params.data.game;
         this._gameEnded = false;
       })
-      .on("/", () => {
-        console.log("meh");
+      .on('/', () => {
+        console.log('meh');
         this._activeGameHash = undefined;
       })
       .resolve();
@@ -98,7 +97,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   async connectToHolochain() {
     this._cellClient = await this.createClient();
 
-    const store = createProfilesStore(this._cellClient);
+    const store = new ProfilesStore(this._cellClient);
 
     // Fetching our profile has a side-effect of executing init
     await store.fetchMyProfile();
@@ -126,9 +125,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
   async _onInvitationCompleted(event: any) {
     const opponent = event.detail.invitation.inviter;
-    const gameHash = await (
-      this._chessService.value as ChessService
-    ).createGame(opponent);
+    const gameHash = await this._chessService.value.createGame(opponent);
     this.openGame(gameHash);
   }
 
@@ -137,14 +134,9 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   }
 
   async createHoloClient() {
-    const connection = new WebSdkConnection(
-      appUrl(),
-      this.signalHandler,
-
-      {
-        app_name: "elemental-chess",
-      }
-    );
+    const connection = new WebSdkConnection(appUrl(), this.signalHandler, {
+      app_name: 'elemental-chess',
+    });
 
     await connection.ready();
     await connection.signIn();
@@ -166,7 +158,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       ] as any;
     }
     const cellClient = new HoloClient(connection, cellData, {
-      app_name: "elemental-chess",
+      app_name: 'elemental-chess',
     });
 
     return cellClient;
@@ -197,7 +189,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     if (this._activeGameHash)
       return html` <div class="row center-content " style="flex: 1;">
         <mwc-button
-          @click=${() => router.navigate("/")}
+          @click=${() => router.navigate('/')}
           label="Go back"
           icon="arrow_back"
           raised
@@ -286,18 +278,18 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
   static get scopedElements() {
     return {
-      "mwc-circular-progress": CircularProgress,
-      "mwc-top-app-bar": TopAppBar,
-      "mwc-button": Button,
-      "mwc-icon-button": IconButton,
-      "mwc-card": Card,
-      "profile-prompt": ProfilePrompt,
-      "list-profiles": ListProfiles,
-      "chess-game": ChessGame,
-      "chess-current-games": ChessCurrentGames,
-      "chess-game-results-history": ChessGameResultsHistory,
-      "create-invitation": CreateInvitation,
-      "invitations-list": InvitationsList,
+      'mwc-circular-progress': CircularProgress,
+      'mwc-top-app-bar': TopAppBar,
+      'mwc-button': Button,
+      'mwc-icon-button': IconButton,
+      'mwc-card': Card,
+      'profile-prompt': ProfilePrompt,
+      'list-profiles': ListProfiles,
+      'chess-game': ChessGame,
+      'chess-current-games': ChessCurrentGames,
+      'chess-game-results-history': ChessGameResultsHistory,
+      'create-invitation': CreateInvitation,
+      'invitations-list': InvitationsList,
     };
   }
 

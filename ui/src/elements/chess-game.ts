@@ -4,7 +4,7 @@ import { contextProvided } from '@lit-labs/context';
 import { ChessBoardElement } from 'chessboard-element';
 // @ts-ignore
 import { Chess } from 'chess.js';
-import { DynamicStore } from 'lit-svelte-stores';
+import { StoreSubscriber } from 'lit-svelte-stores';
 
 import * as msgpack from '@msgpack/msgpack';
 import {
@@ -54,7 +54,7 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
   @contextProvided({ context: profilesStoreContext })
   _profilesStore!: ProfilesStore;
 
-  _knownProfiles = new DynamicStore(
+  _knownProfiles = new StoreSubscriber(
     this,
     () => this._profilesStore.knownProfiles
   );
