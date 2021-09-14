@@ -8,7 +8,7 @@
     "start-alice": "HC_PORT=8888 concurrently -k --names ui,hc \"ENV=hcdev npm run start-ui\" \"APP_ID=elemental-chess ADMIN_PORT=9000 npm run start-holochain\"",
     "start-bob": "HC_PORT=8889 concurrently -k --names ui,hc \"ENV=hcdev npm run start-ui\" \"APP_ID=elemental-chess ADMIN_PORT=9001 npm run start-holochain\"",
     "start-ui": "concurrently -k --names tsc,web-dev-server \"npm run build-watch\" \"sleep 5 && web-dev-server --config web-dev-server.config.mjs\"",
-    "start-holochain": "RUST_LOG=warn WASM_LOG=trace hc s -f=$ADMIN_PORT generate -r=$HC_PORT ../dna/workdir/happ/elemental-chess.happ --app-id=$APP_ID network -b https://bootstrap-staging.holo.host quic -p=kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--",
+    "start-holochain": "RUST_LOG=warn WASM_LOG=trace hc s -f=$ADMIN_PORT generate -r=$HC_PORT ../dna/workdir/happ/elemental-chess.happ --app-id=$APP_ID network -b https://bootstrap-staging.holo.host quic -p=kitsune-proxy://CIW6PxKxsPPlcuvUCbMcKwUpaMSmB7kLD8xyyj4mqcw/kitsune-quic/h/165.22.32.11/p/5778/--",
     "build-watch": "rimraf dist && rollup -c rollup.config.js -w",
     "build-holochain": "rimraf dist && ENV=hc rollup -c rollup.config.js",
     "build-holo": "rimraf dist && ENV=holo rollup -c rollup.config.js",
