@@ -2,39 +2,13 @@ use hdk::prelude::holo_hash::{AgentPubKeyB64, EntryHashB64};
 use hdk::prelude::*;
 use hc_turn_based_game::prelude::*;
 
-use chrono::serde::ts_milliseconds;
-use chrono::{DateTime, NaiveDateTime, Utc};
-
 pub mod chess_game;
 pub mod chess_game_result;
 pub mod current_games;
 
-use chess_game::{ChessGame, ChessGameMove, MakeMoveInput};
+use chess_game::{MakeMoveInput};
 
 use chess_game_result::ChessGameResult;
-
-#[derive(Clone, Deserialize, Serialize, Debug)]
-pub struct Test {
-    pub players: Vec<AgentPubKeyB64>,
-
-    #[serde(with = "ts_milliseconds")]
-    pub created_at: DateTime<Utc>,
-}
-
-#[hdk_extern]
-pub fn test(_: ()) -> ExternResult<Test> {
-    let time = sys_time()?;
-
-    let date = DateTime::from_utc(
-        NaiveDateTime::from_timestamp(time.as_secs() as i64, time.subsec_nanos()),
-        Utc,
-    );
-
-    Ok(Test {
-        players: vec![AgentPubKeyB64::from(agent_info()?.agent_initial_pubkey)],
-        created_at: date,
-    })
-}
 
 entry_defs![
     GameMoveEntry::entry_def(),
@@ -102,6 +76,7 @@ pub fn get_my_current_games(_: ()) -> ExternResult<Vec<EntryHashB64>> {
     current_games::get_my_current_games()
 }
 
+/* TODO: uncomment once validation rules of hc-turn-based-game are updated
 #[hdk_extern]
 fn validate_create_entry_game_entry(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
     hc_turn_based_game::prelude::validate_game_entry::<ChessGame, ChessGameMove>(data)
@@ -115,3 +90,4 @@ fn validate_create_entry_game_move_entry(
     hc_turn_based_game::prelude::validate_game_move_entry::<ChessGame, ChessGameMove>(data)
     // TODO: add validation for read-only agents
 }
+ */

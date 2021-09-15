@@ -3,7 +3,6 @@ members = [
 "zomes/profiles",
 "zomes/chess",
 "zomes/invitations",
-"zomes/joining_code",
 ]
 
 [profile.dev]

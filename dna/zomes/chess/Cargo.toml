@@ -13,7 +13,7 @@ serde = "1"
 derive_more = "0"
 chrono = {version = "0.4", features = ["serde"]}
 
-hdk = {git = "https://github.com/holochain/holochain", rev = "363af6d8af8d18e4616f6aa56ad4d1f0fabaafb7", package = "hdk", version = "0.0.101-alpha.0"}
+hdk = "0.0.104"
 
-hc_turn_based_game = {git ="http://github.com/eyss/hc-turn-based-game", rev ="4a34bf9fd1e008fb13cffe7ef591b45da6a4560a"}
+hc_turn_based_game = {git ="http://github.com/eyss/hc-turn-based-game", rev ="cedcdeaf2c8c155b57fde9b0de8c1f195f329f45"}
 chess = "3.2.0"
