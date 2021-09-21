@@ -218,6 +218,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
               <div class="column" style="flex: 1; margin: 12px;">
                 <span class="title" style="margin-bottom: 12px;">Players </span>
                 <div class="flex-scrollable-parent">
+                  
                   <div class="flex-scrollable-container">
                     <div class="flex-scrollable-y">
                       <list-profiles></list-profiles>
@@ -268,6 +269,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
         <div class="fill row" style="width: 100vw; height: 100%;">
           <profile-prompt style="flex: 1;">
+            <h1>Hola</h1>
             ${this.renderContent()}
           </profile-prompt>
         </div>
