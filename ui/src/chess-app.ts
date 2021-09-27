@@ -77,12 +77,10 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
     router
       .on('/game/:game', (params: any) => {
-        console.log(params);
         this._activeGameHash = params.data.game;
         this._gameEnded = false;
       })
       .on('/', () => {
-        console.log('meh');
         this._activeGameHash = undefined;
       })
       .resolve();
@@ -97,7 +95,9 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   async connectToHolochain() {
     this._cellClient = await this.createClient();
 
-    const store = new ProfilesStore(this._cellClient);
+    const store = new ProfilesStore(this._cellClient, {
+      avatarMode: 'identicon',
+    });
 
     // Fetching our profile has a side-effect of executing init
     await store.fetchMyProfile();

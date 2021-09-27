@@ -1,8 +1,8 @@
 [workspace]
 members = [
-"zomes/profiles",
-"zomes/chess",
-"zomes/invitations",
+  "dna/zomes/profiles",
+  "dna/zomes/chess",
+  "dna/zomes/invitations",
 ]
 
 [profile.dev]
