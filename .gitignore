@@ -4,5 +4,6 @@ dist/
 .cargo/
 *.dna
 *.happ
+*.webhapp
 prueba/
 .hc*
