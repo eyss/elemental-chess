@@ -37,6 +37,10 @@ export default function (config) {
     async (s: ScenarioApi, t) => {
       const [conductor] = await s.players([config]);
 
+      conductor.setSignalHandler((signal) => {
+        console.log("Player has received Signal:", signal.data.payload.payload);
+      });
+
       const [alice_happ, bobby_happ] = await installAgents(
         conductor,
         ["alice", "bob"],

@@ -213,7 +213,7 @@ dependencies = [
 [[package]]
 name = "hc_zome_invitations"
 version = "0.0.1"
-source = "git+https://github.com/eyss/invitations?rev=bbd0ee967f3ff5259f27e29b505ee8cda297b370#bbd0ee967f3ff5259f27e29b505ee8cda297b370"
+source = "git+https://github.com/eyss/invitations?rev=ffcc105ad695ae3f78e8c973a1145d9dbd5c3a4a#ffcc105ad695ae3f78e8c973a1145d9dbd5c3a4a"
 dependencies = [
  "chrono",
  "derive_more",
@@ -225,7 +225,7 @@ dependencies = [
 [[package]]
 name = "hc_zome_profiles"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/profiles?rev=9c24763e26dac761f96e2420e05441aa577c211a#9c24763e26dac761f96e2420e05441aa577c211a"
+source = "git+https://github.com/holochain-open-dev/profiles?rev=968bb4e31efd45147b724d30596b9326ce364818#968bb4e31efd45147b724d30596b9326ce364818"
 dependencies = [
  "derive_more",
  "hdk",

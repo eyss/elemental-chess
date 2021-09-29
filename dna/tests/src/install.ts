@@ -12,7 +12,7 @@ export const MEM_PROOF2 = Buffer.from(
 
 export const MEM_PROOF_READ_ONLY = Buffer.from([0]);
 
-const chessDna = path.join("../workdir/dna/elemental-chess.dna");
+const chessDna = path.join("../workdir/elemental-chess.dna");
 
 export const installAgents = async (
   conductor,
