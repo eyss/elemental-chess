@@ -188,7 +188,7 @@ checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
 [[package]]
 name = "hc_turn_based_game"
 version = "0.0.1"
-source = "git+http://github.com/eyss/hc-turn-based-game?rev=6b8acbaac5b43041f979e02dfded227de5791176#6b8acbaac5b43041f979e02dfded227de5791176"
+source = "git+http://github.com/eyss/hc-turn-based-game?rev=36ff8d6e79050ebabc52b310bb6d2017beb8c130#36ff8d6e79050ebabc52b310bb6d2017beb8c130"
 dependencies = [
  "chrono",
  "derive_more",
@@ -213,7 +213,7 @@ dependencies = [
 [[package]]
 name = "hc_zome_invitations"
 version = "0.0.1"
-source = "git+https://github.com/eyss/invitations?rev=53622b8e0352cc71c168d7400ae4f67fb7acb9dc#53622b8e0352cc71c168d7400ae4f67fb7acb9dc"
+source = "git+https://github.com/eyss/invitations?rev=bbd0ee967f3ff5259f27e29b505ee8cda297b370#bbd0ee967f3ff5259f27e29b505ee8cda297b370"
 dependencies = [
  "chrono",
  "derive_more",
@@ -225,7 +225,7 @@ dependencies = [
 [[package]]
 name = "hc_zome_profiles"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/profiles?rev=8a136df236ef5e4055787b4cc1b29bce39fe4364#8a136df236ef5e4055787b4cc1b29bce39fe4364"
+source = "git+https://github.com/holochain-open-dev/profiles?rev=9c24763e26dac761f96e2420e05441aa577c211a#9c24763e26dac761f96e2420e05441aa577c211a"
 dependencies = [
  "derive_more",
  "hdk",
@@ -235,9 +235,9 @@ dependencies = [
 
 [[package]]
 name = "hdk"
-version = "0.0.107"
+version = "0.0.108"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1df307ee1ddbc819b292761091270837f090c52627e46cb9555c7c40a42e9363"
+checksum = "4cfc953f098824bf690978c7433d3a4d9c3367854bcfb90244a872a373eea753"
 dependencies = [
  "hdk_derive",
  "holo_hash",
@@ -254,9 +254,9 @@ dependencies = [
 
 [[package]]
 name = "hdk_derive"
-version = "0.0.9"
+version = "0.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "247b98b122ff7bf6703d2b1877c4211082c602a1265d0d9e79db351446ef1cdc"
+checksum = "44a4fcdfe77caab5782340aaefbf25ed6291089a6f33e0fb0a93099c92959317"
 dependencies = [
  "holochain_zome_types",
  "paste",
@@ -332,9 +332,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_zome_types"
-version = "0.0.9"
+version = "0.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e51e5c52432490fc6e6a6885f7ec61da4fa0df103419b4297b561ad4dc5c7ec"
+checksum = "a0d011849dd6a989e5a413c6d303f9087053f110bff9ffd261983e22dfeef0cd"
 dependencies = [
  "chrono",
  "holo_hash",
@@ -383,9 +383,9 @@ checksum = "b71991ff56294aa922b450139ee08b3bfc70982c6b2c7562771375cf73542dd4"
 
 [[package]]
 name = "kitsune_p2p_timestamp"
-version = "0.0.3"
+version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "507278ec2536a6db8c4c2349ad972add821cc23e84a9afbe039a560e1d3c250b"
+checksum = "7bf804c1abdcf3c1f4f60f41cdc203352afa37c360a4c373a6323741c737cd68"
 dependencies = [
  "chrono",
  "serde",

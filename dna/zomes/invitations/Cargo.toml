@@ -9,4 +9,4 @@ crate-type = ["cdylib", "rlib"]
 name = "invitations"
 
 [dependencies]
-hc_zome_invitations = {git = "https://github.com/eyss/invitations", rev = "53622b8e0352cc71c168d7400ae4f67fb7acb9dc"}
+hc_zome_invitations = {git = "https://github.com/eyss/invitations", rev = "bbd0ee967f3ff5259f27e29b505ee8cda297b370"}
