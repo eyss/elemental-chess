@@ -13,8 +13,8 @@ chrono = {version = "0.4", features = ["serde"]}
 derive_more = "0"
 serde = "1"
 
-hdk = "0.0.108"
-holo_hash = {version = "0.0.7", features = ["encoding"]}
+hdk = "0.0.109"
+holo_hash = {version = "0.0.8", features = ["encoding"]}
 
 chess = "3.2.0"
-hc_turn_based_game = {git = "http://github.com/eyss/hc-turn-based-game", rev = "36ff8d6e79050ebabc52b310bb6d2017beb8c130"}
+hc_turn_based_game = {git = "http://github.com/eyss/hc-turn-based-game", rev = "74531a5ac4229e238065a9c3887c715a69edfa5e"}

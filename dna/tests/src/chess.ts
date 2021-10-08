@@ -70,7 +70,7 @@ export default function (config) {
       };
 
       const make_move = await makeMove(movement_input)(bobby_conductor);
-      await delay(1000);
+      await delay(3000);
 
       const links = await alice_conductor.call(
         "chess",
@@ -106,7 +106,7 @@ export default function (config) {
         },
         num_of_moves: 1,
       });
-      await delay(1000);
+      await delay(3000);
 
       const aliceCurrentGames1 = await getCurrentGames()(alice_conductor);
       t.equal(aliceCurrentGames1.length, 0);
