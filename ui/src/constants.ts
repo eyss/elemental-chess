@@ -12,7 +12,7 @@ export function appUrl(): string | null {
   if (ENV === 'hc') return `ws://localhost:8888`;
   else if (ENV === 'hcdev') return `ws://localhost:${process.env.HC_PORT}`;
   else if (ENV === 'holodev') return `http://localhost:${process.env.HC_PORT}`;
-  else return null;
+  else return 'https://chaperone.holo.host';
 }
 
 export function isHoloEnv() {
