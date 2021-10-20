@@ -1,21 +1,5 @@
 import { EntryHashB64 } from '@holochain-open-dev/core-types';
 
-export interface GameEntry {
-  players: Array<string>;
-  created_at: number;
-}
-
-export interface GameMoveEntry<M> {
-  game_hash: string;
-  author_pub_key: string;
-  game_move: M;
-  previous_move_hash: string | undefined;
-}
-
-export interface MoveInfo<M> {
-  move_hash: string;
-  move_entry: GameMoveEntry<M>;
-}
 
 export type ChessMove =
   | {
@@ -31,7 +15,7 @@ export type ChessMove =
 export interface ChessGame {
   white_address: string;
   black_address: string;
-  game: ChessGameState;
+  board_state: string;
 }
 
 export interface ChessGameState {

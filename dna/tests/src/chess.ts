@@ -15,8 +15,8 @@ const makeMove = (make_move_input: MakeMoveInput) => (conductor) =>
   conductor.call("chess", "make_move", make_move_input);
 const getCurrentGames = () => (conductor) =>
   conductor.call("chess", "get_my_current_games", null);
-const getMyGameResults = () => (conductor) =>
-  conductor.call("chess", "get_my_game_results", null);
+const getGameResultsForAgents = (conductor) => (agents) =>
+  conductor.call("chess", "get_game_results_for_agents", agents);
 //const getMovement = (conductor) =>  conductor.call("chess", "get_movement",);
 
 type MakeMoveInput = {
@@ -58,7 +58,7 @@ export default function (config) {
       const new_game_address: string = await createGame(bobbyPubKey)(
         alice_conductor
       );
-      await delay(3000);
+      await delay(4000);
 
       console.log("the result is this:");
       console.log(new_game_address);
@@ -69,8 +69,8 @@ export default function (config) {
         game_move: { type: "PlacePiece", from: "e2", to: "e4" },
       };
 
-      const make_move = await makeMove(movement_input)(bobby_conductor);
-      await delay(3000);
+      let lastMoveHash = await makeMove(movement_input)(bobby_conductor);
+      await delay(4000);
 
       const links = await alice_conductor.call(
         "chess",
@@ -81,42 +81,55 @@ export default function (config) {
       t.equal(links.length, 1);
 
       const aliceCurrentGames = await getCurrentGames()(alice_conductor);
-      t.equal(aliceCurrentGames.length, 1);
-      const aliceGamesResults = await getMyGameResults()(alice_conductor);
-      t.equal(aliceGamesResults.length, 0);
+      t.equal(Object.keys(aliceCurrentGames).length, 1);
+      const aliceGamesResults = await getGameResultsForAgents(alice_conductor)([
+        alicePubKey,
+      ]);
+      t.equal(aliceGamesResults[alicePubKey].length, 0);
 
       const bobCurrentGames = await getCurrentGames()(bobby_conductor);
-      t.equal(bobCurrentGames.length, 1);
-      const bobGamesResults = await getMyGameResults()(bobby_conductor);
-      t.equal(bobGamesResults.length, 0);
+      t.equal(Object.keys(bobCurrentGames).length, 1);
+      const bobGamesResults = await getGameResultsForAgents(bobby_conductor)([
+        bobbyPubKey,
+      ]);
+      t.equal(bobGamesResults[bobbyPubKey].length, 0);
 
       const resign_move: MakeMoveInput = {
         game_hash: new_game_address,
-        previous_move_hash: make_move,
+        previous_move_hash: lastMoveHash,
         game_move: { type: "Resign" },
       };
-      await makeMove(resign_move)(alice_conductor);
-      await alice_conductor.call("chess", "publish_result", {
+      lastMoveHash = await makeMove(resign_move)(alice_conductor);
+      const outcome = await alice_conductor.call("chess", "publish_result", {
         game_hash: new_game_address,
-        timestamp: Date.now(),
-        white_player: bobbyPubKey,
-        black_player: alicePubKey,
-        winner: {
-          White: null,
-        },
-        num_of_moves: 1,
+        last_game_move_hash: lastMoveHash,
+        my_score: 0,
+      });
+      t.equal(outcome.type, "Published");
+
+      const game_result_hash = outcome.game_result_hash;
+
+      await delay(3000);
+      await alice_conductor.call("chess", "finish_game_and_link", {
+        game_hash: new_game_address,
+        game_result_hash,
       });
       await delay(3000);
 
       const aliceCurrentGames1 = await getCurrentGames()(alice_conductor);
-      t.equal(aliceCurrentGames1.length, 0);
-      const aliceGamesResults1 = await getMyGameResults()(alice_conductor);
-      t.equal(aliceGamesResults1.length, 1);
+      console.log(aliceCurrentGames1);
+      t.equal(Object.keys(aliceCurrentGames1).length, 0);
+      const aliceGamesResults1 = await getGameResultsForAgents(alice_conductor)(
+        [alicePubKey]
+      );
+      t.equal(aliceGamesResults1[alicePubKey].length, 1);
 
       const bobCurrentGames1 = await getCurrentGames()(bobby_conductor);
-      t.equal(bobCurrentGames1.length, 0);
-      const bobGamesResults1 = await getMyGameResults()(bobby_conductor);
-      t.equal(bobGamesResults1.length, 1);
+      t.equal(Object.keys(bobCurrentGames1).length, 0);
+      const bobGamesResults1 = await getGameResultsForAgents(bobby_conductor)([
+        bobbyPubKey,
+      ]);
+      t.equal(bobGamesResults1[bobbyPubKey].length, 1);
     }
   );
 

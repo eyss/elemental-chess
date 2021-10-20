@@ -1,12 +1,13 @@
-import { html, css, LitElement } from 'lit';
-import { property } from 'lit/decorators.js';
+import { html, css, LitElement, PropertyValues } from 'lit';
+import { property, state } from 'lit/decorators.js';
 import { contextProvided } from '@lit-labs/context';
 import { ChessBoardElement } from 'chessboard-element';
 // @ts-ignore
-import { Chess } from 'chess.js';
+import chess from 'chess.js';
+const Chess = chess.Chess;
+
 import { StoreSubscriber } from 'lit-svelte-stores';
 
-import * as msgpack from '@msgpack/msgpack';
 import {
   CircularProgress,
   List,
@@ -15,21 +16,12 @@ import {
   Button,
 } from '@scoped-elements/material-web';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements';
-import {
-  ProfilesStore,
-  profilesStoreContext,
-} from '@holochain-open-dev/profiles';
 
 import { sharedStyles } from './sharedStyles';
-import { ChessService } from '../chess.service';
-import {
-  ChessGameResult,
-  ChessMove,
-  GameEntry,
-  GameMoveEntry,
-  MoveInfo,
-} from '../types';
-import { chessServiceContext } from '../context';
+import { ChessMove } from '../types';
+import { chessStoreContext } from '../context';
+import { ChessStore } from '../chess-store';
+import { AgentPubKeyB64 } from '@holochain-open-dev/core-types';
 
 const whiteSquareGrey = '#a9a9a9';
 const blackSquareGrey = '#696969';
@@ -41,58 +33,55 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
   @property()
   gameHash!: string;
 
-  @property()
-  _gameInfo!: GameEntry;
-  _moves: Array<MoveInfo<ChessMove>> = [];
+  @state()
+  loading = true;
 
-  _chessGame!: any;
   _chessStyles!: string;
 
-  @contextProvided({ context: chessServiceContext })
-  _chessService!: ChessService;
-
-  @contextProvided({ context: profilesStoreContext })
-  _profilesStore!: ProfilesStore;
+  @contextProvided({ context: chessStoreContext })
+  _chessStore!: ChessStore;
 
   _knownProfiles = new StoreSubscriber(
     this,
-    () => this._profilesStore.knownProfiles
+    () => this._chessStore.profilesStore.knownProfiles
   );
 
-  listenForOpponentMove() {
-    const hcConnection = this._chessService.cellClient;
+  _game = new StoreSubscriber(this, () =>
+    this._chessStore.turnBasedGameStore.game(this.gameHash)
+  );
 
-    hcConnection.addSignalHandler(signal => {
-      const payload = signal.data.payload;
-      if (payload.Move) {
-        const game_hash = payload.Move.move_entry.game_hash;
-        if (game_hash !== this.gameHash) return;
+  _elos = new StoreSubscriber(this, () => this._chessStore.eloStore.elos);
 
-        const move = payload.Move;
-        move.move_entry.game_move = msgpack.decode(move.move_entry.game_move);
-
-        this._moves.push(move);
-
-        if (move.move_entry.game_move.to) {
-          const { from, to } = move.move_entry.game_move;
-          const moveString = `${from}-${to}`;
-
-          this._chessGame.move({ from, to, promotion: 'q' });
-          (this.shadowRoot?.getElementById('board') as any).move(moveString);
-        }
-
-        this.announceIfGameEnded();
-
-        this.requestUpdate();
-      }
-    });
+  get myAddress() {
+    return this._chessStore.profilesStore.myAgentPubKey;
   }
 
-  async getGameInfo(retriesLeft = 4): Promise<GameEntry> {
+  chessGame() {
+    const chessGame = new Chess();
+    for (const move of this._game.value.moves) {
+      if (move.game_move_entry.game_move.type === 'PlacePiece') {
+        const { from, to } = move.game_move_entry.game_move;
+        chessGame.move({ from, to, promotion: 'q' });
+      }
+    }
+    return chessGame;
+  }
+
+  updated(changedValues: PropertyValues) {
+    super.updated(changedValues);
+
+    const board = this.shadowRoot?.getElementById('board');
+    if (board && (board as any).setPosition) {
+      (board as any).setPosition(this.chessGame().fen());
+    }
+  }
+
+  async getGameInfo(retriesLeft = 4): Promise<void> {
+    console.log(this.gameHash);
     try {
-      const gameInfo = await this._chessService.getGame(this.gameHash);
-      return gameInfo;
+      await this._chessStore.fetchGameDetails(this.gameHash);
     } catch (e) {
+      console.log(e);
       if (retriesLeft === 0) throw new Error(`Couldn't get game`);
 
       await sleep(200);
@@ -101,52 +90,27 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
   }
 
   async firstUpdated() {
-    const gameInfo = await this.getGameInfo();
-
-    this._moves = await this._chessService.getGameMoves(this.gameHash);
-
-    const opponent = gameInfo.players.find(
-      player => player !== this.myAddress
-    ) as string;
-
-    await this._profilesStore.fetchAgentProfile(opponent);
-
-    this._chessGame = new Chess();
-    for (const move of this._moves) {
-      if (move.move_entry.game_move.type === 'PlacePiece') {
-        const { from, to } = move.move_entry.game_move;
-        this._chessGame.move({ from, to, promotion: 'q' });
-      }
-    }
+    await this.getGameInfo();
 
     this._chessStyles = '';
-
-    this.listenForOpponentMove();
-
-    this._gameInfo = gameInfo;
-
-    this.announceIfGameEnded();
-  }
-
-  get myAddress() {
-    return this._profilesStore.myAgentPubKey;
   }
 
   amIWhite() {
-    return this._gameInfo.players[0] === this.myAddress;
+    return (
+      this._game.value.entry.players[0] ===
+      this._chessStore.profilesStore.myAgentPubKey
+    );
   }
 
   isMyTurn() {
-    const turnColor = this._chessGame.turn();
+    const turnColor = this.chessGame().turn();
     const myColor = this.amIWhite() ? 'w' : 'b';
 
     return turnColor === myColor;
   }
 
   getOpponent(): string {
-    return this._gameInfo.players.find(
-      player => player !== this.myAddress
-    ) as string;
+    return this._chessStore.turnBasedGameStore.opponent(this._game.value.entry);
   }
 
   getOpponentNickname(): string {
@@ -173,16 +137,18 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
   onDragStart(e: CustomEvent) {
     const { source, piece } = e.detail;
 
+    const game = this.chessGame();
+
     // do not pick up pieces if the game is over
-    if (this._chessGame.game_over() || !this.isMyTurn()) {
+    if (game.game_over() || !this.isMyTurn()) {
       e.preventDefault();
       return;
     }
 
     // or if it's not that side's turn
     if (
-      (this._chessGame.turn() === 'w' && piece.search(/^b/) !== -1) ||
-      (this._chessGame.turn() === 'b' && piece.search(/^w/) !== -1)
+      (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+      (game.turn() === 'b' && piece.search(/^w/) !== -1)
     ) {
       e.preventDefault();
       return;
@@ -195,7 +161,7 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
     this.removeGreySquares();
 
     // see if the move is legal
-    const move = this._chessGame.move({
+    const move = this.chessGame().move({
       from: source,
       to: target,
       promotion: 'q', // NOTE: always promote to a queen for example simplicity
@@ -216,7 +182,7 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
     if (!this.isMyTurn() || this.isGameOver()) return;
 
     // get list of possible moves for this square
-    const moves = this._chessGame.moves({
+    const moves = this.chessGame().moves({
       square: square,
       verbose: true,
     });
@@ -235,61 +201,30 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
     }
   }
 
+  getMyScore(myLastMove: ChessMove) {
+    if (myLastMove.type === 'Resign') return 0.0;
+    if (this.chessGame().in_draw() || this.chessGame().in_stalemate())
+      return 0.5;
+
+    // If there is no draw and I just finished the game myself, means I won
+    return 1.0;
+  }
+
   async makeMove(move: ChessMove) {
-    const previousMove = this._moves[this._moves.length - 1];
-    const previousMoveHash = previousMove ? previousMove.move_hash : undefined;
-
-    const move_entry: GameMoveEntry<ChessMove> = {
-      author_pub_key: this.myAddress,
-      game_hash: this.gameHash,
-      game_move: move,
-      previous_move_hash: previousMoveHash,
-    };
-    const m: MoveInfo<ChessMove> = { move_hash: undefined as any, move_entry };
-    this._moves.push(m);
-    this.requestUpdate();
-
-    const hash = await this._chessService.makeMove(
+    const moveHeaderHash = await this._chessStore.turnBasedGameStore.makeMove(
       this.gameHash,
-      previousMoveHash,
       move
     );
 
-    m.move_hash = hash;
-
     if (this.isGameOver()) {
       // Publish result
-      const amIWhite = this.amIWhite();
-      const myColor = amIWhite ? 'White' : 'Black';
-      const iResigned = m.move_entry.game_move.type === 'Resign';
 
-      let winner: 'Black' | 'White' | 'Draw' = myColor;
-      if (this._chessGame.in_draw() || this._chessGame.in_stalemate())
-        winner = 'Draw';
-      if (iResigned) winner = amIWhite ? 'Black' : 'White';
+      const myScore = this.getMyScore(move);
 
-      let num_of_moves = this._moves.length;
-      if (iResigned) num_of_moves--;
-
-      const result: ChessGameResult = {
-        game_hash: this.gameHash,
-        white_player: amIWhite ? this.myAddress : this.getOpponent(),
-        black_player: amIWhite ? this.getOpponent() : this.myAddress,
-        num_of_moves,
-        timestamp: Date.now(),
-        winner: { [winner]: undefined } as any,
-      };
-
-      await this._chessService.publishResult(result);
-    }
-
-    this.announceIfGameEnded();
-  }
-
-  announceIfGameEnded() {
-    if (this.isGameOver()) {
-      this.dispatchEvent(
-        new CustomEvent('game-ended', { bubbles: true, composed: true })
+      await this._chessStore.publishResult(
+        this.gameHash,
+        moveHeaderHash,
+        myScore
       );
     }
   }
@@ -301,8 +236,6 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
       to,
       promotion,
     };
-    this._chessGame.move({ from, to, promotion: 'q' });
-    this.requestUpdate();
 
     this.makeMove(move);
   }
@@ -310,15 +243,15 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
   renderMoveList() {
     return html`
       <div class="column" style="flex: 1;">
-        <span class="title">Move history</span>
-        ${this._chessGame.history().length > 0
+        <span class="title">Move History</span>
+        ${this.chessGame().history().length > 0
           ? html`
               <div class="flex-scrollable-parent">
                 <div class="flex-scrollable-container">
                   <div class="flex-scrollable-y">
                     <div class="row" style="overflow-y: auto;">
                       <mwc-list>
-                        ${this._chessGame
+                        ${this.chessGame()
                           .history()
                           .filter((_: string, i: number) => i % 2 === 0)
                           .map(
@@ -329,7 +262,7 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
                           )}
                       </mwc-list>
                       <mwc-list>
-                        ${this._chessGame
+                        ${this.chessGame()
                           .history()
                           .filter((_: string, i: number) => i % 2 === 1)
                           .map(
@@ -352,18 +285,18 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
   }
 
   getResult() {
-    if (this._chessGame.game_over()) {
-      if (!this._chessGame.in_checkmate()) return 'Game Over: draw';
+    const lastMove = this.lastMove();
+    const game = this.chessGame();
+    if (game.game_over()) {
+      if (!game.in_checkmate()) return 'Game Over: draw';
       if (this.isMyTurn())
         return `Checkmate: ${this.getOpponentNickname()} wins`;
       return `Checkmate: you win`;
     } else if (
-      this._moves.length > 0 &&
-      this._moves[this._moves.length - 1].move_entry.game_move.type === 'Resign'
+      lastMove &&
+      lastMove.game_move_entry.game_move.type === 'Resign'
     ) {
-      const lastMove = this._moves[this._moves.length - 1];
-
-      if (lastMove.move_entry.author_pub_key === this.myAddress)
+      if (lastMove.game_move_entry.author_pub_key === this.myAddress)
         return `You resigned: ${this.getOpponentNickname()} wins`;
       else return `${this.getOpponentNickname()} resigned: you win`;
     } else {
@@ -372,21 +305,40 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
     }
   }
 
-  isGameOver() {
-    if (this._chessGame.game_over()) return true;
-    const lastMove = this._moves[this._moves.length - 1];
+  lastMove() {
+    if (this._game.value.moves.length === 0) return undefined;
+    return this._game.value.moves[this._game.value.moves.length - 1];
+  }
 
-    return lastMove && lastMove.move_entry.game_move.type === 'Resign';
+  isGameOver() {
+    if (this.chessGame().game_over()) return true;
+    const lastMove = this.lastMove();
+
+    return lastMove && lastMove.game_move_entry.game_move.type === 'Resign';
+  }
+
+  renderPlayer(pubKey: AgentPubKeyB64) {
+    return html`
+      <div class="row">
+        <agent-avatar .agentPubKey=${pubKey}></agent-avatar>
+        <span style="flex: 1;"
+          >${this._knownProfiles.value[pubKey].nickname}</span
+        >
+        <span>ELO: ${this._elos.value[pubKey]}</span>
+      </div>
+    `;
   }
 
   renderGameInfo() {
     return html`
       <mwc-card style="height: 500px; min-width: 300px; align-self: center;">
         <div class="column board game-info" style="margin: 16px; flex: 1;">
-          <span class="title">Opponent: ${this.getOpponentNickname()}</span>
+          ${this.renderPlayer(this.getOpponent())}
           <span class="placeholder"
             >Started at:
-            ${new Date(this._gameInfo.created_at).toLocaleString()}</span
+            ${new Date(
+              this._game.value.entry.created_at
+            ).toLocaleString()}</span
           >
           <hr class="horizontal-divider" />
           ${this.renderMoveList()}
@@ -400,13 +352,16 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
             .disabled=${this.isGameOver() || !this.isMyTurn()}
             @click=${() => this.makeMove({ type: 'Resign' })}
           ></mwc-button>
+          <hr class="horizontal-divider" />
+
+          ${this.renderPlayer(this._chessStore.profilesStore.myAgentPubKey)}
         </div>
       </mwc-card>
     `;
   }
 
   render() {
-    if (!this._gameInfo)
+    if (!this._game.value)
       return html`<div class="column center-content" style="flex: 1;">
         <mwc-circular-progress indeterminate></mwc-circular-progress>
       </div>`;
@@ -419,7 +374,6 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
           style="margin-right: 40px"
           .orientation=${this.amIWhite() ? 'white' : 'black'}
           ?draggable-pieces=${!this.isGameOver()}
-          position="${this._chessGame.fen()}"
           @drag-start=${this.onDragStart}
           @drop=${this.onDrop}
           @mouseover-square=${this.onMouseOverSquare}

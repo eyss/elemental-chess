@@ -1,4 +1,4 @@
-import { AppWebsocket, AdminWebsocket, CellId } from '@holochain/conductor-api';
+import { AppWebsocket } from '@holochain/conductor-api';
 import {
   Card,
   TopAppBar,
@@ -9,7 +9,6 @@ import {
 import { ContextProvider, Context } from '@lit-labs/context';
 import {
   ProfilePrompt,
-  ProfilesService,
   ListProfiles,
   profilesStoreContext,
   ProfilesStore,
@@ -18,37 +17,41 @@ import {
 import {
   CreateInvitation,
   InvitationsStore,
-  InvitationsService,
   InvitationsList,
   invitationsStoreContext,
 } from '@eyss/invitations';
 
 import { LitElement, css, html } from 'lit';
-import { property, query, state } from 'lit/decorators.js';
+import { state } from 'lit/decorators.js';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements';
 import {
   HoloClient,
   HolochainClient,
   CellClient,
 } from '@holochain-open-dev/cell-client';
-import { Connection as WebSdkConnection } from '@holo-host/web-sdk';
+import WebSdk from '@holo-host/web-sdk';
+const WebSdkConnection = WebSdk.Connection;
+
 import { EntryHashB64 } from '@holochain-open-dev/core-types';
+import { GameResultsHistory, EloRanking, eloStoreContext } from '@eyss/elo';
+import {
+  MyCurrentGames,
+  turnBasedGameStoreContext,
+} from '@eyss/turn-based-game';
+import {
+  ChessGame,
+  ChessStore,
+  chessStoreContext,
+  sharedStyles,
+} from '@eyss/chess';
 
 import { router } from './router';
-import { ChessCurrentGames } from './elements/chess-current-games';
-import { ChessService } from './chess.service';
-import { ChessGame } from './elements/chess-game';
-import { ChessGameResultsHistory } from './elements/chess-game-results-history';
-import { sharedStyles } from './elements/sharedStyles';
+
 import { appId, appUrl, isHoloEnv } from './constants';
-import { chessServiceContext } from './context';
 
 export class ChessApp extends ScopedElementsMixin(LitElement) {
   @state()
   _activeGameHash: string | undefined = undefined;
-
-  @property()
-  _gameEnded: boolean = false;
 
   @state()
   _loading = true;
@@ -58,13 +61,13 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
   _cellClient!: CellClient;
 
-  _chessService!: ContextProvider<Context<ChessService>>;
+  _chessStore!: ContextProvider<Context<ChessStore>>;
   _profilesStore!: ContextProvider<Context<ProfilesStore>>;
   _invitationStore!: ContextProvider<Context<InvitationsStore>>;
 
   signalHandler = (signal: any) => {
-    if (signal.data.payload.GameStarted != undefined) {
-      const gameHash = signal.data.payload.GameStarted[0];
+    if (signal.data.payload.type === 'GameStarted') {
+      const gameHash = signal.data.payload.game_hash;
       router.navigate(`/game/${gameHash}`);
     }
     if (this._invitationStore.value && isHoloEnv()) {
@@ -78,7 +81,6 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     router
       .on('/game/:game', (params: any) => {
         this._activeGameHash = params.data.game;
-        this._gameEnded = false;
       })
       .on('/', () => {
         this._activeGameHash = undefined;
@@ -95,20 +97,20 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   async connectToHolochain() {
     this._cellClient = await this.createClient();
 
-    const store = new ProfilesStore(this._cellClient, {
-      avatarMode: 'identicon',
-    });
+    const chessStore = new ChessStore(this._cellClient);
 
     // Fetching our profile has a side-effect of executing init
-    await store.fetchMyProfile();
+    await chessStore.profilesStore.fetchMyProfile();
 
     this._profilesStore = new ContextProvider(
       this,
       profilesStoreContext,
-      store
+      chessStore.profilesStore
     );
 
-    const invitationsStore = new InvitationsStore(this._cellClient, true);
+    const invitationsStore = new InvitationsStore(this._cellClient, {
+      clearOnInvitationComplete: true,
+    });
 
     this._invitationStore = new ContextProvider(
       this,
@@ -116,16 +118,21 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       invitationsStore
     );
 
-    this._chessService = new ContextProvider(
+    this._chessStore = new ContextProvider(this, chessStoreContext, chessStore);
+
+    new ContextProvider(
       this,
-      chessServiceContext,
-      new ChessService(this._cellClient)
+      turnBasedGameStoreContext,
+      chessStore.turnBasedGameStore
     );
+    new ContextProvider(this, eloStoreContext, chessStore.eloStore);
+
+    this._cellClient.addSignalHandler(this.signalHandler)
   }
 
   async _onInvitationCompleted(event: any) {
     const opponent = event.detail.invitation.inviter;
-    const gameHash = await this._chessService.value.createGame(opponent);
+    const gameHash = await this._chessStore.value.createGame(opponent);
     this.openGame(gameHash);
   }
 
@@ -134,7 +141,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   }
 
   async createHoloClient() {
-    const connection = new WebSdkConnection(appUrl(), this.signalHandler, {
+    const connection = new WebSdkConnection(appUrl(), null, {
       app_name: 'elemental-chess',
       skip_registration: true,
     });
@@ -196,10 +203,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
           raised
           style="align-self: start; margin: 16px;"
         ></mwc-button>
-        <chess-game
-          .gameHash=${this._activeGameHash}
-          @game-ended=${() => (this._gameEnded = true)}
-        ></chess-game>
+        <chess-game .gameHash=${this._activeGameHash}></chess-game>
       </div>`;
     else
       return html`
@@ -215,25 +219,14 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
             ></invitations-list>
           </div>
           <div class="row" style="flex: 1; width: 1200px;">
-            <mwc-card style="flex: 1; margin-right: 24px;">
-              <div class="column" style="flex: 1; margin: 12px;">
-                <span class="title" style="margin-bottom: 12px;">Players </span>
-                <div class="flex-scrollable-parent">
-                  <div class="flex-scrollable-container">
-                    <div class="flex-scrollable-y">
-                      <list-profiles></list-profiles>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </mwc-card>
-            <chess-game-results-history
+            <elo-ranking style="flex: 1; margin-right: 24px;"></elo-ranking>
+            <game-results-history
               style="flex: 1; margin-right: 24px;"
-            ></chess-game-results-history>
-            <chess-current-games
+            ></game-results-history>
+            <my-current-games
               style="flex: 1;"
               @open-game=${(e: CustomEvent) => this.openGame(e.detail.gameHash)}
-            ></chess-current-games>
+            ></my-current-games>
           </div>
         </div>
       `;
@@ -285,10 +278,11 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       'mwc-icon-button': IconButton,
       'mwc-card': Card,
       'profile-prompt': ProfilePrompt,
+      'elo-ranking': EloRanking,
       'list-profiles': ListProfiles,
       'chess-game': ChessGame,
-      'chess-current-games': ChessCurrentGames,
-      'chess-game-results-history': ChessGameResultsHistory,
+      'my-current-games': MyCurrentGames,
+      'game-results-history': GameResultsHistory,
       'create-invitation': CreateInvitation,
       'invitations-list': InvitationsList,
     };

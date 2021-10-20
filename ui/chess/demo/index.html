@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        background: #fafafa;
+      }
+    </style>
+  </head>
+  <body>
+    <elo-test></elo-test>
+
+    <script type="module">
+      import {
+        ProfilePrompt,
+        ProfilesStore,
+        profilesStoreContext,
+      } from '@holochain-open-dev/profiles';
+      import { AppWebsocket } from '@holochain/conductor-api';
+      import { HolochainClient } from '@holochain-open-dev/cell-client';
+      import { LitElement, html } from 'lit';
+      import { ScopedElementsMixin } from '@open-wc/scoped-elements';
+      import { ContextProvider } from '@lit-labs/context';
+
+      import {
+        GameResultsHistory,
+        EloRanking,
+        EloStore,
+        EloService,
+        eloStoreContext,
+      } from '../dist';
+
+      class EloTest extends ScopedElementsMixin(LitElement) {
+        static get properties() {
+          return {
+            loaded: {
+              type: Boolean,
+            },
+          };
+        }
+
+        async firstUpdated() {
+          const appWebsocket = await AppWebsocket.connect(
+            `ws://localhost:${process.env.HC_PORT}`
+          );
+          const appInfo = await appWebsocket.appInfo({
+            installed_app_id: 'my-app',
+          });
+
+          const cellData = appInfo.cell_data[0];
+          const cellClient = new HolochainClient(appWebsocket, cellData);
+          const profileStore = new ProfilesStore(cellClient);
+          const eloService = new EloService(cellClient, 'elo');
+          const eloStore = new EloStore(eloService, profileStore);
+
+          new ContextProvider(this, profilesStoreContext, profileStore);
+          new ContextProvider(this, eloStoreContext, eloStore);
+
+          this.loaded = true;
+        }
+
+        render() {
+          if (!this.loaded) return html`<span>Loading...</span>`;
+          return html`
+            <profile-prompt>
+              <game-results-history></game-results-history>
+              <elo-ranking></elo-ranking>
+            </profile-prompt>
+          `;
+        }
+
+        static get scopedElements() {
+          return {
+            'profile-prompt': ProfilePrompt,
+            'game-results-history': GameResultsHistory,
+            'elo-ranking': EloRanking,
+          };
+        }
+      }
+
+      customElements.define('elo-test', EloTest);
+    </script>
+  </body>
+</html>
