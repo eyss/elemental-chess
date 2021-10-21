@@ -12,8 +12,8 @@
   "scripts": {
     "analyze": "cem analyze --litelement",
     "start": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\"",
-    "build": "tsc && npm run analyze -- --exclude dist",
-    "build:watch": "tsc && tsc --watch --preserveWatchOutput",
+    "build": "rimraf tsconfig.tsbuildinfo && tsc && npm run analyze -- --exclude dist",
+    "build:watch": "rimraf tsconfig.tsbuildinfo && tsc && tsc --watch --preserveWatchOutput",
     "prepublish": "tsc && npm run analyze -- --exclude dist",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore && prettier \"**/*.ts\" --check --ignore-path .gitignore",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore && prettier \"**/*.ts\" --write --ignore-path .gitignore",
