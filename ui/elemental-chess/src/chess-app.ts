@@ -283,11 +283,6 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
         <div class="fill row" style="width: 100vw; height: 100%;">
           <profile-prompt style="flex: 1;">
-            <img
-              slot="hero"
-              src="elemental-chess.png"
-              style="height: 225px; width: 300px; margin-bottom: 24px;"
-            />
             ${this.renderContent()}
           </profile-prompt>
         </div>

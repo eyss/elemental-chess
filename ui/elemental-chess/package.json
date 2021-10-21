@@ -23,7 +23,7 @@
     "@holochain-open-dev/cell-client": "0.0.7",
     "@holochain-open-dev/core-types": "0.1.1",
     "@holochain-open-dev/profiles": "github:holochain-open-dev/profiles#ui-build",
-    "@holochain/conductor-api": "github:holochain/holochain-conductor-api#cc7738671551683baac4758ebeffac265bdc3348",
+    "@holochain/conductor-api": "github:holochain/holochain-conductor-api#617adf7f250121d37f8e6f3ba80bef784f94ebd8",
     "@lit-labs/context": "github:holochain-open-dev/context.git#build",
     "@open-wc/scoped-elements": "^2.0.0-next.4",
     "@scoped-elements/material-web": "^0.0.14",

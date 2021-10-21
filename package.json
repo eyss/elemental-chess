@@ -21,7 +21,7 @@
     "build:zome": "CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown"
   },
   "devDependencies": {
-    "@holochain/conductor-api": "github:holochain/holochain-conductor-api#cc7738671551683baac4758ebeffac265bdc3348",
+    "@holochain/conductor-api": "github:holochain/holochain-conductor-api#617adf7f250121d37f8e6f3ba80bef784f94ebd8",
     "concurrently": "^6.2.1",
     "cross-env": "^7.0.3",
     "new-port-cli": "^1.0.0",
