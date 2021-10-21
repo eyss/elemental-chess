@@ -215,7 +215,7 @@ checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
 [[package]]
 name = "hc_mixin_elo"
 version = "0.1.0"
-source = "git+http://github.com/eyss/elo?branch=main#e9cc6441ebbd621e69171a471a9ff2e05bc0f5a9"
+source = "git+http://github.com/eyss/elo?rev=b9daf5b5f3705e2f79ae0004c37dbe3e66bc4aec#b9daf5b5f3705e2f79ae0004c37dbe3e66bc4aec"
 dependencies = [
  "hdk",
  "holo_hash 0.0.9",
@@ -226,7 +226,7 @@ dependencies = [
 [[package]]
 name = "hc_mixin_turn_based_game"
 version = "0.0.1"
-source = "git+http://github.com/eyss/turn-based-game?branch=main#95e1b370798669358ca581a96bff88ba2922b051"
+source = "git+http://github.com/eyss/turn-based-game?rev=f2e4539172f222939e1ba2a4311b4807b0d42b83#f2e4539172f222939e1ba2a4311b4807b0d42b83"
 dependencies = [
  "chrono",
  "derive_more",

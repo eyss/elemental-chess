@@ -22,6 +22,7 @@ import { ChessMove } from '../types';
 import { chessStoreContext } from '../context';
 import { ChessStore } from '../chess-store';
 import { AgentPubKeyB64 } from '@holochain-open-dev/core-types';
+import { AgentAvatar } from '@holochain-open-dev/profiles';
 
 const whiteSquareGrey = '#a9a9a9';
 const blackSquareGrey = '#696969';
@@ -77,7 +78,6 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
   }
 
   async getGameInfo(retriesLeft = 4): Promise<void> {
-    console.log(this.gameHash);
     try {
       await this._chessStore.fetchGameDetails(this.gameHash);
     } catch (e) {
@@ -91,6 +91,8 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
 
   async firstUpdated() {
     await this.getGameInfo();
+
+    this.loading = false;
 
     this._chessStyles = '';
   }
@@ -319,30 +321,31 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
 
   renderPlayer(pubKey: AgentPubKeyB64) {
     return html`
-      <div class="row">
+      <div class="row" style="align-items: center;">
         <agent-avatar .agentPubKey=${pubKey}></agent-avatar>
-        <span style="flex: 1;"
+        <span style="flex: 1; font-size: 16px; margin-left: 8px;"
           >${this._knownProfiles.value[pubKey].nickname}</span
         >
-        <span>ELO: ${this._elos.value[pubKey]}</span>
+        <span style="font-size: 16px">ELO: ${this._elos.value[pubKey]}</span>
       </div>
     `;
   }
 
   renderGameInfo() {
     return html`
-      <mwc-card style="height: 500px; min-width: 300px; align-self: center;">
+      <mwc-card
+        style="height: 500px; min-width: 300px; width: auto; align-self: center;"
+      >
         <div class="column board game-info" style="margin: 16px; flex: 1;">
           ${this.renderPlayer(this.getOpponent())}
+          <hr class="horizontal-divider" style="margin-top: 16px;" />
+          ${this.renderMoveList()}
           <span class="placeholder"
             >Started at:
             ${new Date(
               this._game.value.entry.created_at
             ).toLocaleString()}</span
           >
-          <hr class="horizontal-divider" />
-          ${this.renderMoveList()}
-          <hr class="horizontal-divider" />
           <span style="font-size: 20px; text-align: center;"
             >${this.getResult()}</span
           >
@@ -352,7 +355,7 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
             .disabled=${this.isGameOver() || !this.isMyTurn()}
             @click=${() => this.makeMove({ type: 'Resign' })}
           ></mwc-button>
-          <hr class="horizontal-divider" />
+          <hr class="horizontal-divider" style="margin-top: 16px;" />
 
           ${this.renderPlayer(this._chessStore.profilesStore.myAgentPubKey)}
         </div>
@@ -361,7 +364,7 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
   }
 
   render() {
-    if (!this._game.value)
+    if (this.loading)
       return html`<div class="column center-content" style="flex: 1;">
         <mwc-circular-progress indeterminate></mwc-circular-progress>
       </div>`;
@@ -374,6 +377,7 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
           style="margin-right: 40px"
           .orientation=${this.amIWhite() ? 'white' : 'black'}
           ?draggable-pieces=${!this.isGameOver()}
+          position=${this.chessGame().fen()}
           @drag-start=${this.onDragStart}
           @drop=${this.onDrop}
           @mouseover-square=${this.onMouseOverSquare}
@@ -392,6 +396,7 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
       'mwc-card': Card,
       'mwc-button': Button,
       'chess-board': ChessBoardElement,
+      'agent-avatar': AgentAvatar,
     };
   }
 

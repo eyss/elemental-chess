@@ -8,6 +8,7 @@ import babel from '@rollup/plugin-babel';
 import html from '@web/rollup-plugin-html';
 import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
 import { terser } from 'rollup-plugin-terser';
+import copy from 'rollup-plugin-copy';
 
 export default {
   input: 'index.html',
@@ -16,7 +17,7 @@ export default {
     chunkFileNames: '[hash].js',
     assetFileNames: '[hash][extname]',
     format: 'es',
-    dir: outputDir,
+    dir: 'dist',
   },
   preserveEntrySignatures: false,
 
@@ -43,6 +44,9 @@ export default {
     terser(),
     /** Bundle assets references via import.meta.url */
     importMetaAssets(),
+    copy({
+      targets: [{ src: 'assets/**/*', dest: 'dist/' }],
+    }),
     /** Compile JS to a lower language target */
     babel({
       babelHelpers: 'bundled',

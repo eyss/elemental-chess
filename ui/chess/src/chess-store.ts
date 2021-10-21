@@ -41,13 +41,18 @@ export class ChessStore {
   }
 
   public async fetchGameDetails(gameHash: EntryHashB64) {
-    await Promise.all([
-      this.turnBasedGameStore.fetchGame(gameHash),
-      this.turnBasedGameStore.fetchGameMoves(gameHash),
-    ]);
+    await this.turnBasedGameStore.fetchGame(gameHash);
+    // Fetch moves needs the game already fetched
+    await this.turnBasedGameStore.fetchGameMoves(gameHash);
+
     const game = get(this.turnBasedGameStore.game(gameHash));
 
-    await this.eloStore.fetchEloForAgents(game.entry.players);
+    const players = game.entry.players;
+
+    await Promise.all([
+      this.eloStore.fetchEloForAgents(players),
+      this.profilesStore.fetchAgentsProfiles(players),
+    ]);
   }
 
   public async publishResult(
@@ -66,15 +71,19 @@ export class ChessStore {
         await sleep(2000);
         return this.publishResult(gameHash, lastGameMoveHash, myScore);
       }
-
+      
+      await sleep(500);
       // TODO: replace when post commit lands
-      await this.service.finishGameAndLinkResult(
-        gameHash,
-        outcome.game_result_hash
-      );
+      await this.service.closeGame(gameHash, outcome.game_result_hash);
     } catch (e) {
+      if (JSON.stringify(e).includes('Failed to get Element')) {
+        // The opponent can't get our last move yet, sleep and retry
+        await sleep(2000);
+        return this.publishResult(gameHash, lastGameMoveHash, myScore);
+      }
       console.warn(
-        'Error publishing a countersigned result, most likely the opponent is not online. Create a unilateral one'
+        'Error publishing a countersigned result, most likely the opponent is not online. Create a unilateral one.',
+        e
       );
 
       await this.service.publishGameResultAndFlag(

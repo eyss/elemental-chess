@@ -1,5 +1,5 @@
-use chess::{ChessMove, Color, Game, GameResult, Piece, Square};
-use hc_mixin_turn_based_game::{GameOutcome, TurnBasedGame};
+use chess::{ChessMove, Game, GameResult, Piece, Square};
+use hc_mixin_turn_based_game::{GameStatus, TurnBasedGame};
 use hdk::prelude::holo_hash::*;
 use hdk::prelude::*;
 use std::str::FromStr;
@@ -8,13 +8,46 @@ use std::str::FromStr;
 pub struct ChessGame {
     pub white_address: AgentPubKeyB64,
     pub black_address: AgentPubKeyB64,
+    pub resigned_player: Option<AgentPubKeyB64>,
     pub board_state: String,
 }
 
-#[derive(Clone, SerializedBytes, Deserialize, Serialize, Debug)]
 pub enum ChessGameResult {
-    Winner(AgentPubKeyB64),
     Draw,
+    Winner(AgentPubKeyB64),
+}
+
+impl ChessGame {
+    pub fn game_state(&self) -> ExternResult<Game> {
+        Game::from_str(self.board_state.as_str())
+            .or(Err(WasmError::Guest("Invalid board state".into())))
+    }
+
+    pub fn get_result(&self) -> ExternResult<Option<ChessGameResult>> {
+        let game = self.game_state()?;
+
+        if let Some(player) = self.resigned_player.clone() {
+            return match self.white_address.eq(&player) {
+                true => Ok(Some(ChessGameResult::Winner(self.black_address.clone()))),
+                false => Ok(Some(ChessGameResult::Winner(self.white_address.clone()))),
+            };
+        }
+
+        match game.result() {
+            None => Ok(None),
+            Some(result) => match result {
+                GameResult::DrawAccepted | GameResult::DrawDeclared | GameResult::Stalemate => {
+                    Ok(Some(ChessGameResult::Draw))
+                }
+                GameResult::BlackCheckmates | GameResult::WhiteResigns => {
+                    Ok(Some(ChessGameResult::Winner(self.black_address.clone())))
+                }
+                GameResult::WhiteCheckmates | GameResult::BlackResigns => {
+                    Ok(Some(ChessGameResult::Winner(self.white_address.clone())))
+                }
+            },
+        }
+    }
 }
 
 #[derive(Clone, SerializedBytes, Deserialize, Serialize, Debug)]
@@ -40,7 +73,6 @@ fn promotion_piece(piece: String) -> ExternResult<Piece> {
 
 impl TurnBasedGame for ChessGame {
     type GameMove = ChessGameMove;
-    type GameResult = ChessGameResult;
 
     fn min_players() -> Option<usize> {
         Some(2)
@@ -54,18 +86,17 @@ impl TurnBasedGame for ChessGame {
         ChessGame {
             white_address: players[0].clone().into(),
             black_address: players[1].clone().into(),
+            resigned_player: None,
             board_state: Game::new().current_position().to_string(),
         }
     }
 
-    fn apply_move(
-        &mut self,
-        game_move: ChessGameMove,
-        author: AgentPubKeyB64,
-        players: Vec<AgentPubKeyB64>,
-    ) -> ExternResult<()> {
-        let mut game = Game::from_str(self.board_state.as_str())
-            .or(Err(WasmError::Guest("Invalid board state".into())))?;
+    fn apply_move(&mut self, game_move: ChessGameMove, author: AgentPubKeyB64) -> ExternResult<()> {
+        let mut game = self.game_state()?;
+
+        if game.result().is_some() {
+            return Err(WasmError::Guest("Game was already finished".into()));
+        }
 
         match game_move {
             ChessGameMove::PlacePiece {
@@ -91,16 +122,7 @@ impl TurnBasedGame for ChessGame {
                 game.make_move(chess_move);
             }
             ChessGameMove::Resign => {
-                if game.result().is_some() {
-                    return Err(WasmError::Guest("Game was already finished".into()));
-                }
-
-                let resigner_color: Color = match author.eq(&players[0]) {
-                    true => Color::White,
-                    false => Color::Black,
-                };
-
-                game.resign(resigner_color);
+                self.resigned_player = Some(author);
             }
         }
 
@@ -108,21 +130,17 @@ impl TurnBasedGame for ChessGame {
         return Ok(());
     }
 
-    // Gets the winner for the game // remake this method
-    fn outcome(&self, players: Vec<AgentPubKeyB64>) -> GameOutcome<ChessGameResult> {
+    // Gets the winner for the game
+    fn status(&self) -> GameStatus {
+        if let Some(_) = self.resigned_player {
+            return GameStatus::Finished;
+        }
+
         let game = Game::from_str(self.board_state.as_str()).expect("Invalid board state");
 
         match game.result() {
-            Some(result) => match result {
-                GameResult::DrawAccepted | GameResult::DrawDeclared | GameResult::Stalemate => {
-                    GameOutcome::Finished(ChessGameResult::Draw)
-                }
-                GameResult::WhiteCheckmates | GameResult::BlackResigns => {
-                    GameOutcome::Finished(ChessGameResult::Winner(players[0].clone()))
-                }
-                _ => GameOutcome::Finished(ChessGameResult::Winner(players[1].clone())),
-            },
-            None => GameOutcome::Ongoing,
+            Some(_) => GameStatus::Finished,
+            None => GameStatus::Ongoing,
         }
     }
 }

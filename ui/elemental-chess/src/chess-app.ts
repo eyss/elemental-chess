@@ -12,6 +12,7 @@ import {
   ListProfiles,
   profilesStoreContext,
   ProfilesStore,
+  AgentAvatar,
 } from '@holochain-open-dev/profiles';
 
 import {
@@ -48,6 +49,7 @@ import {
 import { router } from './router';
 
 import { appId, appUrl, isHoloEnv } from './constants';
+import { StoreSubscriber } from 'lit-svelte-stores';
 
 export class ChessApp extends ScopedElementsMixin(LitElement) {
   @state()
@@ -64,6 +66,11 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   _chessStore!: ContextProvider<Context<ChessStore>>;
   _profilesStore!: ContextProvider<Context<ProfilesStore>>;
   _invitationStore!: ContextProvider<Context<InvitationsStore>>;
+
+  _myProfile = new StoreSubscriber(
+    this,
+    () => this._profilesStore?.value.myProfile
+  );
 
   signalHandler = (signal: any) => {
     if (signal.data.payload.type === 'GameStarted') {
@@ -127,7 +134,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     );
     new ContextProvider(this, eloStoreContext, chessStore.eloStore);
 
-    this._cellClient.addSignalHandler(this.signalHandler)
+    this._cellClient.addSignalHandler(this.signalHandler);
   }
 
   async _onInvitationCompleted(event: any) {
@@ -196,13 +203,6 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   renderContent() {
     if (this._activeGameHash)
       return html` <div class="row center-content " style="flex: 1;">
-        <mwc-button
-          @click=${() => router.navigate('/')}
-          label="Go back"
-          icon="arrow_back"
-          raised
-          style="align-self: start; margin: 16px;"
-        ></mwc-button>
         <chess-game .gameHash=${this._activeGameHash}></chess-game>
       </div>`;
     else
@@ -250,6 +250,18 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
     `;
   }
 
+  renderMyProfile() {
+    if (!this._myProfile.value) return html``;
+    return html`
+      <div class="row center-content" slot="actionItems">
+        <agent-avatar
+          .agentPubKey=${this._profilesStore.value.myAgentPubKey}
+        ></agent-avatar>
+        <span style="margin: 0 16px;">${this._myProfile.value.nickname}</span>
+      </div>
+    `;
+  }
+
   render() {
     if (this._loading)
       return html`<div class="fill center-content">
@@ -258,14 +270,28 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
     return html`
       <mwc-top-app-bar style="flex: 1; display: flex;">
+        ${this._activeGameHash
+          ? html`
+              <mwc-icon-button
+                icon="arrow_back"
+                slot="navigationIcon"
+                @click=${() => router.navigate('/')}
+              ></mwc-icon-button>
+            `
+          : html``}
         <div slot="title">Elemental Chess</div>
 
         <div class="fill row" style="width: 100vw; height: 100%;">
           <profile-prompt style="flex: 1;">
+            <img
+              slot="hero"
+              src="elemental-chess.png"
+              style="height: 225px; width: 300px; margin-bottom: 24px;"
+            />
             ${this.renderContent()}
           </profile-prompt>
         </div>
-        ${this.renderLogout()}
+        ${this.renderMyProfile()} ${this.renderLogout()}
       </mwc-top-app-bar>
     `;
   }
@@ -279,6 +305,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       'mwc-card': Card,
       'profile-prompt': ProfilePrompt,
       'elo-ranking': EloRanking,
+      'agent-avatar': AgentAvatar,
       'list-profiles': ListProfiles,
       'chess-game': ChessGame,
       'my-current-games': MyCurrentGames,

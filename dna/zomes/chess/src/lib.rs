@@ -47,7 +47,6 @@ pub fn publish_result(result: PublishResultInput) -> ExternResult<CreateGameResu
 
     let game_info = ChessGameInfo {
         last_game_move_hash: result.last_game_move_hash,
-        game_hash: result.game_hash.clone(),
     };
     let outcome = hc_mixin_elo::attempt_create_countersigned_game_result::<ChessEloRating>(
         game_info,
@@ -62,7 +61,6 @@ pub fn publish_result(result: PublishResultInput) -> ExternResult<CreateGameResu
 pub fn publish_game_result_and_flag(result: PublishResultInput) -> ExternResult<()> {
     let game_info = ChessGameInfo {
         last_game_move_hash: result.last_game_move_hash,
-        game_hash: result.game_hash.clone(),
     };
     let opponent = get_opponent_for_game(result.game_hash.clone())?;
 
@@ -72,7 +70,7 @@ pub fn publish_game_result_and_flag(result: PublishResultInput) -> ExternResult<
         result.my_score,
     )?;
 
-    finish_game(FinishGameInput {
+    close_game(CloseGameInput {
         game_hash: result.game_hash.into(),
         game_result_hash: game_result_hash.into(),
     })?;
@@ -100,32 +98,23 @@ fn get_opponent_for_game(game_hash: EntryHashB64) -> ExternResult<AgentPubKeyB64
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct FinishGameInput {
+pub struct CloseGameInput {
     game_hash: EntryHashB64,
     game_result_hash: EntryHashB64,
 }
 
-#[hdk_extern]
-pub fn finish_game_and_link(input: FinishGameInput) -> ExternResult<()> {
-    link_my_game_results(vec![input.game_result_hash.clone()])?;
-
-    finish_game(input)
-}
-
-fn game_result_tag() -> LinkTag {
+fn closing_game_result_tag() -> LinkTag {
     LinkTag::new("closing_game_result")
 }
 
-pub fn finish_game(input: FinishGameInput) -> ExternResult<()> {
-    let opponent = get_opponent_for_game(input.game_hash.clone())?;
-    let players: Vec<AgentPubKey> = vec![opponent.into(), agent_info()?.agent_latest_pubkey];
-
-    hc_mixin_turn_based_game::remove_current_game(input.game_hash.clone().into(), players.clone())?;
+#[hdk_extern]
+pub fn close_game(input: CloseGameInput) -> ExternResult<()> {
+    hc_mixin_turn_based_game::remove_current_game(input.game_hash.clone().into())?;
 
     create_link(
         input.game_hash.into(),
         input.game_result_hash.into(),
-        game_result_tag(),
+        closing_game_result_tag(),
     )?;
 
     Ok(())

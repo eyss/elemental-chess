@@ -26,11 +26,8 @@ export class ChessService {
     });
   }
 
-  finishGameAndLinkResult(
-    gameHash: EntryHashB64,
-    gameResultHash: EntryHashB64
-  ) {
-    return this.callZome('finish_game_and_link', {
+  closeGame(gameHash: EntryHashB64, gameResultHash: EntryHashB64) {
+    return this.callZome('close_game', {
       game_hash: gameHash,
       game_result_hash: gameResultHash,
     });

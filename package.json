@@ -14,7 +14,7 @@
     "chaperone-bob": "chaperone-server --config ./setup/chaperone_bob.json",
     "test": "npm run build:happ && npm t -w tests",
     "package": "npm run build:happ && npm run package:ui && hc web-app pack workdir",
-    "package:ui": "npm run build:holochain -w @eyss/elemental-chess && cd ui/dist && bestzip ../dist.zip *",
+    "package:ui": "npm run build:holochain -w @eyss/elemental-chess && cd ui/elemental-chess/dist && bestzip ../dist.zip *",
     "start:happ": "hc s clean && RUST_LOG=warn hc s -f=$ADMIN_PORT generate ./workdir/elemental-chess.happ --run=$HC_PORT --app-id=$APP_ID network mdns",
     "build:happ": "npm run build:dna && hc app pack ./workdir/",
     "build:dna": "npm run build:zome && hc dna pack ./dna/workdir/",
