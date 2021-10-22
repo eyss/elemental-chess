@@ -182,7 +182,6 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
     const { square, piece } = e.detail;
 
     if (!this.isMyTurn() || this.isGameOver()) return;
-
     // get list of possible moves for this square
     const moves = this.chessGame().moves({
       square: square,
@@ -377,7 +376,6 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
           style="margin-right: 40px"
           .orientation=${this.amIWhite() ? 'white' : 'black'}
           ?draggable-pieces=${!this.isGameOver()}
-          position=${this.chessGame().fen()}
           @drag-start=${this.onDragStart}
           @drop=${this.onDrop}
           @mouseover-square=${this.onMouseOverSquare}

@@ -215,7 +215,7 @@ checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
 [[package]]
 name = "hc_mixin_elo"
 version = "0.1.0"
-source = "git+http://github.com/eyss/elo?rev=b9daf5b5f3705e2f79ae0004c37dbe3e66bc4aec#b9daf5b5f3705e2f79ae0004c37dbe3e66bc4aec"
+source = "git+http://github.com/eyss/elo?rev=0a286812dbfb77aac390153baef89078a66e2169#0a286812dbfb77aac390153baef89078a66e2169"
 dependencies = [
  "hdk",
  "holo_hash 0.0.9",
