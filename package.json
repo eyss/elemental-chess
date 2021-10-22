@@ -6,7 +6,7 @@
     "dna/tests"
   ],
   "scripts": {
-    "start": "cross-env HC_PORT=$(port) ADMIN_PORT=$(port) APP_ID=elemental-chess ENV=hcdev npm run start:inner",
+    "start": "npm run build:happ && cross-env HC_PORT=$(port) ADMIN_PORT=$(port) APP_ID=elemental-chess ENV=hcdev npm run start:inner",
     "start:holo:alice": "concurrently -k \"npm:chaperone-alice\" \"HC_PORT=8888 ENV=holodev APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9000 npm run start:inner\"",
     "start:holo:bob": "concurrently -k \"npm:chaperone-bob\" \"HC_PORT=8889 ENV=holodev APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9001 npm run start:inner\"",
     "start:inner": "npm run build -w @eyss/chess && concurrently -k \"npm run start:happ\" \"npm run build:watch -w @eyss/chess\" \"npm run start -w @eyss/elemental-chess\"",
