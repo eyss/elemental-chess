@@ -1,14 +1,17 @@
-import { Config, NetworkType, TransportConfigType } from "@holochain/tryorama";
+import {
+  Config,
+  NetworkType,
+  Orchestrator,
+  TransportConfigType,
+} from "@holochain/tryorama";
 
 import chess from "./chess";
+import moves from "./moves";
 
-// QUIC
-const network = {
-  network_type: NetworkType.QuicBootstrap,
-  transport_pool: [{ type: TransportConfigType.Quic }],
-  bootstrap_service: "https://bootstrap-staging.holo.host/",
-};
+let orchestrator = new Orchestrator();
+chess(orchestrator);
+orchestrator.run();
 
-const config = Config.gen({ network });
-
-chess(config);
+orchestrator = new Orchestrator();
+moves(orchestrator);
+orchestrator.run();

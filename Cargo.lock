@@ -226,7 +226,7 @@ dependencies = [
 [[package]]
 name = "hc_mixin_turn_based_game"
 version = "0.0.1"
-source = "git+http://github.com/eyss/turn-based-game?rev=f2e4539172f222939e1ba2a4311b4807b0d42b83#f2e4539172f222939e1ba2a4311b4807b0d42b83"
+source = "git+http://github.com/eyss/turn-based-game?rev=5523457dc5cc723e0c4df3e0b009d55e30465e9e#5523457dc5cc723e0c4df3e0b009d55e30465e9e"
 dependencies = [
  "chrono",
  "derive_more",

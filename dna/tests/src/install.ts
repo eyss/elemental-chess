@@ -1,4 +1,9 @@
-import { InstalledHapp } from "@holochain/tryorama";
+import {
+  Config,
+  InstalledHapp,
+  NetworkType,
+  TransportConfigType,
+} from "@holochain/tryorama";
 import path from "path";
 
 export const MEM_PROOF1 = Buffer.from(
@@ -9,6 +14,15 @@ export const MEM_PROOF2 = Buffer.from(
   "3gACrXNpZ25lZF9oZWFkZXLeAAKmaGVhZGVy3gACp2NvbnRlbnTeAAekdHlwZaZDcmVhdGWmYXV0aG9yxCeEICREcSxdIB5vMom0+wtjVdw148AUiJ4UG3PYBNqeWiTGdILUqTOpdGltZXN0YW1wks5gweIkzixIo3KqaGVhZGVyX3Nlcc0BMatwcmV2X2hlYWRlcsQnhCkkj5QRLt0haVDQtxpfKKtJWJUG/uYJmvwZtkoFdnsbHFHlYW/IqmVudHJ5X3R5cGXeAAGjQXBw3gADomlkAKd6b21lX2lkAKp2aXNpYmlsaXR53gABplB1YmxpY8CqZW50cnlfaGFzaMQnhCEkcnWUeAP9pcKJDhZ4o4O90LrmS18D+GEzbW+NDjO8Z0wf3/T9pGhhc2jEJ4QpJEtzArTCIZZC+l/TQktzXOl+xrmogg1nMIB3Ft5NjnxRZhC//KlzaWduYXR1cmXEQEAf7f2MAkMgXiD266vMoLihO0nrUSpUQIsnu8v7nZkec7OnDOQ639H6f0MfrGH3kpNetQ4j6YH1QE7X2RLrLgKlZW50cnneAAGnUHJlc2VudN4AAqplbnRyeV90eXBlo0FwcKVlbnRyecQngqRyb2xlpUFETUlOrnJlY29yZF9sb2NhdG9yqzFAaG9sby5ob3N0",
   "base64"
 );
+
+// QUIC
+const network = {
+  network_type: NetworkType.QuicBootstrap,
+  transport_pool: [{ type: TransportConfigType.Quic }],
+  bootstrap_service: "https://bootstrap-staging.holo.host/",
+};
+
+export const config = Config.gen({ network });
 
 export const MEM_PROOF_READ_ONLY = Buffer.from([0]);
 

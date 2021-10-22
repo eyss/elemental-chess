@@ -18,4 +18,4 @@ holo_hash = {version = "0.0.8", features = ["encoding"]}
 
 chess = "3.2.0"
 hc_mixin_elo = {git = "http://github.com/eyss/elo", rev = "b9daf5b5f3705e2f79ae0004c37dbe3e66bc4aec"}
-hc_mixin_turn_based_game = {git = "http://github.com/eyss/turn-based-game", rev = "f2e4539172f222939e1ba2a4311b4807b0d42b83"}
+hc_mixin_turn_based_game = {git = "http://github.com/eyss/turn-based-game", rev = "5523457dc5cc723e0c4df3e0b009d55e30465e9e"}

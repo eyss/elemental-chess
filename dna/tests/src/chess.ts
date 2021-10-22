@@ -1,37 +1,18 @@
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
 import { Orchestrator } from "@holochain/tryorama";
-import Base64 from "js-base64";
 import {
+  config,
   installAgents,
   MEM_PROOF1,
   MEM_PROOF2,
   MEM_PROOF_READ_ONLY,
 } from "./install";
+import { createGame, delay, getCurrentGames, getGameResultsForAgents, makeMove, serializeHash } from "./utils";
+import { MakeMoveInput } from "./types";
 
-const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-const createGame = (opponent: string) => (conductor) =>
-  conductor.call("chess", "create_game", opponent);
-const makeMove = (make_move_input: MakeMoveInput) => (conductor) =>
-  conductor.call("chess", "make_move", make_move_input);
-const getCurrentGames = () => (conductor) =>
-  conductor.call("chess", "get_my_current_games", null);
-const getGameResultsForAgents = (conductor) => (agents) =>
-  conductor.call("chess", "get_game_results_for_agents", agents);
 //const getMovement = (conductor) =>  conductor.call("chess", "get_movement",);
 
-type MakeMoveInput = {
-  game_hash: string;
-  previous_move_hash: string | null;
-  game_move: any;
-};
-
-function serializeHash(hash) {
-  return `u${Base64.fromUint8Array(hash, true)}`;
-}
-
-export default function (config) {
-  let orchestrator = new Orchestrator();
-
+export default function (orchestrator: Orchestrator<any>) {
   orchestrator.registerScenario(
     "chess zome tests",
     async (s: ScenarioApi, t) => {
@@ -136,6 +117,4 @@ export default function (config) {
       t.equal(bobGamesResults1[bobbyPubKey].length, 1);
     }
   );
-
-  orchestrator.run();
 }

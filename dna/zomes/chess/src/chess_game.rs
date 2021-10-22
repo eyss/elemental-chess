@@ -91,8 +91,13 @@ impl TurnBasedGame for ChessGame {
         }
     }
 
-    fn apply_move(&mut self, game_move: ChessGameMove, author: AgentPubKeyB64) -> ExternResult<()> {
-        let mut game = self.game_state()?;
+    fn apply_move(
+        self,
+        game_move: ChessGameMove,
+        author: AgentPubKeyB64,
+    ) -> ExternResult<ChessGame> {
+        let mut chess_game = self.clone();
+        let mut game = chess_game.game_state()?;
 
         if game.result().is_some() {
             return Err(WasmError::Guest("Game was already finished".into()));
@@ -122,12 +127,12 @@ impl TurnBasedGame for ChessGame {
                 game.make_move(chess_move);
             }
             ChessGameMove::Resign => {
-                self.resigned_player = Some(author);
+                chess_game.resigned_player = Some(author);
             }
         }
 
-        self.board_state = game.current_position().to_string();
-        return Ok(());
+        chess_game.board_state = game.current_position().to_string();
+        return Ok(chess_game);
     }
 
     // Gets the winner for the game
