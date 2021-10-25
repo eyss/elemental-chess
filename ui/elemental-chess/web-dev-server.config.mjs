@@ -31,6 +31,11 @@ export default /** @type {import('@web/dev-server').DevServerConfig} */ ({
 
   plugins: [
     replace({
+      'const srcSquareRect = srcSquare.getBoundingClientRect();':
+        'if(!srcSquare) return {};const srcSquareRect = srcSquare.getBoundingClientRect();',
+
+      "this._draggedPieceElement.addEventListener('transitionend', transitionComplete);":
+        "this._draggedPieceElement.addEventListener('transitionend', transitionComplete);resolve();",
       'process.env.ENV': JSON.stringify(process.env.ENV),
       'process.env.HC_PORT': JSON.stringify(process.env.HC_PORT || 8888),
       '  COMB =': 'window.COMB =',
