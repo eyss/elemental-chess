@@ -17,5 +17,5 @@ hdk = "0.0.109"
 holo_hash = {version = "0.0.8", features = ["encoding"]}
 
 chess = "3.2.0"
-hc_mixin_elo = {git = "http://github.com/eyss/elo", rev = "0a286812dbfb77aac390153baef89078a66e2169"}
+hc_mixin_elo = {git = "http://github.com/eyss/elo", rev = "fd5fe6965a91c34cf5b95cec0072c0ae4de848a9"}
 hc_mixin_turn_based_game = {git = "http://github.com/eyss/turn-based-game", rev = "5523457dc5cc723e0c4df3e0b009d55e30465e9e"}

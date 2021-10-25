@@ -74,6 +74,7 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
     const board = this.shadowRoot?.getElementById('board');
     if (board && (board as any).setPosition) {
       (board as any).setPosition(this.chessGame().fen());
+      (board as any).position = this.chessGame().fen();
     }
   }
 
@@ -376,6 +377,7 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
           style="margin-right: 40px"
           .orientation=${this.amIWhite() ? 'white' : 'black'}
           ?draggable-pieces=${!this.isGameOver()}
+          position="${this.chessGame().fen()}"
           @drag-start=${this.onDragStart}
           @drop=${this.onDrop}
           @mouseover-square=${this.onMouseOverSquare}
