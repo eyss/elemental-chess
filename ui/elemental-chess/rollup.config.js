@@ -32,12 +32,15 @@ export default {
       preferBuiltins: false,
     }),
     replace({
-      "const srcSquareRect = srcSquare.getBoundingClientRect();": "if(!srcSquare) return {};const srcSquareRect = srcSquare.getBoundingClientRect();",
-      "this._draggedPieceElement.addEventListener('transitionend', transitionComplete);": "this._draggedPieceElement.addEventListener('transitionend', transitionComplete);resolve();",
+      'const srcSquareRect = srcSquare.getBoundingClientRect();':
+        'if(!srcSquare) return {};const srcSquareRect = srcSquare.getBoundingClientRect();',
+      "this._draggedPieceElement.addEventListener('transitionend', transitionComplete);":
+        "this._draggedPieceElement.addEventListener('transitionend', transitionComplete);resolve();",
       'process.env.ENV': `"${process.env.ENV}"`,
       'process.env.HC_PORT': `"${process.env.HC_PORT}"`,
       "COMB = require('@holo-host/comb').COMB":
         "window.COMB = require('@holo-host/comb').COMB",
+      delimiters: ['', ''],
     }),
     builtins(),
     commonjs({}),
