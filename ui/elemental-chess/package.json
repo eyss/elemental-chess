@@ -5,9 +5,11 @@
   "author": "elemental-chess",
   "version": "0.0.0",
   "scripts": {
-    "start": "tsc && concurrently -k --names tsc,web-dev-server \"tsc --watch --preserveWatchOutput\" \"web-dev-server --config web-dev-server.config.mjs\"",
+    "start": "concurrently --names tsc,web-dev-server \"npm run build:watch\" \"web-dev-server --config web-dev-server.config.mjs\"",
+    "build": "rimraf dist && tsc --incremental",
     "build:holochain": "rimraf dist && tsc && ENV=hc rollup -c rollup.config.js",
     "build:holo": "rimraf dist && tsc && ENV=holo rollup -c rollup.config.js",
+    "build:watch": "run-singleton \"tsc -w --incremental --preserveWatchOutput\"",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
     "test": "tsc && web-test-runner --coverage",
@@ -52,6 +54,7 @@
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-workbox": "^6.2.0",
+    "run-singleton-cli": "^0.0.5",
     "tslib": "^2.3.1",
     "typescript": "4.3.5"
   },

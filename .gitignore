@@ -8,3 +8,4 @@ dist/
 *.webhapp
 *.zip
 .hc*
+*.tsbuildinfo

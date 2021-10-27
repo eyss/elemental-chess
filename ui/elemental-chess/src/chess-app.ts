@@ -148,13 +148,11 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   }
 
   async createHoloClient() {
-    console.log(appUrl())
     const connection = new WebSdkConnection(appUrl(), null, {
       app_name: 'elemental-chess',
       skip_registration: true,
     });
 
-    console.log('signin')
     await connection.ready();
     await connection.signIn();
 

@@ -11,9 +11,9 @@
   },
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "start": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\"",
-    "build": "rimraf tsconfig.tsbuildinfo && tsc && npm run analyze -- --exclude dist",
-    "build:watch": "rimraf tsconfig.tsbuildinfo && tsc && tsc --watch --preserveWatchOutput",
+    "start": "concurrently -r \"npm run build:watch\" \"wds\"",
+    "build": "rimraf *.tsbuildinfo dist && tsc --incremental",
+    "build:watch": "run-singleton \"tsc -w --incremental --preserveWatchOutput\"",
     "prepublish": "tsc && npm run analyze -- --exclude dist",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore && prettier \"**/*.ts\" --check --ignore-path .gitignore",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore && prettier \"**/*.ts\" --write --ignore-path .gitignore",
@@ -51,6 +51,7 @@
     "lint-staged": "^10.5.4",
     "prettier": "^2.4.1",
     "rollup-plugin-node-builtins": "^2.1.2",
+    "run-singleton-cli": "^0.0.5",
     "tslib": "^2.3.1",
     "typescript": "^4.4.4"
   },
