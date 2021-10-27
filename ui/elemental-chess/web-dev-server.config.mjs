@@ -33,11 +33,13 @@ export default /** @type {import('@web/dev-server').DevServerConfig} */ ({
     replace({
       'const srcSquareRect = srcSquare.getBoundingClientRect();':
         'if(!srcSquare) return {};const srcSquareRect = srcSquare.getBoundingClientRect();',
+      'process.env.NODE_ENV': `"production"`,
 
       "this._draggedPieceElement.addEventListener('transitionend', transitionComplete);":
         "this._draggedPieceElement.addEventListener('transitionend', transitionComplete);resolve();",
       'process.env.ENV': JSON.stringify(process.env.ENV),
       'process.env.HC_PORT': JSON.stringify(process.env.HC_PORT || 8888),
+      'process.env.CHAPERONE_PORT': JSON.stringify(process.env.CHAPERONE_PORT),
       '  COMB =': 'window.COMB =',
       delimiters: ['', ''],
     }),

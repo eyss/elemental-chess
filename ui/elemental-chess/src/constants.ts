@@ -11,7 +11,7 @@ export function appUrl(): string | null {
   // Hardcoded URL for the launcher
   if (ENV === 'hc') return `ws://localhost:8888`;
   else if (ENV === 'hcdev') return `ws://localhost:${process.env.HC_PORT}`;
-  else if (ENV === 'holodev') return `http://localhost:${process.env.HC_PORT}`;
+  else if (ENV === 'holodev') return `http://localhost:${process.env.CHAPERONE_PORT}`;
   else return 'https://chaperone.holo.host';
 }
 

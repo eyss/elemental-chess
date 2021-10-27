@@ -6,5 +6,5 @@ dist/
 *.dna
 *.happ
 *.webhapp
-prueba/
+*.zip
 .hc*
