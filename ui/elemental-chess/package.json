@@ -7,8 +7,6 @@
   "scripts": {
     "start": "concurrently --names tsc,web-dev-server \"npm run build:watch\" \"web-dev-server --config web-dev-server.config.mjs\"",
     "build": "rimraf dist && tsc && ENV=hc rollup -c rollup.config.js",
-    "build:holochain": "rimraf dist && tsc && ENV=hc rollup -c rollup.config.js",
-    "build:holo": "rimraf dist && tsc && ENV=holo rollup -c rollup.config.js",
     "build:watch": "run-singleton \"tsc -w --incremental --preserveWatchOutput\"",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
@@ -22,7 +20,7 @@
     "@eyss/turn-based-game": "github:eyss/turn-based-game#ui-build",
     "@holo-host/chaperone": "^9.0.0",
     "@holo-host/web-sdk": "^0.5.3",
-    "@holochain-open-dev/cell-client": "github:holochain-open-dev/cell-client#build",
+    "@holochain-open-dev/cell-client": "0.1.3",
     "@holochain-open-dev/core-types": "0.1.1",
     "@holochain-open-dev/profiles": "github:holochain-open-dev/profiles#ui-build",
     "@holochain/conductor-api": "0.2.4",

@@ -16,54 +16,32 @@ From the root folder of the repo:
 npm install
 ```
 
-## Building the DNA
+## Testing
 
 ```bash
-npm run build:happ
+npm test
 ```
 
-## Starting the UI
-
-Enter the UI folder:
+## Starting a Holochain network
 
 ```bash
-cd ui
+npm run network 2
 ```
 
-Then, run this inside the nix-shell in one terminal:
-
-```bash
-npm run start-alice
-```
-
-And this in another terminal inside the nix-shell as well:
-
-```bash
-npm run start-bob
-```
-
-If a page with "Not found" appears, wait for the UI to finish compilation and refresh the page.
+You can replace "2" by the number of agents that you want to boot up
 
 ## Starting with Holo's HCC mode
 
 ```bash
-npm run start-holo-alice
+npm run network:holo
 ```
 
-Go to the page that opens, and login with email: "alice". Any password will work.
+Go to the 2 pages that opens, and login with any email and password.
 
-In another terminal:
+## Packaging for release
 
 ```bash
-npm run start-holo-bob
+npm run package
 ```
 
-Go to the page that opens, and login with email: "bob". Any password will work.
-
-## Building the UI
-
-```bash
-npm run build
-```
-
-At this point, you will have the UI bundled in `ui/dist/` and the happ bundle in `dna/workdir/happ` ready to be published.
+At this point, you will have the application bundled in `workdir`, both the `.webhapp` for the launcher and the `.happ` and the UI `.zip` for Holo.
