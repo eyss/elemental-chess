@@ -45,11 +45,11 @@ import {
   chessStoreContext,
   sharedStyles,
 } from '@eyss/chess';
+import { StoreSubscriber } from 'lit-svelte-stores';
 
 import { router } from './router';
 
 import { appId, appUrl, isHoloEnv } from './constants';
-import { StoreSubscriber } from 'lit-svelte-stores';
 
 export class ChessApp extends ScopedElementsMixin(LitElement) {
   @state()
