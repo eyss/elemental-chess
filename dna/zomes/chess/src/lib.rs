@@ -78,12 +78,13 @@ pub fn publish_game_result_and_flag(result: PublishResultInput) -> ExternResult<
     Ok(())
 }
 
+/* TODO: uncomment when post commit can call self
 #[hdk_extern]
 fn post_commit(header_hashes: HeaderHashes) -> ExternResult<PostCommitCallbackResult> {
     post_commit_elo(header_hashes.0)?;
 
     Ok(PostCommitCallbackResult::Success)
-}
+} */
 
 fn get_opponent_for_game(game_hash: EntryHashB64) -> ExternResult<AgentPubKeyB64> {
     let game = get_game(game_hash)?;

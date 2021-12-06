@@ -2,7 +2,7 @@
 manifest_version: "1"
 name: elemental-chess
 description: ~
-slots:
+roles:
   - id: elemental-chess
     provisioning:
       strategy: create

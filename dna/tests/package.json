@@ -9,9 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@holochain/conductor-api": "github:holochain/holochain-conductor-api#617adf7f250121d37f8e6f3ba80bef784f94ebd8",
+    "@holochain/conductor-api": "0.2.4",
     "@holochain-open-dev/core-types": "0.1.1",
-    "@holochain/tryorama": "github:holochain/tryorama#2ebeafec0f9a74cf1f9e5d351a204a0ea43bf402",
+    "@holochain/tryorama": "0.4.6",
     "@types/lodash": "^4.14.168",
     "@types/node": "^14.14.31",
     "concurrently": "^6.0.0",
