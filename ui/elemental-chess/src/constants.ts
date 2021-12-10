@@ -7,11 +7,12 @@ export function appId(): string | undefined {
   else if (ENV === 'holo') return undefined;
 }
 
-export function appUrl(): string | null {
+export function appUrl(): string {
   // Hardcoded URL for the launcher
   if (ENV === 'hc') return `ws://localhost:8888`;
   else if (ENV === 'hcdev') return `ws://localhost:${process.env.HC_PORT}`;
-  else if (ENV === 'holodev') return `http://localhost:${process.env.CHAPERONE_PORT}`;
+  else if (ENV === 'holodev')
+    return `http://localhost:${process.env.CHAPERONE_PORT}`;
   else return 'https://devnet-chaperone.holo.host';
 }
 

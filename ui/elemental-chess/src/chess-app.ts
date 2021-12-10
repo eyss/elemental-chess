@@ -27,11 +27,10 @@ import { state } from 'lit/decorators.js';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements';
 import {
   HoloClient,
+  WebSdkClient,
   HolochainClient,
   CellClient,
 } from '@holochain-open-dev/cell-client';
-import WebSdk from '@holo-host/web-sdk';
-const WebSdkConnection = WebSdk.Connection;
 
 import { EntryHashB64 } from '@holochain-open-dev/core-types';
 import { GameResultsHistory, EloRanking, eloStoreContext } from '@eyss/elo';
@@ -115,9 +114,13 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       chessStore.profilesStore
     );
 
-    const invitationsStore = new InvitationsStore(this._cellClient, {
-      clearOnInvitationComplete: true,
-    });
+    const invitationsStore = new InvitationsStore(
+      this._cellClient,
+      chessStore.profilesStore,
+      {
+        clearOnInvitationComplete: true,
+      }
+    );
 
     this._invitationStore = new ContextProvider(
       this,
@@ -148,17 +151,17 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   }
 
   async createHoloClient() {
-    const connection = new WebSdkConnection(appUrl(), null, {
+    const client = new WebSdkClient(appUrl(), {
       app_name: 'elemental-chess',
       skip_registration: true,
     });
 
-    await connection.ready();
-    await connection.signIn();
+    await client.connection.ready();
+    await client.connection.signIn();
 
     this._signedIn = true;
 
-    const appInfo = await connection.appInfo(appId());
+    const appInfo = await client.connection.appInfo(appId());
 
     if (!appInfo.cell_data)
       throw new Error(`Holo appInfo() failed: ${JSON.stringify(appInfo)}`);
@@ -172,9 +175,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
         new Uint8Array((cellData.cell_id[1] as any).data),
       ] as any;
     }
-    const cellClient = new HoloClient(connection, cellData, {
-      app_name: 'elemental-chess',
-    });
+    const cellClient = new HoloClient(client, cellData);
 
     return cellClient;
   }
