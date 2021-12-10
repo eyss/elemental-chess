@@ -6,7 +6,7 @@
   "version": "0.0.0",
   "scripts": {
     "start": "concurrently --names tsc,web-dev-server \"npm run build:watch\" \"web-dev-server --config web-dev-server.config.mjs\"",
-    "build": "rimraf dist && tsc && ENV=hc rollup -c rollup.config.js",
+    "build": "rimraf dist && tsc && rollup -c rollup.config.js",
     "build:watch": "run-singleton \"tsc -w --incremental --preserveWatchOutput\"",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore",
