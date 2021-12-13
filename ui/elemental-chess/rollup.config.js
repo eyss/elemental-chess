@@ -9,6 +9,7 @@ import html from '@web/rollup-plugin-html';
 import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
 import { terser } from 'rollup-plugin-terser';
 import copy from 'rollup-plugin-copy';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default {
   input: 'index.html',
@@ -39,8 +40,6 @@ export default {
       'process.env.ENV': `"${process.env.ENV}"`,
       'process.env.NODE_ENV': `"production"`,
       'process.env.HC_PORT': `"${process.env.HC_PORT}"`,
-      "COMB = require('@holo-host/comb').COMB":
-        "window.COMB = require('@holo-host/comb').COMB",
       delimiters: ['', ''],
     }),
     builtins(),
@@ -90,5 +89,6 @@ export default {
         ],
       ],
     }),
+    visualizer(),
   ],
 };
