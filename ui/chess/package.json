@@ -23,7 +23,7 @@
     "@eyss/elo": "github:eyss/elo#ui-build",
     "@eyss/invitations": "github:eyss/invitations#ui-build",
     "@eyss/turn-based-game": "github:eyss/turn-based-game#ui-build",
-    "@holochain-open-dev/cell-client": "0.1.3",
+    "@holochain-open-dev/cell-client": "0.1.4",
     "@holochain-open-dev/core-types": "0.1.1",
     "@holochain-open-dev/profiles": "github:holochain-open-dev/profiles#ui-build",
     "@lit-labs/context": "github:holochain-open-dev/context.git#build",
