@@ -243,8 +243,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
         @click=${async () => {
           const c = (this._cellClient as any).connection.connection;
           await c.signOut();
-          await c.signIn();
-          this._signedIn = false;
+          window.location.reload();
         }}
         slot="actionItems"
       ></mwc-button>
