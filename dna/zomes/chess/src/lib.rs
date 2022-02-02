@@ -148,7 +148,7 @@ pub struct CloseGameInput {
 #[hdk_extern]
 pub fn close_games(input: Vec<CloseGameInput>) -> ExternResult<()> {
     for i in input {
-        hc_mixin_turn_based_game::remove_current_game(i.game_hash.clone().into())?;
+        hc_mixin_turn_based_game::remove_my_current_game(i.game_hash.clone().into())?;
 
         create_link(
             i.game_hash.into(),
