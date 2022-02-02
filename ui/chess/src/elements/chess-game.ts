@@ -1,6 +1,6 @@
 import { html, css, LitElement, PropertyValues } from 'lit';
 import { property, state } from 'lit/decorators.js';
-import { contextProvided } from '@lit-labs/context';
+import { contextProvided } from '@holochain-open-dev/context';
 import { ChessBoardElement } from 'chessboard-element';
 // @ts-ignore
 import chess from 'chess.js';

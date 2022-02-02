@@ -61,20 +61,12 @@ export class ChessStore {
     myScore: 1.0 | 0.5 | 0.0
   ): Promise<void> {
     try {
-      const outcome = await this.service.publishResult(
+      await sleep(500);
+      await this.service.publishResult(
         gameHash,
         lastGameMoveHash,
         myScore
       );
-
-      if (outcome.type === 'OutdatedLastGameResult') {
-        await sleep(2000);
-        return this.publishResult(gameHash, lastGameMoveHash, myScore);
-      }
-      
-      await sleep(500);
-      // TODO: replace when post commit lands
-      await this.service.closeGame(gameHash, outcome.game_result_hash);
     } catch (e) {
       if (JSON.stringify(e).includes('Failed to get Element')) {
         // The opponent can't get our last move yet, sleep and retry

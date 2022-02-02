@@ -82,24 +82,14 @@ export default function (orchestrator: Orchestrator<any>) {
       };
       lastMoveHash = await makeMove(resign_move)(alice_conductor);
       await delay(3000);
-      const outcome = await alice_conductor.call("chess", "publish_result", {
+      const game_result_hash = await alice_conductor.call("chess", "publish_result", {
         game_hash: new_game_address,
         last_game_move_hash: lastMoveHash,
         my_score: 0,
       });
-      t.equal(outcome.type, "Published");
-
-      const game_result_hash = outcome.game_result_hash;
+      t.ok(game_result_hash);
 
       await delay(3000);
-      await alice_conductor.call("chess", "link_my_game_results", [
-        game_result_hash,
-      ]);
-      await alice_conductor.call("chess", "close_game", {
-        game_hash: new_game_address,
-        game_result_hash,
-      });
-      await delay(4000);
 
       const aliceCurrentGames1 = await getCurrentGames()(alice_conductor);
       console.log(aliceCurrentGames1);

@@ -13,9 +13,8 @@ chrono = {version = "0.4", features = ["serde"]}
 derive_more = "0"
 serde = "1"
 
-hdk = "0.0.115"
-holo_hash = {version = "0.0.12", features = ["encoding"]}
+hdk =  {version = "0.0.120", features = ["encoding"]}
 
 chess = "3.2.0"
-hc_mixin_elo = {git = "http://github.com/eyss/elo", rev = "89b6afd2562b16fe79a6eee3372ff971bc2dd14d"}
-hc_mixin_turn_based_game = {git = "http://github.com/eyss/turn-based-game", rev = "a58dbb800a00b7c5b3168e895125650c27238b29"}
+hc_mixin_elo = {git = "http://github.com/eyss/elo", rev = "96e940f1fe64602541c7be705ad7485ce5754545"}
+hc_mixin_turn_based_game = {git = "http://github.com/eyss/turn-based-game", rev = "f7664cc4cd9f1cd899725f17ef25f1548fd16ffe"}

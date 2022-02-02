@@ -5,7 +5,6 @@ import {
   EntryHashB64,
   HeaderHashB64,
 } from '@holochain-open-dev/core-types';
-import { CreateGameResultOutcome } from '@eyss/elo';
 
 export class ChessService {
   constructor(public cellClient: CellClient, public zomeName = 'chess') {}
@@ -18,7 +17,7 @@ export class ChessService {
     gameHash: EntryHashB64,
     lastGameMoveHash: HeaderHashB64,
     myScore: 1.0 | 0.5 | 0.0
-  ): Promise<CreateGameResultOutcome> {
+  ): Promise<EntryHashB64> {
     return this.callZome('publish_result', {
       game_hash: gameHash,
       last_game_move_hash: lastGameMoveHash,
@@ -26,18 +25,11 @@ export class ChessService {
     });
   }
 
-  closeGame(gameHash: EntryHashB64, gameResultHash: EntryHashB64) {
-    return this.callZome('close_game', {
-      game_hash: gameHash,
-      game_result_hash: gameResultHash,
-    });
-  }
-
   publishGameResultAndFlag(
     gameHash: EntryHashB64,
     lastGameMoveHash: HeaderHashB64,
     myScore: 1.0 | 0.5 | 0.0
-  ): Promise<CreateGameResultOutcome> {
+  ): Promise<EntryHashB64> {
     return this.callZome('publish_game_result_and_flag', {
       game_hash: gameHash,
       last_game_move_hash: lastGameMoveHash,

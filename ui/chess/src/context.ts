@@ -1,4 +1,4 @@
-import { Context, createContext } from '@lit-labs/context';
+import { Context, createContext } from '@holochain-open-dev/context';
 import { ChessStore } from './chess-store';
 
 export const chessStoreContext: Context<ChessStore> =

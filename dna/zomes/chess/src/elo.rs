@@ -8,6 +8,7 @@ use crate::chess_game::{ChessGame, ChessGameResult};
 #[derive(Serialize, Deserialize, Debug, SerializedBytes)]
 pub struct ChessGameInfo {
     pub last_game_move_hash: HeaderHashB64,
+    pub game_hash: EntryHashB64
 }
 
 pub struct ChessEloRating;
