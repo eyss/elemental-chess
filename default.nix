@@ -1,5 +1,6 @@
 let
-  holonixPath = builtins.fetchTarball "https://github.com/holochain/holonix/archive/1cb431ac2d30d6f44dbcb5a40520f7328ae49ec1.tar.gz";
+  hash_nix = "843c86d5871df8de2d9a02bdd797ad6f33fa5be5";
+  holonixPath = builtins.fetchTarball "https://github.com/holochain/holonix/archive/${hash_nix}.tar.gz";
   holonix = import (holonixPath) {
     holochainVersionId = "v0_0_124";
   };
