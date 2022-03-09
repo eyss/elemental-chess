@@ -1,5 +1,5 @@
 let
-  hash_nix = "843c86d5871df8de2d9a02bdd797ad6f33fa5be5";
+  hash_nix = "46297548fd8db19bec228171a524330e7b5f6744";
   holonixPath = builtins.fetchTarball "https://github.com/holochain/holonix/archive/${hash_nix}.tar.gz";
   holonix = import (holonixPath) {
     holochainVersionId = "v0_0_124";
