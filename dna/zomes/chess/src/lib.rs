@@ -153,6 +153,7 @@ pub fn close_games(input: Vec<CloseGameInput>) -> ExternResult<()> {
         create_link(
             i.game_hash.into(),
             i.game_result_hash.into(),
+            LinkType(0),
             closing_game_result_tag(),
         )?;
     }

@@ -1,5 +1,5 @@
 [package]
-authors = ["manuel_puentes"]
+authors = ["manuel_puentes","Thomas_cal"]
 edition = "2018"
 name = "hc_zome_chess"
 version = "0.0.1"
@@ -13,8 +13,8 @@ chrono = {version = "0.4", features = ["serde"]}
 derive_more = "0"
 serde = "1"
 
-hdk =  {version = "0.0.122", features = ["encoding"]}
+hdk =  {version = "0.0.126", features = ["encoding"]}
 
 chess = "3.2.0"
-hc_mixin_elo = {git = "http://github.com/eyss/elo", rev = "aaf1f8eec880d020195f3d9f9e9f3932482eafbf"}
-hc_mixin_turn_based_game = {git = "http://github.com/eyss/turn-based-game", rev = "5c69d3b364e28da009063092a3f7e4eb27c4f630"}
+hc_mixin_elo = {git = "http://github.com/eyss/elo", rev = "for-hdk-v0.0.126"}
+hc_mixin_turn_based_game = {git = "http://github.com/eyss/turn-based-game", rev = "for-hdk-v0.0.126"}
