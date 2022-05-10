@@ -210,7 +210,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
         icon="logout"
         style="--mdc-theme-primary: white;"
         @click=${async () => {
-          const c = (this._cellClient as any).connection.connection;
+          const c = (this._cellClient as any).client.connection;
           await c.signOut();
           window.location.reload();
         }}
