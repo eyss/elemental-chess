@@ -19,7 +19,7 @@
     "@eyss/invitations": "github:eyss/invitations#ui-build",
     "@eyss/turn-based-game": "github:eyss/turn-based-game#ui-build",
     "@holo-host/chaperone": "^9.0.0",
-    "@holochain-open-dev/cell-client": "^0.3.4",
+    "@holochain-open-dev/cell-client": "^0.3.5",
     "@holochain-open-dev/core-types": "^0.2.0",
     "@holochain-open-dev/profiles": "^0.0.7",
     "@holochain-open-dev/context": "^0.0.3",
