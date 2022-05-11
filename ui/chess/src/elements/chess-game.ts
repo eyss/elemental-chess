@@ -3,8 +3,7 @@ import { property, state } from 'lit/decorators.js';
 import { contextProvided } from '@holochain-open-dev/context';
 import { ChessBoardElement } from 'chessboard-element';
 // @ts-ignore
-import chess from 'chess.js';
-const Chess = chess.Chess;
+import { Chess } from 'chess.js' 
 
 import { StoreSubscriber } from 'lit-svelte-stores';
 
