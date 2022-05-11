@@ -10,7 +10,7 @@
     "network": "npm run build:happ && concurrently-repeat \"npm run start:agent\"",
     "start:agent": "cross-env HC_PORT=$(port) ADMIN_PORT=$(port) APP_ID=elemental-chess ENV=hcdev npm run start:inner",
     "network:holo": "npm run build:happ && concurrently -k \"npm run start:holo:alice\" \"npm run start:holo:bob\"",
-    "start:holo:alice": "concurrently -k \"npm:chaperone-alice\" \"HC_PORT=8888 CHAPERONE_PORT=24273 ENV=holodev APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9000 npm run start:inner\"",
+    "start:holo:alice": "concurrently -k \"npm:chaperone-alice\" \"HC_PORT=8888 CHAPERONE_PORT=24273 ENV=holo APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9000 npm run start:inner\"",
     "start:holo:bob": "concurrently -k \"npm:chaperone-bob\" \"HC_PORT=8889 CHAPERONE_PORT=24274 ENV=holodev APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9001 npm run start:inner\"",
     "start:inner": "concurrently \"npm run playground\" \"npm run start:happ\" \"npm run build:watch -w @eyss/chess\" \"npm run start -w @eyss/elemental-chess\"",
     "chaperone-alice": "chaperone-server --config ./setup/chaperone_alice.json",
@@ -26,18 +26,18 @@
     "build:zome": "CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown",
     "playground": "run-singleton \"holochain-playground\"",
     "clean": "npm run clean:node && npm run clean:rust",
-    "clean:node": "rimraf node_modules && rimraf ui/elemental-chess/node_modules/  &&  rimraf test/node_modules",
-    "clean:rust": "rimraf target && rimraf .cargo"
+    "clean:node": "npx rimraf package-lock.json && npx rimraf node_modules && npx rimraf ui/elemental-chess/node_modules/ && npx rimraf ui/chess/node_modules/ && npx rimraf dna/tests/node_modules",
+    "clean:rust": "npx rimraf target && npx rimraf .cargo && npx rimraf Cargo.lock"
   },
   "devDependencies": {
-    "@holochain-playground/cli": "0.0.7",
-    "bestzip": "^2.2.0",
-    "concurrently": "^6.4.0",
+    "@holochain-playground/cli": "0.0.8",
+    "bestzip": "^2.2.1",
+    "concurrently": "^7.1.0",
     "concurrently-repeat": "^0.0.1",
     "cross-env": "^7.0.3",
     "new-port-cli": "^1.0.0",
     "rimraf": "^3.0.2",
-    "rollup-plugin-visualizer": "^5.5.2",
+    "rollup-plugin-visualizer": "^5.6.0",
     "run-singleton-cli": "^0.0.5"
   },
   "engines": {
