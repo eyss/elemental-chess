@@ -5,7 +5,7 @@
   "author": "elemental-chess",
   "version": "0.0.0",
   "scripts": {
-    "start": "concurrently --names tsc,web-dev-server \"npm run build:watch\" \"web-dev-server --config web-dev-server.config.mjs --port 1234\"",
+    "start": "concurrently --names tsc,web-dev-server \"npm run build:watch\" \"web-dev-server --config web-dev-server.config.mjs\"",
     "build": "rimraf dist && rimraf out-tsc *.tsbuildinfo && tsc && rollup -c rollup.config.js",
     "build:watch": "run-singleton \"tsc -w --incremental --preserveWatchOutput\"",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore",
