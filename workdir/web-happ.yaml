@@ -2,6 +2,6 @@
 manifest_version: "1"
 name: elemental-chess
 ui:
-  bundled: "../ui/elemental-chess/dist.zip"
+  bundled: "./elemental-chess-ui.zip"
 happ_manifest:
   bundled: "./elemental-chess.happ"

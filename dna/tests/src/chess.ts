@@ -98,12 +98,17 @@ export default function (orchestrator: Orchestrator<any>) {
         [alicePubKey]
       );
       t.equal(aliceGamesResults1[alicePubKey].length, 1);
+      console.log("test 8, alices game results",aliceGamesResults1[alicePubKey])
 
       const bobCurrentGames1 = await getCurrentGames()(bobby_conductor);
       t.equal(Object.keys(bobCurrentGames1).length, 0);
-      const bobGamesResults1 = await getGameResultsForAgents(bobby_conductor)([
-        bobbyPubKey,
-      ]);
+      console.log("finished test 9, bobs current games zero",bobCurrentGames1)
+
+      const bobGamesResults1 = await getGameResultsForAgents(bobby_conductor)(
+        [bobbyPubKey]
+      );
+      console.log("test 10, bobs game results",bobGamesResults1)
+
       t.equal(bobGamesResults1[bobbyPubKey].length, 1);
     }
   );
