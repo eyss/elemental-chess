@@ -5,7 +5,7 @@
   "author": "elemental-chess",
   "version": "0.0.0",
   "scripts": {
-    "start": "concurrently --names tsc,web-dev-server \"npm run build:watch\" \"web-dev-server --config web-dev-server.config.mjs\"",
+    "start": "concurrently --names tsc,web-dev-server \"npm run build:watch\" \"web-dev-server --config web-dev-server.config.mjs --port 1234\"",
     "build": "rimraf dist && rimraf out-tsc *.tsbuildinfo && tsc && rollup -c rollup.config.js",
     "build:watch": "run-singleton \"tsc -w --incremental --preserveWatchOutput\"",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore",
@@ -20,13 +20,14 @@
     "@eyss/turn-based-game": "github:eyss/turn-based-game#ui-build",
     "@holo-host/chaperone": "^9.0.0",
     "@holochain-open-dev/cell-client": "^0.3.5",
+    "@holochain-open-dev/context": "^0.0.3",
     "@holochain-open-dev/core-types": "^0.2.0",
     "@holochain-open-dev/profiles": "^0.0.7",
-    "@holochain-open-dev/context": "^0.0.3",
     "@open-wc/scoped-elements": "^2.1.1",
     "@scoped-elements/material-web": "^0.0.19",
+    "@webcomponents/scoped-custom-element-registry": "^0.0.5",
     "lit": "^2.2.3",
-    "lit-svelte-stores": "^0.1.3",
+    "lit-svelte-stores": "0.1.3",
     "navigo": "^8.11.1"
   },
   "devDependencies": {

@@ -10,7 +10,7 @@
     "network": "npm run build:happ && concurrently-repeat \"npm run start:agent\"",
     "start:agent": "cross-env HC_PORT=$(port) ADMIN_PORT=$(port) APP_ID=elemental-chess ENV=hcdev npm run start:inner",
     "network:holo": "npm run build:happ && concurrently -k \"npm run start:holo:alice\" \"npm run start:holo:bob\"",
-    "start:holo:alice": "concurrently -k \"npm:chaperone-alice\" \"HC_PORT=8888 CHAPERONE_PORT=24273 ENV=holodev APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9000 npm run start:inner\"",
+    "start:holo:alice": "concurrently -k \"npm:chaperone-alice\" \"HC_PORT=8888 CHAPERONE_PORT=24273 ENV=holo APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9000 npm run start:inner\"",
     "start:holo:bob": "concurrently -k \"npm:chaperone-bob\" \"HC_PORT=8889 CHAPERONE_PORT=24274 ENV=holodev APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9001 npm run start:inner\"",
     "start:inner": "concurrently \"npm run playground\" \"npm run start:happ\" \"npm run build:watch -w @eyss/chess\" \"npm run start -w @eyss/elemental-chess\"",
     "chaperone-alice": "chaperone-server --config ./setup/chaperone_alice.json",
