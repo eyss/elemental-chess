@@ -34,7 +34,8 @@ import {
 import { EntryHashB64 } from '@holochain-open-dev/core-types';
 import {
   GameResultsHistory,
-  EloRanking,
+  //EloRanking,
+  EloStore,
   eloStoreContext,
   EloRankingElement,
 } from '@eyss/elo';
@@ -69,10 +70,16 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
   _chessStore!: ContextProvider<Context<ChessStore>>;
   _profilesStore!: ContextProvider<Context<ProfilesStore>>;
   _invitationStore!: ContextProvider<Context<InvitationsStore>>;
+  _eloStore!: ContextProvider<Context<EloStore>>
 
   _myProfile = new StoreSubscriber(
     this,
     () => this._profilesStore?.value.myProfile
+  );
+
+  _myElo = new StoreSubscriber(
+    this,
+    () => this._eloStore?.value.myElo
   );
 
   async firstUpdated() {
@@ -139,7 +146,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       turnBasedGameStoreContext,
       chessStore.turnBasedGameStore
     );
-    new ContextProvider(this, eloStoreContext, chessStore.eloStore);
+    this._eloStore = new ContextProvider(this, eloStoreContext, chessStore.eloStore);
 
   }
 
@@ -227,6 +234,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
           .agentPubKey=${this._profilesStore.value.myAgentPubKey}
         ></agent-avatar>
         <span style="margin: 0 16px;">${this._myProfile.value.nickname}</span>
+        <span style="margin: 0 10px; font-weight:bold">Elo: ${this._myElo.value}</span>
       </div>
     `;
   }
