@@ -5,10 +5,10 @@ import { ChessBoardElement } from 'chessboard-element';
 // @ts-ignore
 import { Chess } from 'chess.js' 
 
-import { StoreSubscriber } from 'lit-svelte-stores';
+import { StoreSubscriber} from 'lit-svelte-stores'; //, TaskSubscriber 
 
 import {
-  CircularProgress,
+  CircularProgress, 
   List,
   ListItem,
   Card,
@@ -41,10 +41,14 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
   @contextProvided({ context: chessStoreContext })
   _chessStore!: ChessStore;
 
-  _knownProfiles = new StoreSubscriber(
-    this,
-    () => this._chessStore.profilesStore.knownProfiles
-  );
+  //_knownProfiles = new TaskSubscriber(
+   // this,
+    //() => this._chessStore.profilesStore.fetchAllProfiles()
+//);
+_knownProfiles = new StoreSubscriber(
+  this,
+  () => this._chessStore.profilesStore.knownProfiles
+);
 
   _game = new StoreSubscriber(this, () =>
     this._chessStore.turnBasedGameStore.game(this.gameHash)
@@ -89,6 +93,16 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
       await sleep(200);
       return this.getGameInfo(retriesLeft - 1);
     }
+  }
+
+  timeOutDHTResponse(move_header_hash:string){
+    setInterval(async()=>{ 
+      if (this._game.value.moves.at(this._game.value.moves.length - 1)?.header_hash === move_header_hash){
+        console.warn("two minutes of no action, polling DHT for a new move")
+        await this._chessStore.turnBasedGameStore.fetchGameMoves(this.gameHash)
+        this.render()
+      }
+    },120000)
   }
 
   async firstUpdated() {
@@ -229,6 +243,8 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
         moveHeaderHash,
         myScore
       );
+    } else {
+      this.timeOutDHTResponse(moveHeaderHash)
     }
   }
 
