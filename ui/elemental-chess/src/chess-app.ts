@@ -11,7 +11,7 @@ import {
   ListProfiles,
   profilesStoreContext,
   ProfilesStore,
-  AgentAvatar,
+  AgentAvatar
 } from '@holochain-open-dev/profiles';
 
 import {
@@ -74,7 +74,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
   _myProfile = new StoreSubscriber(
     this,
-    () => this._profilesStore?.value.myProfile
+   () => this._profilesStore?.value.myProfile
   );
 
   _myElo = new StoreSubscriber(

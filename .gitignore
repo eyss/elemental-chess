@@ -10,4 +10,3 @@ dist/
 .hc*
 *.tsbuildinfo
 .running
-package-lock.json
