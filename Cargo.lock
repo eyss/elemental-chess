@@ -215,7 +215,7 @@ dependencies = [
 [[package]]
 name = "hc_mixin_elo"
 version = "0.1.0"
-source = "git+http://github.com/eyss/elo?rev=for-hdk-v0.0.126#af59ed5050bcae82ef9d16589f155eb6cca0497e"
+source = "git+http://github.com/eyss/elo?rev=for-hdk-v0.0.126p1#8f36909083f0dc4b82658e5acd0cc6e0b6e2a184"
 dependencies = [
  "hc_lib_ranking_index",
  "hdk 0.0.126",

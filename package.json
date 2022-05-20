@@ -27,7 +27,7 @@
     "playground": "run-singleton \"holochain-playground\"",
     "clean": "npm run clean:node && npm run clean:rust",
     "clean:node": "npx rimraf node_modules && npx rimraf ui/elemental-chess/node_modules/ && npx rimraf ui/chess/node_modules/ && npx rimraf dna/tests/node_modules",
-    "clean:rust": "npx rimraf target && npx rimraf .cargo && npx rimraf Cargo.lock"
+    "clean:rust": "npx rimraf .hc* && npx rimraf target && npx rimraf .cargo && npx rimraf Cargo.lock"
   },
   "devDependencies": {
     "@holochain-playground/cli": "0.0.8",

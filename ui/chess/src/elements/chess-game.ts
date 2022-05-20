@@ -96,11 +96,10 @@ _knownProfiles = new StoreSubscriber(
   }
 
   timeOutDHTResponse(move_header_hash:string){
-    setInterval(async()=>{ 
+    setTimeout(async()=>{ 
       if (this._game.value.moves.at(this._game.value.moves.length - 1)?.header_hash === move_header_hash){
         console.warn("two minutes of no action, polling DHT for a new move")
         await this._chessStore.turnBasedGameStore.fetchGameMoves(this.gameHash)
-        this.render()
       }
     },120000)
   }

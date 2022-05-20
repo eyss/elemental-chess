@@ -71,7 +71,7 @@ export class ChessStore {
       if (JSON.stringify(e).includes('Failed to get Element')) {
         // The opponent can't get our last move yet, sleep and retry
         await sleep(2000);
-        return this.publishResult(gameHash, lastGameMoveHash, myScore);
+        //return this.publishResult(gameHash, lastGameMoveHash, myScore);
       }
       console.warn(
         'Error publishing a countersigned result, most likely the opponent is not online. Create a unilateral one.',
