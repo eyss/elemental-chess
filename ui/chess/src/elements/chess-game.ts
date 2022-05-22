@@ -95,15 +95,6 @@ _knownProfiles = new StoreSubscriber(
     }
   }
 
-  timeOutDHTResponse(move_header_hash:string){
-    setTimeout(async()=>{ 
-      if (this._game.value.moves.at(this._game.value.moves.length - 1)?.header_hash === move_header_hash){
-        console.warn("two minutes of no action, polling DHT for a new move")
-        await this._chessStore.turnBasedGameStore.fetchGameMoves(this.gameHash)
-      }
-    },120000)
-  }
-
   async firstUpdated() {
     await this.getGameInfo();
 
@@ -243,7 +234,7 @@ _knownProfiles = new StoreSubscriber(
         myScore
       );
     } else {
-      this.timeOutDHTResponse(moveHeaderHash)
+      this._chessStore.checkForMovesOnTimeout(moveHeaderHash,this._game.value.moves,this.gameHash)
     }
   }
 

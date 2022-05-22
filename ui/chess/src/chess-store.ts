@@ -1,5 +1,6 @@
 import { EloService, EloStore } from '@eyss/elo';
 import {
+  MoveInfo,
   TurnBasedGameService,
   TurnBasedGameStore,
 } from '@eyss/turn-based-game';
@@ -85,6 +86,17 @@ export class ChessStore {
       );
     }
   }
+
+
+  public checkForMovesOnTimeout(move_header_hash:string, all_game_moves:MoveInfo<ChessMove>[], gameHash:string) {
+    setTimeout(async()=>{ 
+      if (all_game_moves.at(all_game_moves.length - 1)?.header_hash === move_header_hash){
+        console.info("checking for a new move")
+        await this.turnBasedGameStore.fetchGameMoves(gameHash)
+      }
+    },60000)
+  }
+
 }
 
 export const sleep = (ms: number) =>
