@@ -92,7 +92,7 @@ fn post_commit(headers: Vec<SignedHeaderHashed>) {
         .into_iter()
         .filter(|el| header_hashes.contains(el.header_address()))
         .collect();
-
+  
     let new_game_results: Vec<CloseGameInput> = newly_created_game_results_elements
         .into_iter()
         .map(|el| {
@@ -109,15 +109,19 @@ fn post_commit(headers: Vec<SignedHeaderHashed>) {
         .collect();
 
     if new_game_results.len() > 0 {
-        call_remote(
+        let res = call_remote(
             agent_info().unwrap().agent_initial_pubkey,
             zome_info().unwrap().name,
             "close_games".into(),
             None,
             new_game_results,
-        ).unwrap();
+        ); //.unwrap();
+        //debug!("new game result call remote :{:?}", res);
+        if let Err(err) = res {
+            error!("Error executing call_remote for close_games function: {:?}", err);
+        }
     }
-
+    
     if let Err(err) = result {
         error!("Error executing the post_commit_elo function: {:?}", err);
     }

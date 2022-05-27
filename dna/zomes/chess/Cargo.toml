@@ -16,5 +16,5 @@ serde = "1"
 hdk =  {version = "0.0.126", features = ["encoding"]}
 
 chess = "3.2.0"
-hc_mixin_elo = {git = "http://github.com/eyss/elo", rev = "for-hdk-v0.0.126p1"}
+hc_mixin_elo = {git = "http://github.com/eyss/elo", rev = "for-hdk-v0.0.126"}
 hc_mixin_turn_based_game = {git = "http://github.com/eyss/turn-based-game", rev = "for-hdk-v0.0.126"}
