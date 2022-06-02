@@ -1,0 +1,12 @@
+[package]
+authors = ["guillem_cordoba"]
+edition = "2018"
+name = "peer-status"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "hc_zome_peer_status"
+
+[dependencies]
+hc_zome_peer_status = {git = "https://github.com/holochain-open-dev/peer-status", branch = "for-hdk-v0.0.126", package = "hc_zome_peer_status"}

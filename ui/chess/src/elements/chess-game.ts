@@ -22,6 +22,7 @@ import { chessStoreContext } from '../context';
 import { ChessStore } from '../chess-store';
 import { AgentPubKeyB64 } from '@holochain-open-dev/core-types';
 import { AgentAvatar } from '@holochain-open-dev/profiles';
+import { Status } from '@holochain-open-dev/peer-status'
 
 const whiteSquareGrey = '#a9a9a9';
 const blackSquareGrey = '#696969';
@@ -45,16 +46,17 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
    // this,
     //() => this._chessStore.profilesStore.fetchAllProfiles()
 //);
-_knownProfiles = new StoreSubscriber(
-  this,
-  () => this._chessStore.profilesStore.knownProfiles
-);
-
+  _knownProfiles = new StoreSubscriber(
+    this,
+    () => this._chessStore.profilesStore.knownProfiles
+  );
   _game = new StoreSubscriber(this, () =>
     this._chessStore.turnBasedGameStore.game(this.gameHash)
   );
 
   _elos = new StoreSubscriber(this, () => this._chessStore.eloStore.elos);
+
+  _opponent_status!: StoreSubscriber<Status>
 
   get myAddress() {
     return this._chessStore.profilesStore.myAgentPubKey;
@@ -97,7 +99,10 @@ _knownProfiles = new StoreSubscriber(
 
   async firstUpdated() {
     await this.getGameInfo();
-
+    this._opponent_status = new StoreSubscriber(
+      this,
+      () => this._chessStore.peerStatusStore.subscribeToAgentStatus(this.getOpponent())
+    );
     this.loading = false;
 
     this._chessStyles = '';
@@ -115,6 +120,11 @@ _knownProfiles = new StoreSubscriber(
     const myColor = this.amIWhite() ? 'w' : 'b';
 
     return turnColor === myColor;
+  }
+
+  getOnlineStatus(pubKey:AgentPubKeyB64):string{
+    if (pubKey === this._chessStore.profilesStore.myAgentPubKey) return "offline"
+    return this._opponent_status.value
   }
 
   getOpponent(): string {
@@ -328,12 +338,11 @@ _knownProfiles = new StoreSubscriber(
 
   renderPlayer(pubKey: AgentPubKeyB64) {
     return html`
-      <div class="row" style="align-items: center;">
-        <agent-avatar .agentPubKey=${pubKey}></agent-avatar>
-        <span style="flex: 1; font-size: 16px; margin-left: 8px;"
-          >${this._knownProfiles.value[pubKey].nickname}</span
-        >
-        <span style="font-size: 16px">ELO: ${this._elos.value[pubKey]}</span>
+      <div class="row ${this.getOnlineStatus(pubKey)}" style="align-items: center;">
+          <agent-avatar .agentPubKey=${pubKey}></agent-avatar>
+          <span style="flex: 1; font-size: 16px; margin-left: 8px;">${this._knownProfiles.value[pubKey].nickname}</span>
+          <span class="${this.getOnlineStatus(pubKey)}-icon"></span>
+          <span style="font-size: 16px">ELO: ${this._elos.value[pubKey]}</span>
       </div>
     `;
   }
@@ -427,6 +436,33 @@ _knownProfiles = new StoreSubscriber(
           opacity: 0.6;
           margin-bottom: 16px;
           margin-top: 4px;
+        }
+        .online-icon,
+        .idle-icon,
+        .offline-icon {
+          margin-right: 4px; 
+          border-radius: 50%;
+        }
+        .online-icon {
+          height: 16px;
+          width: 16px;
+          background-color: #00ef00;
+        }
+        .idle {
+          opacity: 0.7;
+        }
+        .idle-icon {      
+          height: 16px;
+          width: 16px;
+          background-color: #dfc800;
+        }
+        .offline {
+          opacity: 0.5;
+        }
+        .offline-icon {
+          height: 6px;
+          width: 6px;
+          border: 5px solid #7c7c7c;
         }
       `,
     ];

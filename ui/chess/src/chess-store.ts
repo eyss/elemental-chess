@@ -11,6 +11,7 @@ import {
   HeaderHashB64,
 } from '@holochain-open-dev/core-types';
 import { ProfilesStore } from '@holochain-open-dev/profiles';
+import { PeerStatusStore } from '@holochain-open-dev/peer-status';
 import { get } from 'svelte/store';
 import { ChessService } from './chess-service';
 import { ChessMove } from './types';
@@ -19,6 +20,7 @@ export class ChessStore {
   public profilesStore: ProfilesStore;
   public turnBasedGameStore: TurnBasedGameStore<ChessMove>;
   public eloStore: EloStore;
+  public peerStatusStore: PeerStatusStore
   public service: ChessService;
 
   constructor(
@@ -35,6 +37,7 @@ export class ChessStore {
       new EloService(cellClient, zomeName),
       this.profilesStore
     );
+    this.peerStatusStore = new PeerStatusStore(cellClient)
   }
 
   public async createGame(opponent: AgentPubKeyB64): Promise<EntryHashB64> {
@@ -54,6 +57,7 @@ export class ChessStore {
       this.eloStore.fetchEloForAgents(players),
       this.profilesStore.fetchAgentsProfiles(players),
     ]);
+    
   }
 
   public async publishResult(

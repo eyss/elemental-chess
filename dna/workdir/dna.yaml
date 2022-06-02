@@ -9,4 +9,6 @@ zomes:
   - name: invitations
     bundled: ../../target/wasm32-unknown-unknown/release/invitations.wasm
   - name: chess
-    bundled: ../../target/wasm32-unknown-unknown/release/hc_zome_chess.wasm    
+    bundled: ../../target/wasm32-unknown-unknown/release/hc_zome_chess.wasm   
+  - name: peer_status
+    bundled: ../../target/wasm32-unknown-unknown/release/hc_zome_peer_status.wasm    

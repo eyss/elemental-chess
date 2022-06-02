@@ -3,6 +3,7 @@ members = [
   "dna/zomes/profiles",
   "dna/zomes/chess",
   "dna/zomes/invitations",
+  "dna/zomes/peer_status"
 ]
 
 [profile.dev]
