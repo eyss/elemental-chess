@@ -123,7 +123,7 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
   }
 
   getOnlineStatus(pubKey:AgentPubKeyB64):string{
-    if (pubKey === this._chessStore.profilesStore.myAgentPubKey) return "offline"
+    if (pubKey === this._chessStore.profilesStore.myAgentPubKey) return ""
     return this._opponent_status.value
   }
 
