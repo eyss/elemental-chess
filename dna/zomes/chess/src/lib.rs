@@ -42,6 +42,12 @@ pub struct PublishResultInput {
     my_score: f32,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CloseGameInput {
+    game_hash: EntryHashB64,
+    game_result_hash: EntryHashB64,
+}
+
 #[hdk_extern]
 pub fn publish_result(result: PublishResultInput) -> ExternResult<EntryHashB64> {
     let opponent = get_opponent_for_game(result.game_hash.clone())?;
@@ -74,61 +80,20 @@ pub fn publish_game_result_and_flag(result: PublishResultInput) -> ExternResult<
     Ok(game_result_hash)
 }
 
-#[hdk_extern(infallible)]
-fn post_commit(headers: Vec<SignedHeaderHashed>) {
-    let result = post_commit_elo(headers.clone());
+/*#[hdk_extern] //uses publish_and_close branch for index_grame_result
+pub fn complete_game(input: CloseGameInput) -> ExternResult<HeaderHashB64> {
+    hc_mixin_elo::index_game_result::<ChessEloRating>(input.game_result_hash.clone())?;
+    hc_mixin_turn_based_game::remove_my_current_game(input.game_hash.clone().into())?;
 
-    let filter = ChainQueryFilter::new()
-        .entry_type(GameResult::entry_type().unwrap())
-        .include_entries(true);
-    let elements = query(filter).unwrap();
+        let result = create_link(
+            input.game_hash.into(),
+            input.game_result_hash.into(),
+            LinkType(0),
+            closing_game_result_tag(),
+        )?;
+        Ok(HeaderHashB64::from(result))
+}*/
 
-    let header_hashes: Vec<HeaderHash> = headers
-        .into_iter()
-        .map(|shh| shh.header_address().clone())
-        .collect();
-
-    let newly_created_game_results_elements: Vec<Element> = elements
-        .into_iter()
-        .filter(|el| header_hashes.contains(el.header_address()))
-        .collect();
-    /*
-    let new_game_results: Vec<CloseGameInput> = newly_created_game_results_elements
-        .into_iter()
-        .map(|el| {
-            let (_, game_result) = element_to_game_result(el.clone()).unwrap();
-            let entry_hash = el.header().entry_hash().unwrap();
-
-            let info = ChessGameInfo::try_from(game_result.game_info).unwrap();
-
-            CloseGameInput {
-                game_hash: info.game_hash,
-                game_result_hash: entry_hash.clone().into(),
-            }
-        })
-        .collect();
-
-    if new_game_results.len() > 0 {
-        let res = call_remote(
-            agent_info().unwrap().agent_initial_pubkey,
-            zome_info().unwrap().name,
-            "close_games".into(),
-            None,
-            new_game_results,
-        ); //.unwrap();
-           //debug!("new game result call remote :{:?}", res);
-        if let Err(err) = res {
-            error!(
-                "Error executing call_remote for close_games function: {:?}",
-                err
-            );
-        }
-    } */
-
-    if let Err(err) = result {
-        error!("Error executing the post_commit_elo function: {:?}", err);
-    }
-}
 
 fn get_opponent_for_game(game_hash: EntryHashB64) -> ExternResult<AgentPubKeyB64> {
     let game = get_game(game_hash)?;
@@ -146,17 +111,17 @@ fn closing_game_result_tag() -> LinkTag {
     LinkTag::new("closing_game_result")
 }
 
-fn get_my_game_results_activity() -> ExternResult<AgentActivity> {
+
+
+fn get_my_game_results_activity() -> ExternResult<Vec<Element>> {
     let chain_query = ChainQueryFilter::new().entry_type(EntryType::App(AppEntryType {
         id: entry_def_index!(GameResult)?,
         visibility: EntryVisibility::Public,
         zome_id: zome_info()?.id,
     }));
 
-    get_agent_activity(
-        agent_info()?.agent_initial_pubkey,
-        chain_query,
-        ActivityRequest::Full,
+    query(
+        chain_query
     )
 }
 
@@ -216,20 +181,15 @@ pub struct NonClosedGame {
 }
 
 #[hdk_extern]
-pub fn close_games(_: ()) -> ExternResult<()> {
+pub fn close_games(_: ()) -> ExternResult<Vec<HeaderHashB64>> {
     let my_current_games = hc_mixin_turn_based_game::get_my_current_games()?;
-
     let my_game_results_activity = get_my_game_results_activity()?;
     let header_hash: Vec<HeaderHash> = my_game_results_activity
-        .valid_activity
         .into_iter()
-        .map(|(_, h)| h)
+        .map(|element| element.header_address().clone())
         .collect();
-
     let game_results = get_game_results(header_hash)?;
-
     let game_results_by_game_hash = index_game_results_by_game_hash(game_results)?;
-
     let non_closed_games: Vec<NonClosedGame> = my_current_games
         .keys()
         .filter_map(|current_game_hash| {
@@ -242,7 +202,8 @@ pub fn close_games(_: ()) -> ExternResult<()> {
             )
         })
         .collect();
-
+    //debug!("game_results_by_game_hash: {:?}",game_results_by_game_hash);
+    let mut linked_results: Vec<HeaderHashB64> = Vec::new();
     for non_closed_game in non_closed_games {
         hc_mixin_elo::index_game_result_if_not_exists::<ChessEloRating>(
             non_closed_game.game_result.clone(),
@@ -250,13 +211,14 @@ pub fn close_games(_: ()) -> ExternResult<()> {
         )?;
         hc_mixin_turn_based_game::remove_my_current_game(non_closed_game.game_hash.clone().into())?;
 
-        create_link(
+        let result = create_link(
             non_closed_game.game_hash.into(),
             non_closed_game.game_result_hash.into(),
             LinkType(0),
             closing_game_result_tag(),
         )?;
+        linked_results.push(HeaderHashB64::from(result))
     }
-
-    Ok(())
+    Ok(linked_results)
+    //Ok(())
 }

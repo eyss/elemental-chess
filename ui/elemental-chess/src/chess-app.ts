@@ -94,6 +94,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       })
       .resolve();
     this._loading = false;
+    await this._chessStore.value.closeFinishedGames()
   }
 
   createClient(): Promise<BaseClient> {
@@ -116,7 +117,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
 
     const chessStore = new ChessStore(this._cellClient);
 
-    // Fetching our profile has a side-effect of executing init
+    //  Fetching our profile has a side-effect of executing init
     await chessStore.profilesStore.fetchMyProfile();
 
     this._profilesStore = new ContextProvider(
@@ -252,7 +253,10 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
               <mwc-icon-button
                 icon="arrow_back"
                 slot="navigationIcon"
-                @click=${() => router.navigate('/')}
+                @click=${() => {
+                  router.navigate('/')
+                  this._chessStore.value.closeFinishedGames()
+                }}
               ></mwc-icon-button>
             `
           : html``}

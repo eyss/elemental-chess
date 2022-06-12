@@ -37,6 +37,14 @@ export class ChessService {
     });
   }
 
+  closeGames(){
+    return this.callZome('close_games', null)
+  }
+  
+  completeGame(gameHash:EntryHashB64, gameResultHash: EntryHashB64 ):Promise<void>{
+    return this.callZome('complete_game', { game_hash: gameHash, game_result_hash: gameResultHash});
+  }
+
   private callZome(fn_name: string, payload: any) {
     return this.cellClient.callZome(this.zomeName, fn_name, payload);
   }

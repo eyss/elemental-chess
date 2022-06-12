@@ -60,24 +60,62 @@ export class ChessStore {
     
   }
 
-  public async publishResult(
+  public async publishResultCloseGame(
     gameHash: EntryHashB64,
     lastGameMoveHash: HeaderHashB64,
     myScore: 1.0 | 0.5 | 0.0
   ): Promise<void> {
+    let publishHash = await this.publishResult(gameHash, lastGameMoveHash, myScore)
+    console.log("publish_hash:",publishHash)
+    if (publishHash){
+      await sleep(1000)
+      let header_hashes: HeaderHashB64[] | undefined;
+      const numRetries = 10;
+      let retryCount = 0;
+
+      while (!header_hashes && retryCount < numRetries) {
+        try {
+          header_hashes = await this.service.closeGames()
+        } catch (e) {
+        // Retry if we can't see previous move hash yet
+        if (JSON.stringify(e).includes("chain was locked for a countersigning session")) {
+          await sleep(2000);
+          console.log(JSON.stringify(e))
+        } else {
+          console.log("unknown error",JSON.stringify(e))
+          await sleep(2000);
+        }
+      }
+      retryCount += 1;
+    }
+
+    if (!header_hashes)
+      console.log("close games failed")
+    else
+      console.log("closed_hashes: ",header_hashes)
+    }
+  }
+
+  private async publishResult(
+    gameHash: EntryHashB64,
+    lastGameMoveHash: HeaderHashB64,
+    myScore: 1.0 | 0.5 | 0.0
+  ): Promise<EntryHashB64> {
+    let entryhash: EntryHashB64 | undefined
     try {
       await sleep(500);
-      await this.service.publishResult(
+      entryhash = await this.service.publishResult(
         gameHash,
         lastGameMoveHash,
         myScore
       );
     } catch (e) {
-      if (JSON.stringify(e).includes('Failed to get Element')) {
-        // The opponent can't get our last move yet, sleep and retry
+      if (JSON.stringify(e).includes('Failed to get Element') || JSON.stringify(e).includes('chain was locked for a countersigning session')) {
+        // The opponent can't get our last move yet, sleep and retry 
         await sleep(2000);
         return this.publishResult(gameHash, lastGameMoveHash, myScore);
       }
+
       console.warn('Error publishing a countersigned result, most likely the opponent is not online. Create a unilateral one.',e);
 
       await this.service.publishGameResultAndFlag(
@@ -86,6 +124,10 @@ export class ChessStore {
         myScore
       );
     }
+    if (!entryhash)
+      throw Error("publish result failed")
+
+    return entryhash
   }
 
 
@@ -98,6 +140,10 @@ export class ChessStore {
     },60000)
   }
 
+  public async closeFinishedGames(){
+    let headerhashes = await this.service.closeGames()
+    console.log("closed games: ",headerhashes)
+  }
 }
 
 export const sleep = (ms: number) =>

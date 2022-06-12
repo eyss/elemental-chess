@@ -20,7 +20,7 @@ import { sharedStyles } from './sharedStyles';
 import { ChessMove } from '../types';
 import { chessStoreContext } from '../context';
 import { ChessStore } from '../chess-store';
-import { AgentPubKeyB64 } from '@holochain-open-dev/core-types';
+import { AgentPubKeyB64, HeaderHashB64 } from '@holochain-open-dev/core-types';
 import { AgentAvatar } from '@holochain-open-dev/profiles';
 import { Status } from '@holochain-open-dev/peer-status'
 
@@ -228,17 +228,40 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
   }
 
   async makeMove(move: ChessMove) {
-    const moveHeaderHash = await this._chessStore.turnBasedGameStore.makeMove(
-      this.gameHash,
-      move
-    );
+    const numRetries = 10;
+    let retryCount = 0;
+    let moveHeaderHash: HeaderHashB64 | undefined;
+    while (!moveHeaderHash && retryCount < numRetries) {
+      try {
+        moveHeaderHash = await this._chessStore.turnBasedGameStore.makeMove(
+          this.gameHash,
+          move
+        );
+      } catch (e) {
+        // Retry if we can't see previous move hash yet
+        if (
+          JSON.stringify(e).includes("Could not make the move since we don't see the previous move from our opponent")
+        ) {
+          console.log(e)
+          await sleep(1000);
+        } else {
+          console.log("unknown error: ",JSON.stringify(e))
+          await sleep(1000);
+          //throw e;
+        }
+      } 
+      retryCount += 1;
+    }
+    if (!moveHeaderHash){
+      console.log("network is busy, try again later"); //TODO put this message in the UI
+      return
+    }
 
     if (this.isGameOver()) {
       // Publish result
-
       const myScore = this.getMyScore(move);
-
-      await this._chessStore.publishResult(
+      await sleep(1000)
+      await this._chessStore.publishResultCloseGame(
         this.gameHash,
         moveHeaderHash,
         myScore
