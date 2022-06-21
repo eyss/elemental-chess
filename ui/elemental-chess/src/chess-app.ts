@@ -37,7 +37,7 @@ import {
   //EloRanking,
   EloStore,
   eloStoreContext,
-  EloRankingElement,
+  //EloRankingElement,
 } from '@eyss/elo';
 import {
   MyCurrentGames,
@@ -197,7 +197,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
             ></invitations-list>
           </div>
           <div class="row" style="flex: 1; width: 1200px;">
-            <elo-ranking style="flex: 1; margin-right: 24px;"></elo-ranking>
+            <!--<elo-ranking style="flex: 1; margin-right: 24px;"></elo-ranking>-->
             <game-results-history style="flex: 1; margin-right: 24px;"></game-results-history>
             <my-current-games
               style="flex: 1;"
@@ -277,7 +277,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
       'mwc-icon-button': IconButton,
       'mwc-card': Card,
       'profile-prompt': ProfilePrompt,
-      'elo-ranking': EloRankingElement,
+      //'elo-ranking': EloRankingElement,
       'agent-avatar': AgentAvatar,
       'list-profiles': ListProfiles,
       'chess-game': ChessGame,
