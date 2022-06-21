@@ -93,8 +93,8 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
         this._activeGameHash = undefined;
       })
       .resolve();
-    this._loading = false;
     await this._chessStore.value.closeFinishedGames()
+    this._loading = false;
   }
 
   createClient(): Promise<BaseClient> {
@@ -198,9 +198,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
           </div>
           <div class="row" style="flex: 1; width: 1200px;">
             <elo-ranking style="flex: 1; margin-right: 24px;"></elo-ranking>
-            <game-results-history
-              style="flex: 1; margin-right: 24px;"
-            ></game-results-history>
+            <game-results-history style="flex: 1; margin-right: 24px;"></game-results-history>
             <my-current-games
               style="flex: 1;"
               @open-game=${(e: CustomEvent) => this.openGame(e.detail.gameHash)}
@@ -254,8 +252,7 @@ export class ChessApp extends ScopedElementsMixin(LitElement) {
                 icon="arrow_back"
                 slot="navigationIcon"
                 @click=${() => {
-                  router.navigate('/')
-                  this._chessStore.value.closeFinishedGames()
+                  this._chessStore.value.closeFinishedGames().then(()=>router.navigate('/'))
                 }}
               ></mwc-icon-button>
             `

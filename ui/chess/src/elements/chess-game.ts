@@ -228,30 +228,19 @@ export class ChessGame extends ScopedElementsMixin(LitElement) {
   }
 
   async makeMove(move: ChessMove) {
-    const numRetries = 10;
-    let retryCount = 0;
     let moveHeaderHash: HeaderHashB64 | undefined;
-    while (!moveHeaderHash && retryCount < numRetries) {
+
       try {
         moveHeaderHash = await this._chessStore.turnBasedGameStore.makeMove(
           this.gameHash,
           move
         );
       } catch (e) {
-        // Retry if we can't see previous move hash yet
-        if (
-          JSON.stringify(e).includes("Could not make the move since we don't see the previous move from our opponent")
-        ) {
-          console.log(e)
-          await sleep(1000);
-        } else {
-          console.log("unknown error: ",JSON.stringify(e))
-          await sleep(1000);
-          //throw e;
-        }
+        // turn based game failed makemove
+          console.log(JSON.stringify(e))
       } 
-      retryCount += 1;
-    }
+
+    
     if (!moveHeaderHash){
       console.log("network is busy, try again later"); //TODO put this message in the UI
       return
