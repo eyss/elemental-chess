@@ -7,12 +7,15 @@
   ],
   "scripts": {
     "start": "npm run build:happ && npm run start:agent",
-    "network": "npm run build:happ && concurrently-repeat \"npm run start:agent\"",
-    "start:agent": "cross-env HC_PORT=$(port) ADMIN_PORT=$(port) APP_ID=elemental-chess ENV=hcdev npm run start:inner",
+    "network":       "npm run build:happ && concurrently-repeat \"npm run start:agent\"",
+    "network-react": "npm run build:happ && concurrently-repeat \"npm run start:agent-react\"",
+    "start:agent":       "cross-env HC_PORT=$(port) ADMIN_PORT=$(port) APP_ID=elemental-chess ENV=hcdev npm run start:inner",
+    "start:agent-react": "cross-env HC_PORT=$(port) ADMIN_PORT=$(port) APP_ID=elemental-chess ENV=hcdev npm run start:inner-react",
     "network:holo": "npm run build:happ && concurrently -k \"npm run start:holo:alice\" \"npm run start:holo:bob\"",
     "start:holo:alice": "concurrently -k \"npm:chaperone-alice\" \"HC_PORT=8888 CHAPERONE_PORT=24273 ENV=holodev APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9000 npm run start:inner\"",
     "start:holo:bob": "concurrently -k \"npm:chaperone-bob\" \"HC_PORT=8889 CHAPERONE_PORT=24274 ENV=holodev APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL ADMIN_PORT=9001 npm run start:inner\"",
-    "start:inner": "concurrently \"npm run playground\" \"npm run start:happ\" \"npm run build:watch -w @eyss/chess\" \"npm run start -w @eyss/elemental-chess\"",
+    "start:inner":       "concurrently \"npm run playground\" \"npm run start:happ\" \"npm run build:watch -w @eyss/chess\" \"npm run start -w @eyss/elemental-chess\"",
+    "start:inner-react": "concurrently \"npm run playground\" \"npm run start:happ\" \"npm run build:watch -w @eyss/chess\" \"npm start -w @eyss/elemental-chess-react\"",
     "chaperone-alice": "chaperone-server --config ./setup/chaperone_alice.json",
     "chaperone-bob": "chaperone-server --config ./setup/chaperone_bob.json",
     "test": "npm run build:happ && npm t -w tests",
@@ -26,7 +29,7 @@
     "build:zome": "CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown",
     "playground": "run-singleton \"holochain-playground\"",
     "clean": "npm run clean:node && npm run clean:rust",
-    "clean:node": "npx rimraf node_modules && npx rimraf ui/elemental-chess/node_modules/ && npx rimraf ui/chess/node_modules/ && npx rimraf dna/tests/node_modules",
+    "clean:node": "npx rimraf node_modules && npx rimraf ui/elemental-chess/node_modules/ && npx rimraf ui/chess/node_modules/ && npx rimraf ui/ui-react/node_modules/ && npx rimraf dna/tests/node_modules ",
     "clean:rust": "npx rimraf .hc* && npx rimraf target && npx rimraf .cargo && npx rimraf Cargo.lock"
   },
   "devDependencies": {
